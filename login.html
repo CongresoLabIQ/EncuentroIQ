@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Congreso Estudiantil de Laboratorios de Ingeniería Química</div>
+                </div>
+            </div>
+            <nav class="top-bar-nav d-none d-lg-flex">
+                <a href="index.html" class="top-bar-link">Inicio</a>
+                <a href="login.html" class="top-bar-link active">Ingresar</a>
+                <a href="register.html" class="top-bar-link">Registro</a>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li class="active">Iniciar Sesión</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <div class="login-card card">
+            <div class="card-header text-center">
+                <h4 class="mb-0 fw-bold">Iniciar Sesión</h4>
+            </div>
+            <div class="card-body p-4">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control form-control-lg" id="email" required
+                            placeholder="tu@email.com">
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control form-control-lg" id="password" required
+                                placeholder="••••••">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="togglePassword('password', this)">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-unam w-100 py-2 mb-2">
+                        Ingresar al Portal
+                    </button>
+                    <a href="mailto:sistema.congresolabiq@gmail.com?subject=Recuperar%20Contraseña&body=Olvide%20mi%20contraseña%2C%20mi%20correo%20es%3A"
+                        class="text-muted small text-decoration-none">
+                        ¿Olvidaste tu contraseña? <u>Haz clic aquí para enviarnos un correo</u>
+                    </a>
+                </form>
+                <div class="text-center mt-3">
+                    <p class="text-muted mb-1">¿No tienes cuenta?</p>
+                    <a href="register.html" class="text-decoration-none fw-bold">Regístrate aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerText = "🔒";
+            } else {
+                input.type = "password";
+                btn.innerText = "👁️";
+            }
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('PWA lista para instalar'))
+                    .catch(err => console.log('Error al registrar PWA', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

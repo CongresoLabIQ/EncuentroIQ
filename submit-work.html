@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Trabajo - Portal Congreso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Congreso Estudiantil de Laboratorios de Ingeniería Química</div>
+                </div>
+            </div>
+            <nav class="top-bar-nav d-none d-lg-flex">
+                <a href="student-dashboard.html" class="top-bar-link active">← Volver</a>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="student-dashboard.html">Panel del Alumno</a></li>
+                <li class="active">Enviar Trabajo</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="content-card">
+            <div class="content-card-header">Enviar Nuevo Trabajo</div>
+            <div class="content-card-body">
+                <form id="submitWorkForm">
+                    <!-- Título -->
+                    <div class="mb-4">
+                        <label for="title" class="form-label fw-bold">Título del Trabajo *</label>
+                        <input type="text" class="form-control form-control-lg" id="title" required
+                            placeholder="Ej: Investigación sobre...">
+                    </div>
+
+                    <!-- Semestre -->
+                    <div class="mb-4">
+                        <label for="semester" class="form-label fw-bold">Semestre Actual *</label>
+                        <select class="form-select form-select-lg" id="semester" required>
+                            <option value="">Selecciona tu semestre...</option>
+                            <option value="1er Semestre">1er Semestre</option>
+                            <option value="2do Semestre">2do Semestre</option>
+                            <option value="3er Semestre">3er Semestre</option>
+                            <option value="4to Semestre">4to Semestre</option>
+                            <option value="5to Semestre">5to Semestre</option>
+                            <option value="6to Semestre">6to Semestre</option>
+                            <option value="7mo Semestre">7mo Semestre</option>
+                            <option value="8vo Semestre">8vo Semestre</option>
+                            <option value="9no Semestre">9no Semestre</option>
+                        </select>
+                    </div>
+                    <!-- Grupo -->
+                    <div class="mb-4">
+                        <label for="group" class="form-label fw-bold">Grupo *</label>
+                        <input type="text" class="form-control form-control-lg" id="group" required
+                            placeholder="Ej: 1301 o 2152">
+                    </div>
+
+                    <!-- Profesor a cargo -->
+                    <div class="mb-4">
+                        <label for="professorInCharge" class="form-label fw-bold">Profesor a cargo de la asignatura
+                            *</label>
+                        <select class="form-select form-select-lg" id="professorInCharge" required disabled>
+                            <option value="">Primero selecciona un semestre...</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo Manual (Se activa si elige "Otro") -->
+                    <div id="manualProfessorGroup" class="mb-4 d-none">
+                        <label for="manualProfessor" class="form-label fw-bold text-primary">Escribe el nombre completo
+                            del profesor *</label>
+                        <input type="text" class="form-control form-control-lg border-primary" id="manualProfessor"
+                            placeholder="Ej: Dr. Juan Pérez">
+                        <div class="form-text">Si tu profesor no aparece en la lista, escríbelo aquí respetando
+                            mayúsculas y minúsculas.</div>
+                    </div>
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold mb-0">Integrantes del Equipo (Autores) *</label>
+                            <span id="memberCounter" class="badge bg-secondary">0 / 10</span>
+                        </div>
+                        <p class="small text-muted mb-2">Ingresa el nombre completo tal como quieres que aparezca en la
+                            constancia y presiona "Agregar".</p>
+
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="memberInput"
+                                placeholder="Ej: Juan Pérez García">
+                            <button class="btn btn-outline-primary" type="button" onclick="addMember()">➕
+                                Agregar</button>
+                        </div>
+
+                        <!-- Lista visual de integrantes -->
+                        <div id="membersList" class="d-flex flex-wrap"></div>
+                        <div id="membersError" class="text-danger small mt-1 d-none">Debes agregar al menos un
+                            integrante.</div>
+                    </div>
+
+                    <!-- Resumen -->
+                    <div class="mb-4">
+                        <label for="abstract" class="form-label fw-bold">Palabras clave / Keywords *</label>
+                        <textarea class="form-control" id="abstract" rows="4" placeholder="Máximo 5 palabras clave..."
+                            required></textarea>
+                    </div>
+
+                    <!-- Subida de Archivo -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Subir Archivo PDF *</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <p class="h2">📎</p>
+                            <p class="mb-0 fw-bold" id="fileName">Haz clic para seleccionar archivo</p>
+                            <small class="text-muted">Solo formato PDF (Máx 10MB)</small>
+                            <input type="file" class="d-none" id="fileInput" accept=".pdf" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 d-none" id="progressGroup">
+                        <label class="form-label fw-bold">Subiendo archivo...</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgressBar"
+                                role="progressbar" style="width: 0%;">0%</div>
+                        </div>
+                        <small class="text-muted mt-1" id="progressText">Iniciando...</small>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg" id="submitButton">
+                            📤 Enviar Trabajo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script>
+        // --- VARIABLES GLOBALES ---
+        let members = [];
+        const semesterSelect = document.getElementById('semester');
+        const professorSelect = document.getElementById('professorInCharge');
+        const manualGroup = document.getElementById('manualProfessorGroup');
+        const manualInput = document.getElementById('manualProfessor');
+        const fileInput = document.getElementById('fileInput');
+
+        // --- 1. LÓGICA DE INTEGRANTES (MÁXIMO 10) ---
+        function addMember() {
+            const input = document.getElementById('memberInput');
+            const name = input.value.trim().toUpperCase();
+
+            if (!name) return;
+            if (members.length >= 10) {
+                showToast('Límite alcanzado: Solo se permiten máximo 10 integrantes.', 'warning');
+                return;
+            }
+            if (members.includes(name)) return showToast('Este integrante ya está en la lista.', 'warning');
+
+            members.push(name);
+            input.value = '';
+            renderMembers();
+        }
+
+        function removeMember(index) {
+            members.splice(index, 1);
+            renderMembers();
+        }
+
+        function renderMembers() {
+            const container = document.getElementById('membersList');
+            const counter = document.getElementById('memberCounter');
+            const input = document.getElementById('memberInput');
+            const btn = document.querySelector('button[onclick="addMember()"]');
+
+            container.innerHTML = members.map((m, i) => `
+        <span class="badge bg-white text-dark border member-badge shadow-sm">
+            👤 ${m} 
+            <button type="button" class="btn-close btn-close-sm ms-2" onclick="removeMember(${i})" style="font-size: 0.5rem;"></button>
+        </span>
+    `).join('');
+
+            counter.textContent = `${members.length} / 10`;
+            counter.className = members.length >= 10 ? "badge bg-danger" : "badge bg-secondary";
+
+            // Bloquear si llega a 10
+            const isFull = members.length >= 10;
+            input.disabled = isFull;
+            input.placeholder = isFull ? "Límite alcanzado" : "Ej: Juan Pérez García";
+            btn.disabled = isFull;
+
+            if (members.length > 0) document.getElementById('membersError').classList.add('d-none');
+        }
+
+        // --- 2. LÓGICA DE PROFESORES DINÁMICOS ---
+
+        // Detectar cambio de semestre para cargar lista de profesores
+        semesterSelect.addEventListener('change', async () => {
+            const selectedSemester = semesterSelect.value;
+            manualGroup.classList.add('d-none'); // Esconder campo manual al cambiar semestre
+
+            if (!selectedSemester) {
+                professorSelect.disabled = true;
+                professorSelect.innerHTML = '<option value="">Primero selecciona un semestre...</option>';
+                return;
+            }
+
+            professorSelect.disabled = true;
+            professorSelect.innerHTML = '<option value="">⏳ Cargando profesores...</option>';
+
+            try {
+                const response = await window.apiClient.getProfessorsBySemester(selectedSemester);
+                if (response.success && response.data.length > 0) {
+                    professorSelect.disabled = false;
+                    let options = '<option value="">-- Selecciona a tu profesor --</option>';
+                    response.data.forEach(p => options += `<option value="${p.name}">${p.name}</option>`);
+                    options += `<option value="Otro">Otro (No está en la lista)</option>`;
+                    professorSelect.innerHTML = options;
+                } else {
+                    professorSelect.disabled = false;
+                    professorSelect.innerHTML = '<option value="Otro">Otro (Escribir manualmente)</option>';
+                    manualGroup.classList.remove('d-none'); // Mostrar manual si no hay lista
+                }
+            } catch (e) {
+                showToast("Error al conectar con la base de datos de profesores.", 'error');
+            }
+        });
+
+        // Mostrar/Ocultar campo manual si eligen "Otro"
+        professorSelect.addEventListener('change', () => {
+            if (professorSelect.value === 'Otro') {
+                manualGroup.classList.remove('d-none');
+                manualInput.required = true;
+                manualInput.focus();
+            } else {
+                manualGroup.classList.add('d-none');
+                manualInput.required = false;
+                manualInput.value = '';
+            }
+        });
+
+        // --- 3. MANEJO DE ARCHIVOS (PDF) ---
+        const area = document.getElementById('fileUploadArea');
+        area.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                const file = e.target.files[0];
+                if (file.type !== 'application/pdf') {
+                    showToast('Solo se permiten archivos PDF', 'error');
+                    fileInput.value = '';
+                    return;
+                }
+                document.getElementById('fileName').textContent = "✅ " + file.name;
+                area.style.borderColor = "#198754";
+            }
+        });
+
+        // --- 4. ENVÍO DEL FORMULARIO ---
+        document.getElementById('submitWorkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validar integrantes
+            if (members.length === 0) {
+                document.getElementById('membersError').classList.remove('d-none');
+                showToast('Agrega al menos un integrante.', 'warning');
+                return;
+            }
+
+            // Validar nombre de profesor
+            let finalProfessorName = professorSelect.value;
+            if (finalProfessorName === 'Otro') {
+                finalProfessorName = manualInput.value.trim();
+            }
+            if (!finalProfessorName) return showToast("Selecciona o escribe el nombre del profesor.", 'warning');
+
+            if (fileInput.files.length === 0) return showToast('Selecciona un archivo PDF', 'warning');
+
+            const btn = document.getElementById('submitButton');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando...';
+
+            const progressGroup = document.getElementById('progressGroup');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('progressText');
+
+            progressGroup.classList.remove('d-none');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            btn.classList.add('d-none');
+
+            try {
+                const session = await window.apiClient.checkAuth();
+                const membersString = members.join(', ');
+
+                const workData = {
+                    student_id: session.user.id,
+                    title: document.getElementById('title').value,
+                    abstract: document.getElementById('abstract').value,
+                    semester: semesterSelect.value,
+                    group: document.getElementById('group').value,
+                    professor_cargo: finalProfessorName,
+                    team_members: membersString
+                };
+
+                const result = await window.apiClient.submitWork(workData, fileInput.files[0], (e) => {
+                    if (e.lengthComputable) {
+                        const pct = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = pct + '%';
+                        progressBar.textContent = pct + '%';
+                        progressText.textContent = `Subiendo... ${pct}% (${(e.loaded / 1024 / 1024).toFixed(1)} MB de ${(e.total / 1024 / 1024).toFixed(1)} MB)`;
+                    }
+                });
+
+                if (result.success) {
+                    progressBar.className = 'progress-bar bg-success';
+                    progressBar.textContent = '100%';
+                    progressText.textContent = '¡Completado! Redirigiendo...';
+                    showToast('Trabajo enviado correctamente. ID asignado: ' + result.shortId, 'success');
+                    setTimeout(() => { window.location.href = 'student-dashboard.html'; }, 1500);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                progressGroup.classList.add('d-none');
+                btn.classList.remove('d-none');
+                showToast('Error: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '📤 Enviar Trabajo';
+            }
+        });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('PWA lista para instalar'))
+                    .catch(err => console.log('Error al registrar PWA', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

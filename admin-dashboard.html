@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | LABIQ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Panel Administrativo</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="top-bar-link" style="cursor:default;"><svg width="16" height="16" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg> Administrador</span>
+                <button class="top-bar-link" onclick="handleLogout()">Salir</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li class="active">Panel Administrativo</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <div class="row">
+
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="sidebar-card">
+                    <div class="sidebar-header">Menú</div>
+                    <div class="sidebar-nav">
+                        <button class="sidebar-link active-section" onclick="showSection('dashboard')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                            Dashboard
+                        </button>
+                        <button class="sidebar-link" onclick="showSection('works')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <path d="M12 20h9" />
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                            </svg>
+                            Pendientes
+                        </button>
+                        <button class="sidebar-link" onclick="showSection('assignments')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                            Asignaciones
+                        </button>
+                        <button class="sidebar-link" onclick="showSection('ready')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <polyline points="9 11 12 14 22 4" />
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                            </svg>
+                            Dictaminar
+                            <span id="readyBadge" class="badge bg-danger rounded-pill d-none">0</span>
+                        </button>
+                        <button class="sidebar-link" onclick="showSection('schedule')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            Horarios
+                        </button>
+                        <button class="sidebar-link" onclick="showSection('event')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" class="me-2">
+                                <circle cx="12" cy="8" r="6" />
+                                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                            </svg>
+                            Fase 2
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="col-lg-9">
+
+                <div class="stats-row mb-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalWorks">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="pendingWorks">0</span>
+                        <span class="stat-label">Pendientes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="assignedWorks">0</span>
+                        <span class="stat-label">En Revisión</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="completedWorks">0</span>
+                        <span class="stat-label">Dictaminados</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mb-4">
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                            <polyline points="23 4 23 10 17 10" />
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+
+                <!-- Sección Dashboard (default) -->
+                <div id="dashboardSection">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        <h3 class="mb-0">Evaluaciones · Seguimiento</h3>
+                        <span class="text-muted small ms-auto" id="dashboardUpdated"></span>
+                    </div>
+
+                    <!-- Progreso de evaluaciones por trabajo -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0">
+                            <div class="px-3 pt-3 pb-2 d-flex flex-wrap gap-1 border-bottom" id="evalFilterBar">
+                                <span class="text-muted small me-1 align-self-center">Filtrar:</span>
+                                <button class="btn btn-sm btn-outline-secondary active-filter" data-filter="status"
+                                    data-value="all" onclick="setEvalFilter('status','all')">Todos</button>
+                                <button class="btn btn-sm btn-outline-warning" data-filter="status" data-value="pending"
+                                    onclick="setEvalFilter('status','pending')">Pendiente</button>
+                                <button class="btn btn-sm btn-outline-info" data-filter="status"
+                                    data-value="under_review" onclick="setEvalFilter('status','under_review')">En
+                                    Revisión</button>
+                                <button class="btn btn-sm btn-outline-success" data-filter="status"
+                                    data-value="dictaminados"
+                                    onclick="setEvalFilter('status','dictaminados')">Dictaminados</button>
+                                <span class="text-muted small mx-1 align-self-center">|</span>
+                                <button class="btn btn-sm btn-outline-primary" data-filter="modality" data-value="all"
+                                    onclick="setEvalFilter('modality','all')">Oral + Cartel</button>
+                                <button class="btn btn-sm btn-outline-primary" data-filter="modality" data-value="oral"
+                                    onclick="setEvalFilter('modality','oral')">Solo Oral</button>
+                                <button class="btn btn-sm btn-outline-success" data-filter="modality"
+                                    data-value="poster" onclick="setEvalFilter('modality','poster')">Solo
+                                    Cartel</button>
+                                <span class="text-muted small mx-1 align-self-center">|</span>
+                                <button class="btn btn-sm btn-outline-dark" data-filter="sortBy" data-value="default"
+                                    onclick="setEvalFilter('sortBy','default')">Orden original</button>
+                                <button class="btn btn-sm btn-outline-dark" data-filter="sortBy" data-value="score"
+                                    onclick="setEvalFilter('sortBy','score')">Por calificación</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table data-table table-hover align-middle mb-0" id="evalProgressTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width:200px;">Trabajo</th>
+                                            <th>Semestre</th>
+                                            <th>Tipo</th>
+                                            <th style="width:140px;">Evaluadores</th>
+                                            <th style="width:80px;">Promedio</th>
+                                            <th style="width:130px;">Estatus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="evalProgressBody">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">Cargando datos...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Asignaciones -->
+                <div id="assignmentsSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        <h3 class="mb-0">Detalle de Asignaciones</h3>
+                    </div>
+                    <div id="assignmentsList"></div>
+                </div>
+
+                <!-- Sección Dictamen -->
+                <div id="readySection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 11 12 14 22 4" />
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        <h3 class="text-success mb-0">Dictamen Final (Fase 1)</h3>
+                    </div>
+                    <div class="alert alert-info d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                        <span>Solo aparecen trabajos con las <strong>3 evaluaciones completadas</strong>. El sistema
+                            aplica la regla de <strong>Top 2 por semestre</strong> para ponencias.</span>
+                    </div>
+                    <button class="btn btn-success fw-bold w-100 mb-4 py-3 shadow" onclick="finalizeAllReadyWorks()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                            <polyline points="9 11 12 14 22 4" />
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        DICTAMINAR Y NOTIFICAR TODOS
+                    </button>
+                    <div id="readyWorksList"></div>
+                </div>
+
+                <!-- Sección Pendientes -->
+                <div id="worksSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                        </svg>
+                        <h3 class="mb-0">Trabajos por Asignar</h3>
+                    </div>
+                    <div class="alert alert-warning d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        <span>Cada trabajo será asignado a <strong>3 evaluadores distintos</strong> seleccionados al
+                            azar.</span>
+                    </div>
+                    <button class="btn btn-warning fw-bold w-100 mb-3 py-3" onclick="assignAllPendingWorks()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                        Asignar Todos Automáticamente (3 evaluadores c/u)
+                    </button>
+                    <div id="pendingWorksList"></div>
+                </div>
+
+                <!-- Sección Horarios -->
+                <div id="scheduleSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <h2 class="mb-0" style="color: #0d6efd;">Horario General de Ponencias</h2>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" onclick="renderGeneralSchedule()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                            </svg>
+                            Refrescar
+                        </button>
+                        <button class="btn btn-outline-dark" onclick="printSchedule()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                                <polyline points="6 9 6 2 18 2 18 9" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            Imprimir
+                        </button>
+                    </div>
+
+                    <div class="table-responsive" id="schedulePrintable">
+                        <table class="table table-bordered align-middle text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Hora</th>
+                                    <th style="width: 42%;">Auditorio UMIEZ</th>
+                                    <th style="width: 42%;">Auditorio Principal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sección Fase 2 -->
+                <div id="eventSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6610f2" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="6" />
+                            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                        </svg>
+                        <h2 class="mb-0" style="color: #6610f2;">Fase 2: Evento Presencial</h2>
+                    </div>
+
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 mb-3 mb-md-0">
+                                    <h5 class="fw-bold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                        Asignación de Jueces Presenciales
+                                    </h5>
+                                    <p class="mb-0 text-muted">Asigna 3 evaluadores aleatorios a todos los trabajos
+                                        aceptados.</p>
+                                </div>
+                                <div class="col-md-5 text-md-end">
+                                    <button class="btn btn-primary btn-lg w-100 w-md-auto" onclick="assignLiveJudges()">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-2">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <line x1="12" y1="8" x2="12" y2="16" />
+                                            <line x1="8" y1="12" x2="16" y2="12" />
+                                        </svg>
+                                        Asignar evaluadores Fase 2
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4 border-warning bg-light border-2">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 mb-3 mb-md-0">
+                                    <h5 class="text-warning fw-bold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <path
+                                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                            <line x1="12" y1="9" x2="12" y2="13" />
+                                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                                        </svg>
+                                        Caso de Emergencia
+                                    </h5>
+                                    <p class="mb-0 small">Si un juez no asistió, asigna a un profesor disponible a un
+                                        trabajo específico.</p>
+                                </div>
+                                <div class="col-md-5 text-md-end">
+                                    <button class="btn btn-warning fw-bold" onclick="openEmergencyModal()">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                        Asignar Juez de Emergencia
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-dark w-100 mb-3 py-3" onclick="enviarAgendas()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                        Enviar Agendas por Correo a todos los Jueces
+                    </button>
+
+                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2" style="color: #6610f2;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                        Reconocimientos por Ciclo Académico
+                    </h3>
+                    <div class="row mb-4" id="winnersByCycle">
+                        <div class="col-12 text-center text-muted py-3">Cargando mejores de cada ciclo...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <!-- Modal Progreso -->
+    <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary mb-3" style="width:3.5rem;height:3.5rem;" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <h5 id="progressMessage" class="fw-semibold">Procesando...</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Emergencia -->
+    <div class="modal fade" id="emergencyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                            <path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        Asignación de Emergencia
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Seleccionar Trabajo</label>
+                        <select id="emWork" class="form-select form-select-lg"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Seleccionar Profesor Sustituto</label>
+                        <select id="emJudge" class="form-select form-select-lg"></select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-warning fw-bold px-4" onclick="submitEmergency()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Asignar Sustituto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/evaluation-assignment.js"></script>
+    <script>
+        let allWorks = [], pendingWorks = [], readyWorksCache = [], allAssignmentsCache = [];
+        let evalFilter = { status: 'all', modality: 'all', sortBy: 'default' };
+        let assignmentSystem = new EvaluationAssignment();
+        let progressModal = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+            checkAdminAuth();
+        });
+
+        async function handleLogout() {
+            if (confirm('¿Cerrar sesión?')) {
+                await window.apiClient.logoutUser();
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function checkAdminAuth() {
+            const session = await window.apiClient.checkAuth();
+            if (!session) return window.location.href = 'login.html';
+            const profile = await window.apiClient.getUserProfile(session.user.id);
+            if (profile?.user_type !== 'admin') return window.location.href = 'student-dashboard.html';
+            loadAdminDashboard();
+        }
+
+        async function loadAdminDashboard() {
+            try {
+                const [works, assignments] = await Promise.all([
+                    window.apiClient.getAllWorks(),
+                    window.apiClient.getAssignments()
+                ]);
+                allWorks = works;
+                pendingWorks = works.filter(w => w.status === 'pending');
+                allAssignmentsCache = assignments;
+                updateStats();
+                calculateReadyWorks();
+                renderDashboard();
+                renderAssignmentsList();
+                renderPendingList();
+            } catch (e) { showToast('Error al cargar: ' + e.message, 'error'); }
+        }
+
+        async function refreshDashboard() {
+            await loadAdminDashboard();
+            showToast('Datos actualizados', 'success');
+        }
+
+        function renderDashboard() {
+            renderEvaluationProgress();
+            document.getElementById('dashboardUpdated').textContent = 'actualizado ' + new Date().toLocaleTimeString();
+        }
+
+        function getAvgScoreForWork(workId) {
+            const workAssignments = allAssignmentsCache.filter(a => a.work_id === workId && a.status === 'completed');
+            const scores = workAssignments
+                .map(a => parseFloat(getScoreFromAssignment(a)))
+                .filter(s => !isNaN(s));
+            return scores.length ? { avg: (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1), count: scores.length, total: workAssignments.length } : null;
+        }
+
+        function setEvalFilter(key, value) {
+            evalFilter[key] = value;
+            const buttons = document.querySelectorAll('#evalFilterBar .btn[data-filter]');
+            buttons.forEach(b => {
+                const matches = b.dataset.filter === key && b.dataset.value === value;
+                b.classList.toggle('active-filter', matches);
+                ['btn-outline-secondary', 'btn-outline-warning', 'btn-outline-info', 'btn-outline-success', 'btn-outline-primary', 'btn-outline-dark'].forEach(c => b.classList.remove(c));
+                if (!matches) {
+                    if (b.dataset.filter === 'status') {
+                        if (b.dataset.value === 'all') b.classList.add('btn-outline-secondary');
+                        else if (b.dataset.value === 'pending') b.classList.add('btn-outline-warning');
+                        else if (b.dataset.value === 'under_review') b.classList.add('btn-outline-info');
+                        else b.classList.add('btn-outline-success');
+                    } else if (b.dataset.filter === 'modality') {
+                        b.classList.add(b.dataset.value === 'poster' ? 'btn-outline-success' : 'btn-outline-primary');
+                    } else if (b.dataset.filter === 'sortBy') {
+                        b.classList.add('btn-outline-dark');
+                    }
+                }
+            });
+            renderEvaluationProgress();
+        }
+
+        function renderEvaluationProgress() {
+            const container = document.getElementById('evalProgressBody');
+            let filtered = [...allWorks];
+
+            if (evalFilter.status === 'pending') filtered = filtered.filter(w => w.status === 'pending');
+            else if (evalFilter.status === 'under_review') filtered = filtered.filter(w => w.status === 'under_review');
+            else if (evalFilter.status === 'dictaminados') filtered = filtered.filter(w => ['accepted_oral', 'accepted_poster', 'rejected'].includes(w.status));
+
+            if (evalFilter.modality === 'oral') filtered = filtered.filter(w => w.modality === 'Oral' || w.modality === 'Ponencia' || w.status === 'accepted_oral');
+            else if (evalFilter.modality === 'poster') filtered = filtered.filter(w => w.modality !== 'Oral' && w.modality !== 'Ponencia' && w.status === 'accepted_poster');
+
+            if (evalFilter.sortBy === 'score') {
+                filtered.sort((a, b) => {
+                    const sa = getAvgScoreForWork(a.id);
+                    const sb = getAvgScoreForWork(b.id);
+                    return (sb ? parseFloat(sb.avg) : -1) - (sa ? parseFloat(sa.avg) : -1);
+                });
+            }
+
+            if (!filtered.length) {
+                container.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay trabajos que coincidan con el filtro.</td></tr>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(w => {
+                const wAssignments = allAssignmentsCache.filter(a => a.work_id === w.id);
+                const completed = wAssignments.filter(a => a.status === 'completed').length;
+                const scoreInfo = getAvgScoreForWork(w.id);
+
+                const dots = [0, 1, 2].map(i => {
+                    if (!wAssignments.length) return `<span class="eval-dot pending">-</span>`;
+                    if (i < completed) return `<span class="eval-dot done">✓</span>`;
+                    if (wAssignments.length > i) return `<span class="eval-dot active">${i + 1}</span>`;
+                    return `<span class="eval-dot pending">${i + 1}</span>`;
+                }).join('');
+
+                const isOral = w.modality === 'Oral' || w.modality === 'Ponencia' || w.status === 'accepted_oral';
+                const typeBadge = isOral
+                    ? '<span class="badge" style="background: var(--unam-blue); color: #fff; font-weight:600;">Oral</span>'
+                    : '<span class="badge" style="background: #1a5c2e; color: #fff; font-weight:600;">Cartel</span>';
+
+                let statusBadge = '';
+                if (w.status === 'pending') {
+                    statusBadge = '<span class="badge" style="background: #ffc107; color: #212529; font-weight:600;">Pendiente</span>';
+                } else if (w.status === 'under_review') {
+                    if (completed >= 3) statusBadge = '<span class="badge" style="background: #20c997; color: #fff; font-weight:600;">Listo para dictaminar</span>';
+                    else statusBadge = `<span class="badge" style="background: #0dcaf0; color: #212529; font-weight:600;">${completed}/3 completado</span>`;
+                } else if (w.status === 'accepted_oral') {
+                    statusBadge = '<span class="badge" style="background: var(--unam-blue); color: #fff; font-weight:600;">Aceptado · Oral</span>';
+                } else if (w.status === 'accepted_poster') {
+                    statusBadge = '<span class="badge" style="background: #1a5c2e; color: #fff; font-weight:600;">Aceptado · Cartel</span>';
+                } else if (w.status === 'rejected') {
+                    statusBadge = '<span class="badge" style="background: #dc3545; color: #fff; font-weight:600;">Rechazado</span>';
+                }
+
+                let scoreDisplay = '<span class="text-muted small">—</span>';
+                if (scoreInfo) {
+                    const cls = parseFloat(scoreInfo.avg) >= 80 ? 'high' : parseFloat(scoreInfo.avg) >= 60 ? 'mid' : 'low';
+                    scoreDisplay = `<span class="avg-score-ring ${cls}">${scoreInfo.avg}</span>`;
+                }
+
+                const evalLabel = !wAssignments.length
+                    ? '<span class="text-muted small">Sin asignar</span>'
+                    : `<div class="eval-progress-track">${dots}<span class="eval-progress-label ms-1">${completed}/${wAssignments.length}</span></div>`;
+
+                return `<tr>
+                    <td>
+                        <div class="fw-semibold small">${w.title}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">${w.student_name || ''}</div>
+                    </td>
+                    <td class="small">${w.semester || '—'}</td>
+                    <td>${typeBadge}</td>
+                    <td>${evalLabel}</td>
+                    <td>${scoreDisplay}</td>
+                    <td>${statusBadge}</td>
+                </tr>`;
+            }).join('');
+        }
+        async function openEmergencyModal() {
+            const works = allWorks.filter(w => w.status.includes('accepted'));
+            const judges = await window.apiClient.getEvaluators();
+
+            document.getElementById('emWork').innerHTML = works.map(w => `<option value="${w.id}">${w.title} (${w.grupo})</option>`).join('');
+            document.getElementById('emJudge').innerHTML = judges.map(j => `<option value="${j.id}">${j.name}</option>`).join('');
+
+            new bootstrap.Modal(document.getElementById('emergencyModal')).show();
+        }
+
+        async function submitEmergency() {
+            const work_id = document.getElementById('emWork').value;
+            const evaluator_id = document.getElementById('emJudge').value;
+
+            if (!confirm("¿Asignar este juez de emergencia?")) return;
+
+            const res = await window.apiClient.post({
+                action: 'assignManualLive',
+                work_id,
+                evaluator_id
+            });
+
+            if (res.success) {
+                showToast("Juez asignado. Ya puede ver el trabajo en su panel.", 'success');
+                location.reload();
+            } else {
+                showToast(res.error, 'error');
+            }
+        }
+        function renderAssignmentsList() {
+            const container = document.getElementById('assignmentsList');
+            if (!allAssignmentsCache.length) {
+                container.innerHTML = '<p class="text-center text-muted">Sin asignaciones aún.</p>';
+                return;
+            }
+            // Agrupar asignaciones por trabajo
+            const grouped = {};
+            allAssignmentsCache.forEach(a => {
+                const wid = a.work_id;
+                if (!grouped[wid]) grouped[wid] = { work: a.works || null, assignments: [] };
+                grouped[wid].assignments.push(a);
+            });
+            const entries = Object.entries(grouped);
+            container.innerHTML = entries.map(([wid, group]) => {
+                const work = group.work || allWorks.find(w => w.id === wid);
+                const total = group.assignments.length;
+                const completed = group.assignments.filter(a => a.status === 'completed').length;
+                return `
+      <div class="card mb-3 border-start border-primary border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="badge bg-secondary me-1">${work?.short_id || wid.slice(0, 8)}</span>
+              <strong class="fs-6">${work?.title || 'Sin título'}</strong>
+            </div>
+            <span class="badge bg-info fs-6">${completed}/${total} evaluaciones</span>
+          </div>
+          ${group.assignments.map(a => `
+          <div class="d-flex justify-content-between align-items-center py-1 px-2 rounded ${a.status === 'completed' ? 'bg-light' : ''}" style="border-bottom:1px solid #f0f0f0;">
+            <small>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              ${a.user_profiles?.name || 'Evaluador desconocido'}
+            </small>
+            <span class="badge bg-${a.status === 'completed' ? 'success' : 'warning text-dark'}">${a.status === 'completed' ? 'Completado' : 'Pendiente'}</span>
+          </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+            }).join('');
+        }
+
+        function renderPendingList() {
+            document.getElementById('pendingWorksList').innerHTML = pendingWorks.map(w => `
+      <div class="card mb-3">
+        <div class="card-body row align-items-center">
+          <div class="col-9">
+            <h6 class="mb-0">${w.title}</h6>
+            <small class="text-muted">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              ${w.student_name}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1 ms-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              ${w.semester || 'N/D'}
+            </small>
+          </div>
+          <div class="col-3 text-end">
+            <button class="btn btn-sm btn-success fw-semibold" onclick="assignOne('${w.id}')">Asignar</button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<p class="text-center text-muted">No hay trabajos pendientes.</p>';
+        }
+
+        // ✅ CORREGIDO: Un trabajo está listo cuando tiene >= 3 evaluaciones completadas
+        function getScoreFromAssignment(a) {
+            // Intentar distintos nombres de campo que podría tener el score
+            return a.total_score ?? a.score ?? a.puntaje ?? a.calificacion ?? a.final_score ?? a.evaluation_score ?? null;
+        }
+
+        function calculateReadyWorks() {
+            const container = document.getElementById('readyWorksList');
+
+            readyWorksCache = allWorks.filter(w => {
+                if (w.status !== 'under_review') return false;
+                const workAssignments = allAssignmentsCache.filter(a => a.work_id === w.id);
+                const completed = workAssignments.filter(a => a.status === 'completed').length;
+                return completed >= 3; // ✅ Listo cuando 3 evaluadores completaron
+            });
+
+            const badge = document.getElementById('readyBadge');
+            badge.textContent = readyWorksCache.length;
+            badge.classList.toggle('d-none', readyWorksCache.length === 0);
+
+            container.innerHTML = readyWorksCache.map(w => {
+                const workAssignments = allAssignmentsCache.filter(a => a.work_id === w.id);
+                const completed = workAssignments.filter(a => a.status === 'completed').length;
+                const completedWithScore = workAssignments.filter(a => a.status === 'completed' && getScoreFromAssignment(a) != null);
+                const completedScores = completedWithScore.map(a => parseFloat(getScoreFromAssignment(a)));
+                const avgScore = completedScores.length ? (completedScores.reduce((a, b) => a + b, 0) / completedScores.length).toFixed(1) : null;
+                return `
+        <div class="card mb-3">
+          <div class="card-body row align-items-center">
+            <div class="col-9">
+              <h6 class="text-success mb-0">${w.title}</h6>
+              <small class="text-muted">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                ${w.semester || 'N/D'}
+                <span class="mx-2">|</span>
+                ${avgScore !== null ? `<span class="badge bg-info text-white me-2">Promedio: ${avgScore}/100</span>` : ''}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                ${completed}/3 evaluaciones completadas
+              </small>
+            </div>
+            <div class="col-3 text-end">
+              <span class="badge bg-success">Listo</span>
+            </div>
+          </div>
+        </div>
+      `;
+            }).join('') || '<p class="text-muted text-center">No hay trabajos con 3 evaluaciones completas aún.</p>';
+
+            // Debug: mostrar el primer assignment completado para ver sus campos
+            const firstCompleted = allAssignmentsCache.find(a => a.status === 'completed');
+            if (firstCompleted) console.log('DEBUG - Assignment completado:', JSON.stringify(firstCompleted, null, 2));
+        }
+
+
+        function renderGeneralSchedule() {
+            const body = document.getElementById('scheduleBody');
+            const oralWorks = allWorks.filter(w => w.status === 'accepted_oral');
+
+            if (oralWorks.length === 0) {
+                body.innerHTML = '<tr><td colspan="3" class="text-muted p-4">No hay ponencias dictaminadas aún.</td></tr>';
+                return;
+            }
+
+            // Obtener horas únicas y ordenarlas
+            const horasUnicas = [...new Set(oralWorks.map(w => w.horario))].sort();
+
+            body.innerHTML = horasUnicas.map(hora => {
+                // Buscar qué trabajo hay en cada salón a esa hora
+                const workUMIEZ = oralWorks.find(w => w.horario === hora && w.auditorio === 'UMIEZ');
+                const workPrincipal = oralWorks.find(w => w.horario === hora && w.auditorio === 'Auditorio Principal');
+
+                return `
+            <tr>
+                <td class="fw-bold bg-light">${hora}</td>
+                <td>
+                    ${workUMIEZ ? `
+                        <div class="p-2 border rounded bg-white shadow-sm">
+                            <span class="badge bg-primary mb-1">${workUMIEZ.short_id}</span><br>
+                            <small class="fw-bold d-block text-truncate">${workUMIEZ.title}</small>
+                            <small class="text-muted">${workUMIEZ.semester}</small>
+                        </div>
+                    ` : '<em class="text-muted small">Disponible</em>'}
+                </td>
+                <td>
+                    ${workPrincipal ? `
+                        <div class="p-2 border rounded bg-white shadow-sm">
+                            <span class="badge bg-success mb-1">${workPrincipal.short_id}</span><br>
+                            <small class="fw-bold d-block text-truncate">${workPrincipal.title}</small>
+                            <small class="text-muted">${workPrincipal.semester}</small>
+                        </div>
+                    ` : '<em class="text-muted small">Disponible</em>'}
+                </td>
+            </tr>
+        `;
+            }).join('');
+        }
+        function printSchedule() {
+            const content = document.getElementById('schedulePrintable').innerHTML;
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html>
+                <head>
+                    <title>Horario General - LABIQ</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                    <style>
+                        body { padding: 2rem; font-family: 'Segoe UI', sans-serif; }
+                        h2 { text-align: center; margin-bottom: 1.5rem; color: #0d6efd; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th { background: #212529 !important; color: #fff; padding: 0.75rem; }
+                        td { padding: 0.5rem; }
+                        .badge { display: inline-block; padding: 0.25em 0.6em; border-radius: 0.25rem; font-size: 0.8em; }
+                        .badge.bg-primary { background: #0d6efd; color: #fff; }
+                        .badge.bg-success { background: #198754; color: #fff; }
+                        @media print {
+                            body { padding: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>Horario General de Ponencias</h2>
+                    ${content}
+                    <p class="text-muted text-center mt-4 small no-print">Generado desde el Panel Admin LABIQ</p>
+                </body>
+                </html>
+            `);
+            win.document.close();
+            setTimeout(() => { win.print(); }, 500);
+        }
+
+        async function finalizeAllReadyWorks() {
+            if (!readyWorksCache.length) return showToast('No hay trabajos con 3 evaluaciones completas.', 'warning');
+            if (!confirm(`¿Dictaminar ${readyWorksCache.length} trabajos?\n\nSe aplicará la regla Top 2 por semestre y se notificará a los alumnos por correo.`)) return;
+
+            progressModal.show();
+            document.getElementById('progressMessage').innerText = 'Dictaminando y enviando correos...';
+            try {
+                const res = await window.apiClient.batchFinalize();
+                progressModal.hide();
+                if (res.success) {
+                    showToast(`Listo. ${res.count} trabajos dictaminados y notificados.`, 'success');
+                    loadAdminDashboard();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+            } catch (e) { progressModal.hide(); showToast('Error: ' + e.message, 'error'); }
+        }
+
+        // ✅ CORREGIDO: Una sola llamada al backend en vez de loop de llamadas HTTP
+        async function assignAllPendingWorks() {
+            if (!pendingWorks.length) return showToast('No hay trabajos pendientes de asignar.', 'warning');
+            if (!confirm(`¿Asignar ${pendingWorks.length} trabajo(s) automáticamente?\n\nCada uno será asignado a 3 evaluadores distintos al azar.`)) return;
+
+            progressModal.show();
+            document.getElementById('progressMessage').innerText = 'Asignando evaluadores... por favor espera.';
+            try {
+                const res = await window.apiClient.assignAllPending();
+                progressModal.hide();
+                if (res.success) {
+                    showToast(`Se asignaron ${res.count} trabajo(s) a 3 evaluadores cada uno.`, 'success');
+                    loadAdminDashboard();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+            } catch (e) { progressModal.hide(); showToast('Error de red: ' + e.message, 'error'); }
+        }
+
+        // Asignación individual (botón por trabajo)
+        async function assignOne(workId) {
+            if (!confirm('¿Asignar este trabajo a 3 evaluadores al azar?')) return;
+            progressModal.show();
+            document.getElementById('progressMessage').innerText = 'Asignando...';
+            try {
+                const res = await assignmentSystem.assignWorksToEvaluators(workId, 3);
+                progressModal.hide();
+                if (res.success) {
+                    showToast(res.message, 'success');
+                    loadAdminDashboard();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+            } catch (e) { progressModal.hide(); showToast('Error: ' + e.message, 'error'); }
+        }
+
+        // --- FASE 2 ---
+        async function assignLiveJudges() {
+            if (!confirm('¿Asignar evaluadores a todos los trabajos aceptados para la evaluación presencial?')) return;
+            progressModal.show();
+            document.getElementById('progressMessage').innerText = 'Asignando evaluadores presenciales...';
+            try {
+                const res = await window.apiClient.assignLiveWorks();
+                progressModal.hide();
+                if (res.success) showToast(`Se generaron ${res.count} asignaciones para el evento.`, 'success');
+                else showToast('Error: ' + res.error, 'error');
+            } catch (e) { progressModal.hide(); showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function loadWinners() {
+            const data = await window.apiClient.getWinners();
+            if (data && data.porCiclo) {
+                const cycleSemesters = {
+                    "Básico": ["1er Semestre", "2do Semestre", "3er Semestre"],
+                    "Intermedio": ["4to Semestre", "5to Semestre", "6to Semestre"],
+                    "Terminal": ["7mo Semestre", "8vo Semestre", "9no Semestre"]
+                };
+                const enriched = data.porCiclo.map(ciclo => {
+                    const semestres = cycleSemesters[ciclo.ciclo_nombre] || [];
+
+                    const acceptedOral = allWorks.filter(w =>
+                        w.status === 'accepted_oral' &&
+                        semestres.includes(w.semester)
+                    );
+                    const acceptedPoster = allWorks.filter(w =>
+                        w.status === 'accepted_poster' &&
+                        semestres.includes(w.semester)
+                    );
+
+                    const normalize = (w) => {
+                        if (!w) return [];
+                        return Array.isArray(w) ? w : [w];
+                    };
+
+                    const mergeAndSort = (apiWorks, localWorks) => {
+                        const apiArr = normalize(apiWorks).filter(x => x != null);
+                        const existingIds = new Set(apiArr.map(x => x.id));
+                        const localArr = localWorks
+                            .filter(x => !existingIds.has(x.id))
+                            .map(x => {
+                                const wa = allAssignmentsCache.filter(a => a.work_id === x.id && a.status === 'completed');
+                                const scores = wa.map(a => parseFloat(getScoreFromAssignment(a))).filter(s => !isNaN(s));
+                                const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+                                return { ...x, live_score: x.live_score || Math.round(avg) };
+                            });
+                        return [...apiArr, ...localArr]
+                            .sort((a, b) => (b.live_score || 0) - (a.live_score || 0))
+                            .slice(0, 2);
+                    };
+
+                    return {
+                        ciclo_nombre: ciclo.ciclo_nombre,
+                        oral: mergeAndSort(ciclo.oral, acceptedOral),
+                        poster: mergeAndSort(ciclo.poster, acceptedPoster)
+                    };
+                });
+                renderCycleWinners(enriched);
+            }
+        }
+
+        function renderCycleWinners(list) {
+            const el = document.getElementById('winnersByCycle');
+            if (!list || list.length === 0) {
+                el.innerHTML = '<div class="col-12 text-center text-muted">Aún no hay evaluaciones presenciales.</div>';
+                return;
+            }
+
+            function rankLabel(index) {
+                if (index === 0) return '🥇 1<sup>er</sup> Lugar';
+                if (index === 1) return '🥈 2<sup>do</sup> Lugar';
+                return '';
+            }
+
+            function rankColor(index) {
+                if (index === 0) return '#ffc107';
+                if (index === 1) return '#adb5bd';
+                return '#6c757d';
+            }
+
+            function workCard(tipo, arr, icon, color) {
+                if (!arr || !arr.length) return '';
+                return arr.map((w, i) => `
+                    <div class="border rounded p-2 mb-2" style="border-left: 4px solid ${rankColor(i)} !important; background: ${i === 0 ? '#fffdf5' : '#fafafa'};">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold" style="color: ${rankColor(i)};">${rankLabel(i)}</span>
+                            <span class="badge bg-warning text-dark fw-bold px-3">${w.live_score || '—'} pts</span>
+                        </div>
+                        <div class="small fw-semibold" style="color: ${color};">${icon} ${tipo === 'oral' ? 'Ponencia' : 'Cartel'}</div>
+                        <div class="fw-bold text-truncate">${w.title}</div>
+                        <div class="small text-muted">${w.student_name || ''} &middot; ${w.semester || ''}</div>
+                        <div class="d-flex justify-content-end mt-1">
+                            <button class="btn btn-sm btn-outline-success fw-semibold py-0 px-2" onclick="generateCertificates('${w.id}')" style="font-size:0.7rem;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Constancia
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            el.innerHTML = list.map(ciclo => `
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white text-center fw-bold">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                        Ciclo ${ciclo.ciclo_nombre}
+                    </div>
+                    <div class="card-body">
+                        ${workCard('oral', ciclo.oral, '🎤', '#0d6efd')}
+                        ${workCard('poster', ciclo.poster, '🖼️', '#198754')}
+                        ${(!ciclo.oral || !ciclo.oral.length) && (!ciclo.poster || !ciclo.poster.length) ? '<div class="text-center text-muted small py-3">Sin evaluaciones en este ciclo.</div>' : ''}
+                    </div>
+                </div>
+            </div>
+            `).join('') || '<div class="col-12 text-center text-muted">Sin datos de ciclos.</div>';
+        }
+
+        async function generateCertificates(workId) {
+            if (!confirm('¿Generar los PDFs de las constancias para este equipo?\n\nSe guardarán en tu Google Drive.')) return;
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Creando...';
+            btn.className = 'btn btn-sm btn-warning fw-bold';
+            try {
+                const res = await window.apiClient.generateCertificates(workId);
+                if (res.success) {
+                    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> PDF Listo';
+                    btn.className = 'btn btn-sm btn-success fw-bold';
+                    setTimeout(() => {
+                        if (confirm(`✅ ¡Éxito!\nSe generó el reconocimiento del equipo.\n\n¿Quieres abrir el archivo ahora?`)) {
+                            window.open(res.fileUrl, '_blank'); // Abrir el PDF directamente
+                        }
+                    }, 500);
+                } else {
+                    throw new Error(res.error);
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.className = 'btn btn-sm btn-outline-primary fw-bold';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalWorks').textContent = allWorks.length;
+            document.getElementById('pendingWorks').textContent = pendingWorks.length;
+            document.getElementById('assignedWorks').textContent = allWorks.filter(w => w.status === 'under_review').length;
+            document.getElementById('completedWorks').textContent = allWorks.filter(w => ['accepted_oral', 'accepted_poster', 'rejected'].includes(w.status)).length;
+        }
+
+        let winnersInterval;
+
+        function showSection(id) {
+            if (winnersInterval) { clearInterval(winnersInterval); winnersInterval = null; }
+            ['dashboard', 'assignments', 'works', 'ready', 'schedule', 'event'].forEach(s => {
+                const el = document.getElementById(s + 'Section');
+                if (el) el.classList.add('d-none');
+            });
+            // Resaltar botón activo en sidebar
+            document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active-section'));
+            const activeBtn = document.querySelector(`.sidebar-link[onclick*="'${id}'"]`) || document.querySelector(`.sidebar-link[onclick*="${id}"]`);
+            if (activeBtn) activeBtn.classList.add('active-section');
+
+            const target = document.getElementById(id + 'Section');
+            if (target) {
+                target.classList.remove('d-none');
+                if (id === 'dashboard') renderDashboard();
+                if (id === 'event') {
+                    loadWinners();
+                    winnersInterval = setInterval(loadWinners, 15000);
+                }
+                if (id === 'schedule') renderGeneralSchedule();
+            }
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('PWA lista para instalar'))
+                    .catch(err => console.log('Error al registrar PWA', err));
+            });
+        }
+    </script>
+    <script>
+        async function enviarAgendas() {
+            if (!confirm("¿Enviar las agendas personalizadas a los 45 profesores?")) return;
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+            try {
+                const res = await window.apiClient.post({ action: 'notifyJudgesAgenda' });
+                if (res.success) showToast("Agendas enviadas correctamente.", 'success');
+            } catch (e) { showToast("Error: " + e.message, 'error'); }
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Enviar Agendas por Correo a todos los Jueces';
+        }
+    </script>
+</body>
+
+</html>

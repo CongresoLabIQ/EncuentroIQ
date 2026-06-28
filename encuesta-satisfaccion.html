@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Satisfacción - Portal del Congreso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Congreso Estudiantil de Laboratorios de Ingeniería Química</div>
+                </div>
+            </div>
+            <nav class="top-bar-nav d-none d-lg-flex">
+                <a href="student-dashboard.html" class="top-bar-link active">← Volver al Panel</a>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="student-dashboard.html">Panel del Alumno</a></li>
+                <li class="active">Encuesta de Satisfacción</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="content-card">
+            <div class="content-card-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Encuesta de Satisfacción
+            </div>
+            <div class="content-card-body">
+                <form id="surveyForm">
+                    <!-- DATOS GENERALES -->
+                    <div class="section-title">📌 Datos Generales</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="fullName" class="form-label">Nombre completo <small
+                                    class="text-muted">(opcional)</small></label>
+                            <input type="text" class="form-control" id="fullName" placeholder="Tu nombre">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="semester" class="form-label">Semestre <small
+                                    class="text-muted">(opcional)</small></label>
+                            <select class="form-select" id="semester">
+                                <option value="">Seleccionar...</option>
+                                <option value="1">1°</option>
+                                <option value="2">2°</option>
+                                <option value="3">3°</option>
+                                <option value="4">4°</option>
+                                <option value="5">5°</option>
+                                <option value="6">6°</option>
+                                <option value="7">7°</option>
+                                <option value="8">8°</option>
+                                <option value="9">9°</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="participationType" class="form-label">Tipo de participación</label>
+                            <select class="form-select" id="participationType">
+                                <option value="">Seleccionar...</option>
+                                <option value="oral">Presentación Oral</option>
+                                <option value="poster">Cartel / Poster</option>
+                                <option value="attendee">Asistente</option>
+                                <option value="evaluator">Evaluador</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="timesUsed" class="form-label">¿Cuántas veces has usado el sistema?</label>
+                            <select class="form-select" id="timesUsed">
+                                <option value="">Seleccionar...</option>
+                                <option value="1">1 vez</option>
+                                <option value="2-3">2-3 veces</option>
+                                <option value="4-6">4-6 veces</option>
+                                <option value="7+">7 o más veces</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 1: USABILIDAD Y ACCESIBILIDAD -->
+                    <div class="section-title">💻 Usabilidad y Accesibilidad</div>
+
+                    <div class="mb-4">
+                        <p class="question-text">1. ¿Qué tan fácil fue registrarte e iniciar sesión en el sistema?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1" id="q1-1" value="1">
+                                <label class="form-check-label" for="q1-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Muy difícil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1" id="q1-2" value="2">
+                                <label class="form-check-label" for="q1-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Difícil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1" id="q1-3" value="3">
+                                <label class="form-check-label" for="q1-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1" id="q1-4" value="4">
+                                <label class="form-check-label" for="q1-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Fácil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1" id="q1-5" value="5">
+                                <label class="form-check-label" for="q1-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Muy fácil</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">2. ¿Cómo calificas la navegación entre las páginas del sistema (menús,
+                            botones, enlaces)?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q2" id="q2-1" value="1">
+                                <label class="form-check-label" for="q2-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Muy confusa</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q2" id="q2-2" value="2">
+                                <label class="form-check-label" for="q2-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Confusa</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q2" id="q2-3" value="3">
+                                <label class="form-check-label" for="q2-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q2" id="q2-4" value="4">
+                                <label class="form-check-label" for="q2-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Clara</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q2" id="q2-5" value="5">
+                                <label class="form-check-label" for="q2-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Muy clara</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">3. ¿El sistema funciona correctamente en tu dispositivo móvil o
+                            tableta?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q3" id="q3-1" value="1">
+                                <label class="form-check-label" for="q3-1">
+                                    <span class="emoji-big">📱❌</span>
+                                    <span class="emoji-label">No funciona</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q3" id="q3-2" value="2">
+                                <label class="form-check-label" for="q3-2">
+                                    <span class="emoji-big">📱😕</span>
+                                    <span class="emoji-label">Con fallas</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q3" id="q3-3" value="3">
+                                <label class="form-check-label" for="q3-3">
+                                    <span class="emoji-big">📱😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q3" id="q3-4" value="4">
+                                <label class="form-check-label" for="q3-4">
+                                    <span class="emoji-big">📱🙂</span>
+                                    <span class="emoji-label">Bien</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q3" id="q3-5" value="5">
+                                <label class="form-check-label" for="q3-5">
+                                    <span class="emoji-big">📱✅</span>
+                                    <span class="emoji-label">Perfecto</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">4. ¿Las instrucciones e indicaciones en el sistema son claras y fáciles
+                            de entender?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q4" id="q4-1" value="1">
+                                <label class="form-check-label" for="q4-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Muy confusas</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q4" id="q4-2" value="2">
+                                <label class="form-check-label" for="q4-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Confusas</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q4" id="q4-3" value="3">
+                                <label class="form-check-label" for="q4-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q4" id="q4-4" value="4">
+                                <label class="form-check-label" for="q4-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Claras</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q4" id="q4-5" value="5">
+                                <label class="form-check-label" for="q4-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Muy claras</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: FUNCIONALIDAD -->
+                    <div class="section-title">⚙️ Funcionalidad del Sistema</div>
+
+                    <div class="mb-4">
+                        <p class="question-text">5. ¿Qué tan útil te resultó el módulo de envío de trabajos (subir
+                            archivos, registrar equipo, etc.)?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q5" id="q5-1" value="1">
+                                <label class="form-check-label" for="q5-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Nada útil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q5" id="q5-2" value="2">
+                                <label class="form-check-label" for="q5-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Poco útil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q5" id="q5-3" value="3">
+                                <label class="form-check-label" for="q5-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q5" id="q5-4" value="4">
+                                <label class="form-check-label" for="q5-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Útil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q5" id="q5-5" value="5">
+                                <label class="form-check-label" for="q5-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Muy útil</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">6. ¿Pudiste consultar fácilmente el estado de tu trabajo y la
+                            retroalimentación de los evaluadores?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q6" id="q6-1" value="1">
+                                <label class="form-check-label" for="q6-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">No pude</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q6" id="q6-2" value="2">
+                                <label class="form-check-label" for="q6-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Con dificultad</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q6" id="q6-3" value="3">
+                                <label class="form-check-label" for="q6-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q6" id="q6-4" value="4">
+                                <label class="form-check-label" for="q6-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Sí, fácil</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q6" id="q6-5" value="5">
+                                <label class="form-check-label" for="q6-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Muy fácil</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">7. ¿Cómo calificas la velocidad y el rendimiento del sistema (tiempos
+                            de carga, respuesta)?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q7" id="q7-1" value="1">
+                                <label class="form-check-label" for="q7-1">
+                                    <span class="emoji-big">🐢</span>
+                                    <span class="emoji-label">Muy lento</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q7" id="q7-2" value="2">
+                                <label class="form-check-label" for="q7-2">
+                                    <span class="emoji-big">🐢😕</span>
+                                    <span class="emoji-label">Lento</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q7" id="q7-3" value="3">
+                                <label class="form-check-label" for="q7-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Aceptable</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q7" id="q7-4" value="4">
+                                <label class="form-check-label" for="q7-4">
+                                    <span class="emoji-big">🚀</span>
+                                    <span class="emoji-label">Rápido</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q7" id="q7-5" value="5">
+                                <label class="form-check-label" for="q7-5">
+                                    <span class="emoji-big">⚡</span>
+                                    <span class="emoji-label">Muy rápido</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: DISEÑO Y EXPERIENCIA VISUAL -->
+                    <div class="section-title">🎨 Diseño y Experiencia Visual</div>
+
+                    <div class="mb-4">
+                        <p class="question-text">8. ¿Qué te parece el diseño visual del sistema (colores, tipografía,
+                            distribución)?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q8" id="q8-1" value="1">
+                                <label class="form-check-label" for="q8-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Muy malo</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q8" id="q8-2" value="2">
+                                <label class="form-check-label" for="q8-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Malo</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q8" id="q8-3" value="3">
+                                <label class="form-check-label" for="q8-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q8" id="q8-4" value="4">
+                                <label class="form-check-label" for="q8-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Bueno</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q8" id="q8-5" value="5">
+                                <label class="form-check-label" for="q8-5">
+                                    <span class="emoji-big">😍</span>
+                                    <span class="emoji-label">Excelente</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 4: COMUNICACIÓN Y SOPORTE -->
+                    <div class="section-title">📞 Comunicación y Soporte</div>
+
+                    <div class="mb-4">
+                        <p class="question-text">9. ¿Recibiste información oportuna sobre fechas, cambios o resultados a
+                            través del sistema?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q9" id="q9-1" value="1">
+                                <label class="form-check-label" for="q9-1">
+                                    <span class="emoji-big">🔇</span>
+                                    <span class="emoji-label">Nunca</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q9" id="q9-2" value="2">
+                                <label class="form-check-label" for="q9-2">
+                                    <span class="emoji-big">🔉</span>
+                                    <span class="emoji-label">Casi nunca</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q9" id="q9-3" value="3">
+                                <label class="form-check-label" for="q9-3">
+                                    <span class="emoji-big">🔊</span>
+                                    <span class="emoji-label">A veces</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q9" id="q9-4" value="4">
+                                <label class="form-check-label" for="q9-4">
+                                    <span class="emoji-big">📢</span>
+                                    <span class="emoji-label">Casi siempre</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q9" id="q9-5" value="5">
+                                <label class="form-check-label" for="q9-5">
+                                    <span class="emoji-big">📣</span>
+                                    <span class="emoji-label">Siempre</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">10. Si tuviste algún problema técnico, ¿recibiste ayuda o respuesta
+                            oportuna?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q10" id="q10-1" value="1">
+                                <label class="form-check-label" for="q10-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">No recibí ayuda</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q10" id="q10-2" value="2">
+                                <label class="form-check-label" for="q10-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Tardaron mucho</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q10" id="q10-3" value="3">
+                                <label class="form-check-label" for="q10-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Regular</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q10" id="q10-4" value="4">
+                                <label class="form-check-label" for="q10-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Sí, me ayudaron</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q10" id="q10-5" value="5">
+                                <label class="form-check-label" for="q10-5">
+                                    <span class="emoji-big">😁</span>
+                                    <span class="emoji-label">Atención excelente</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 5: SATISFACCIÓN GENERAL -->
+                    <div class="section-title">⭐ Satisfacción General</div>
+
+                    <div class="mb-4">
+                        <p class="question-text">11. En general, ¿qué tan satisfecho(a) estás con el sistema de páginas
+                            web del Congreso?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q11" id="q11-1" value="1">
+                                <label class="form-check-label" for="q11-1">
+                                    <span class="emoji-big">😞</span>
+                                    <span class="emoji-label">Muy insatisfecho</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q11" id="q11-2" value="2">
+                                <label class="form-check-label" for="q11-2">
+                                    <span class="emoji-big">😕</span>
+                                    <span class="emoji-label">Insatisfecho</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q11" id="q11-3" value="3">
+                                <label class="form-check-label" for="q11-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">Neutral</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q11" id="q11-4" value="4">
+                                <label class="form-check-label" for="q11-4">
+                                    <span class="emoji-big">😊</span>
+                                    <span class="emoji-label">Satisfecho</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q11" id="q11-5" value="5">
+                                <label class="form-check-label" for="q11-5">
+                                    <span class="emoji-big">😍</span>
+                                    <span class="emoji-label">Muy satisfecho</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="question-text">12. ¿Recomendarías el uso de este sistema a otros congresos o eventos
+                            académicos?</p>
+                        <div class="emoji-rating">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q12" id="q12-1" value="1">
+                                <label class="form-check-label" for="q12-1">
+                                    <span class="emoji-big">❌</span>
+                                    <span class="emoji-label">No lo recomiendo</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q12" id="q12-2" value="2">
+                                <label class="form-check-label" for="q12-2">
+                                    <span class="emoji-big">🤷</span>
+                                    <span class="emoji-label">Tal vez no</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q12" id="q12-3" value="3">
+                                <label class="form-check-label" for="q12-3">
+                                    <span class="emoji-big">😐</span>
+                                    <span class="emoji-label">No sé</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q12" id="q12-4" value="4">
+                                <label class="form-check-label" for="q12-4">
+                                    <span class="emoji-big">👍</span>
+                                    <span class="emoji-label">Sí lo haría</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q12" id="q12-5" value="5">
+                                <label class="form-check-label" for="q12-5">
+                                    <span class="emoji-big">🔥</span>
+                                    <span class="emoji-label">Definitivamente</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 6: COMENTARIOS -->
+                    <div class="section-title">💬 Comentarios y Sugerencias</div>
+
+                    <div class="mb-4">
+                        <label for="positiveFeedback" class="form-label fw-bold">¿Qué es lo que más te gustó del
+                            sistema?</label>
+                        <textarea class="form-control" id="positiveFeedback" rows="3"
+                            placeholder="Comparte los aspectos positivos..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="improvements" class="form-label fw-bold">¿Qué mejorarías o qué funcionalidades
+                            agregarías?</label>
+                        <textarea class="form-control" id="improvements" rows="3"
+                            placeholder="Sugerencias para mejorar..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="generalComments" class="form-label fw-bold">Comentarios adicionales <small
+                                class="text-muted">(opcional)</small></label>
+                        <textarea class="form-control" id="generalComments" rows="3"
+                            placeholder="Cualquier otro comentario..."></textarea>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="reset" class="btn btn-outline-secondary px-4">🗑️ Limpiar</button>
+                        <button type="submit" class="btn btn-unam px-5">📤 Enviar Encuesta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Química</li>
+                        <li>FES Cuautitlán</li>
+                        <li>FES Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Ciudad Universitaria, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('surveyForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const required = document.querySelectorAll('input[type="radio"][required]');
+            let valid = true;
+            required.forEach(r => {
+                const name = r.name;
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    valid = false;
+                    const group = r.closest('.mb-4');
+                    if (group) {
+                        let alert = group.querySelector('.alert-required');
+                        if (!alert) {
+                            alert = document.createElement('div');
+                            alert.className = 'alert alert-danger alert-required py-1 mt-2 small';
+                            alert.textContent = '⚠️ Por favor selecciona una opción.';
+                            group.appendChild(alert);
+                        }
+                    }
+                } else {
+                    const group = r.closest('.mb-4');
+                    if (group) {
+                        const alert = group.querySelector('.alert-required');
+                        if (alert) alert.remove();
+                    }
+                }
+            });
+
+            if (!valid) {
+                document.querySelector('.alert-required')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Enviando...';
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+            data.fullName = document.getElementById('fullName').value;
+            data.semester = document.getElementById('semester').value;
+            data.participationType = document.getElementById('participationType').value;
+            data.timesUsed = document.getElementById('timesUsed').value;
+            data.positiveFeedback = document.getElementById('positiveFeedback').value;
+            data.improvements = document.getElementById('improvements').value;
+            data.generalComments = document.getElementById('generalComments').value;
+            data.timestamp = new Date().toISOString();
+
+            try {
+                const resp = await fetch('https://script.google.com/macros/s/AKfycbyxGzFJhSWfnNLNpugqtYZAdJCDdi7OKsVuimAKeI-CxpKftgTbgJz_QTJjf1MLGAi24w/exec', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveSurvey', ...data })
+                });
+
+                if (resp.ok) {
+                    showToast('Encuesta enviada con éxito. ¡Gracias por tu participación!', 'success');
+                    this.reset();
+                } else {
+                    showToast('Error al enviar. Código: ' + resp.status, 'error');
+                }
+            } catch (err) {
+                showToast('Error de conexión: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        document.getElementById('surveyForm').addEventListener('reset', function () {
+            document.querySelectorAll('.alert-required').forEach(el => el.remove());
+        });
+    </script>
+</body>
+
+</html>

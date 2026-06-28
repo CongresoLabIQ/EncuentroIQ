@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Evaluador - Congreso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Panel Evaluador</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="top-bar-link" onclick="logout()">Salir</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li class="active">Panel Evaluador</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div id="agendaNotice" class="alert alert-warning d-none animate__animated animate__bounceIn">
+        <strong>📌 Recordatorio:</strong> Tienes una evaluación en el
+        <span id="nextRoom" class="fw-bold"></span> a las
+        <span id="nextTime" class="fw-bold"></span>.
+    </div>
+
+    <div class="container">
+
+        <!-- Pestañas de Fase -->
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="phase1-tab" data-bs-toggle="tab" data-bs-target="#phase1"
+                    type="button">
+                    📄 Fase 1: Resumenes
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="phase2-tab" data-bs-toggle="tab" data-bs-target="#phase2" type="button">
+                    🎤 Fase 2: Presentación oral/cartel
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+
+            <!-- FASE 1 -->
+            <div class="tab-pane fade show active" id="phase1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-secondary mb-0">Evaluación de Escritos</h4>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadPhase1()">🔄 Actualizar</button>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Instrucciones:</strong> Abre el PDF de cada trabajo, califícalo del 0 al 100.
+                    Solo ves los trabajos que aún <strong>no has evaluado</strong>.
+                </div>
+                <div id="phase1List" class="row">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2 text-muted">Cargando tus asignaciones...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 2 -->
+            <div class="tab-pane fade" id="phase2">
+                <div class="alert alert-info border-start border-4 border-info">
+                    <strong>Instrucciones:</strong> Evalúa al alumno durante su presentación oral/cartel.
+                </div>
+                <div id="phase2List" class="row">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2 text-muted">Cargando evaluaciones presenciales...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ✅ MODAL FASE 1 CON SLIDERS (RÚBRICA DETALLADA) -->
+    <div class="modal fade" id="evalModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--unam-blue); color: white;">
+                    <h5 class="modal-title">📋 Evaluación de Resumenes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-8">
+                            <h5 id="evalWorkTitle" class="text-primary fw-bold mb-1"></h5>
+                            <span id="evalWorkSemester" class="badge bg-secondary"></span>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a id="evalWorkUrl" href="#" target="_blank" class="btn btn-outline-primary fw-bold">
+                                📄 Leer Trabajo (PDF)
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- PARTE 1: ESTRUCTURA (90%) -->
+                        <div class="col-lg-7 border-end">
+                            <h6 class="bg-light p-2 fw-bold border-start border-primary border-4 mb-3">Parte 1:
+                                Contenido del Documento (90 pts)</h6>
+
+                            <!-- Criterio: Resumen -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Resumen (0-10%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_resumen">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Estructura, ¿Qué se hizo?, ¿Cuál fue el
+                                    resultado?</small>
+                                <input type="range" class="form-range rubric-slider" id="r_resumen" min="0" max="10"
+                                    step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Justificación -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Justificación (0-10%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_justificacion">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Problema detectado e ideas clave claras.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_justificacion" min="0"
+                                    max="10" step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Objetivos -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Objetivos (0-15%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_objetivos">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Taxonomía de Bloom, objetivo general y
+                                    específicos.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_objetivos" min="0" max="15"
+                                    step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Introducción -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Introducción (0-10%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_introduccion">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Contraste de teorías y referencias
+                                    bibliográficas.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_introduccion" min="0"
+                                    max="10" step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Metodología -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Metodología (0-10%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_metodologia">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Materiales, herramientas y
+                                    procedimientos.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_metodologia" min="0" max="10"
+                                    step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Resultados -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Resultados y Análisis (0-15%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_resultados">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Tratamiento de datos, cuadros, figuras y
+                                    formato.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_resultados" min="0" max="15"
+                                    step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Conclusiones -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Conclusiones (0-15%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_conclusiones">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Relación con el cumplimiento de
+                                    objetivos.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_conclusiones" min="0"
+                                    max="15" step="1" value="0">
+                            </div>
+
+                            <!-- Criterio: Referencias -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">Referencias (0-5%)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_referencias">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Bibliografía actual y formato APA 7.</small>
+                                <input type="range" class="form-range rubric-slider" id="r_referencias" min="0" max="5"
+                                    step="1" value="0">
+                            </div>
+                        </div>
+
+                        <!-- PARTE 2: PERTINENCIA (10%) -->
+                        <div class="col-lg-5">
+                            <h6 class="bg-light p-2 fw-bold border-start border-success border-4 mb-3">Parte 2:
+                                Pertinencia e Innovación (10 pts)</h6>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small">
+                                    <span>Factibilidad y pertinencia (0-2)</span>
+                                    <span class="fw-bold text-success rubric-val" id="val_factibilidad">0</span>
+                                </div>
+                                <input type="range" class="form-range rubric-slider" id="r_factibilidad" min="0" max="2"
+                                    step="1" value="0">
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small">
+                                    <span>Innovación (0-2)</span>
+                                    <span class="fw-bold text-success rubric-val" id="val_innovacion">0</span>
+                                </div>
+                                <input type="range" class="form-range rubric-slider" id="r_innovacion" min="0" max="2"
+                                    step="1" value="0">
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small">
+                                    <span>Integración de conocimientos (0-2)</span>
+                                    <span class="fw-bold text-success rubric-val" id="val_integracion">0</span>
+                                </div>
+                                <input type="range" class="form-range rubric-slider" id="r_integracion" min="0" max="2"
+                                    step="1" value="0">
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small">
+                                    <span>Cumplimiento del Programa (0-2)</span>
+                                    <span class="fw-bold text-success rubric-val" id="val_programa">0</span>
+                                </div>
+                                <input type="range" class="form-range rubric-slider" id="r_programa" min="0" max="2"
+                                    step="1" value="0">
+                            </div>
+
+                            <div class="mb-3 border-bottom pb-2">
+                                <div class="d-flex justify-content-between small">
+                                    <span>Ética y valores (0-2)</span>
+                                    <span class="fw-bold text-success rubric-val" id="val_etica">0</span>
+                                </div>
+                                <input type="range" class="form-range rubric-slider" id="r_etica" min="0" max="2"
+                                    step="1" value="0">
+                            </div>
+
+                            <!-- TOTAL -->
+                            <div class="card bg-dark text-white text-center mb-4 shadow">
+                                <div class="card-body py-2">
+                                    <small class="text-uppercase opacity-75">Calificación Final</small>
+                                    <h2 class="mb-0 fw-bold"><span id="totalRubricScore">0</span> / 100</h2>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Comentarios y Retroalimentación</label>
+                                <textarea class="form-control" id="evalComments" rows="4"
+                                    placeholder="Escribe aquí las observaciones para el alumno..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="guardarBorrador()">💾 Guardar
+                        Borrador</button>
+                    <button type="button" class="btn btn-success btn-lg fw-bold" onclick="submitEval()">
+                        🚀 Guardar Evaluación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FASE 2 -->
+    <div class="modal fade" id="liveModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--unam-blue); color: white;">
+                    <h5 class="modal-title">🎤 Evaluación de Presentación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h5 id="liveWorkTitle" class="mb-3" style="color: var(--unam-blue);"></h5>
+                    <form id="liveForm">
+
+                        <div class="mb-4 p-4 border rounded bg-light">
+                            <label class="form-label fw-bold mb-2">Revisión del Material de Apoyo</label>
+                            <small class="text-muted d-block mb-3">Verifique si el material contiene cada elemento (1
+                                punto c/u)</small>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Título</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_titulo" id="c_titulo_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_titulo_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_titulo" id="c_titulo_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_titulo_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Nombre del docente</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_docente" id="c_docente_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_docente_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_docente" id="c_docente_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_docente_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Participantes</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_participantes" id="c_participantes_si" value="1"
+                                                        required onchange="updLive()">
+                                                    <label class="form-check-label" for="c_participantes_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_participantes" id="c_participantes_no" value="0"
+                                                        required onchange="updLive()">
+                                                    <label class="form-check-label" for="c_participantes_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Semestre</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_grupo" id="c_grupo_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_grupo_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_grupo" id="c_grupo_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_grupo_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Objetivos</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_objetivos" id="c_objetivos_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_objetivos_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_objetivos" id="c_objetivos_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_objetivos_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Introducción</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_marco" id="c_marco_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_marco_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_marco" id="c_marco_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_marco_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Metodología</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_metodologia" id="c_metodologia_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_metodologia_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_metodologia" id="c_metodologia_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_metodologia_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Resultados</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_resultados" id="c_resultados_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_resultados_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_resultados" id="c_resultados_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_resultados_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3 border-bottom border-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Conclusión</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_conclusion" id="c_conclusion_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_conclusion_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_conclusion" id="c_conclusion_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_conclusion_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="py-2 px-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Bibliografía</span>
+                                            <div class="d-flex gap-3">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_bibliografia" id="c_bibliografia_si" value="1" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_bibliografia_si">Sí</label>
+                                                </div>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input contenido-check" type="radio"
+                                                        name="c_bibliografia" id="c_bibliografia_no" value="0" required
+                                                        onchange="updLive()">
+                                                    <label class="form-check-label" for="c_bibliografia_no">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 rubric-item" data-modality="ambos">
+                            <label class="form-label fw-bold">1. Tono de voz (0-5)</label>
+                            <small class="text-muted d-block mb-1">Las y los ponentes modulan correcta y apropiadamente
+                                el tono de voz. La comunicación fluye con naturalidad y corrección. Utilizan el
+                                vocabulario correcto y adecuado</small>
+                            <div class="star-rating eval-star-rating" id="stars_1">
+                                <input type="hidden" class="star-input" id="r_1" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_1',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_1',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_1',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_1',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_1',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="ambos">
+                            <label class="form-label fw-bold">2. Calidad de presentación (0-5)</label>
+                            <small class="text-muted d-block mb-1">Mantienen la atención de la audiencia. Evitan
+                                limitarse a leer lo que está escrito en las diapositivas.</small>
+                            <div class="star-rating eval-star-rating" id="stars_2">
+                                <input type="hidden" class="star-input" id="r_2" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_2',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_2',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_2',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_2',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_2',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="ambos">
+                            <label class="form-label fw-bold">3. Dominio del contenido (0-5)</label>
+                            <small class="text-muted d-block mb-1">Demuestran dominio del tema al exponer y al responder
+                                las preguntas de la audiencia.</small>
+                            <div class="star-rating eval-star-rating" id="stars_3">
+                                <input type="hidden" class="star-input" id="r_3" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_3',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_3',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_3',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_3',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_3',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="ambos">
+                            <label class="form-label fw-bold">4. Lenguaje corporal (0-5)</label>
+                            <small class="text-muted d-block mb-1">Utilizan un lenguaje corporal correcto (movimientos,
+                                gestos, vestimenta adecuada, etc.). </small>
+                            <div class="star-rating eval-star-rating" id="stars_4">
+                                <input type="hidden" class="star-input" id="r_4" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_4',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_4',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_4',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_4',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_4',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="ambos">
+                            <label class="form-label fw-bold">5. Trabajo en equipo (0-5)</label>
+                            <small class="text-muted d-block mb-1">Se distribuyen actividades en el momento de la
+                                presentación.</small>
+                            <div class="star-rating eval-star-rating" id="stars_5">
+                                <input type="hidden" class="star-input" id="r_5" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_5',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_5',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_5',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_5',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_5',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="ponencia">
+                            <label class="form-label fw-bold">6. Uso de recursos visuales (0-5)</label>
+                            <small class="text-muted d-block mb-1">Se apoyan en las diapositivas para su exposición y
+                                éstas guardan una adecuada proporción de texto/imagen.</small>
+                            <div class="star-rating eval-star-rating" id="stars_6">
+                                <input type="hidden" class="star-input" id="r_6" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_6',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_6',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_6',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_6',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_6',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="cartel">
+                            <label class="form-label fw-bold">7. Uso de recursos visuales (0-5)</label>
+                            <small class="text-muted d-block mb-1">El cartel es original y creativo, logra captar la
+                                atención de la audiencia por su combinación y uso de colores e imágenes alusivas al
+                                tema.</small>
+                            <div class="star-rating eval-star-rating" id="stars_7">
+                                <input type="hidden" class="star-input" id="r_7" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_7',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_7',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_7',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_7',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_7',5)">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 rubric-item" data-modality="cartel">
+                            <label class="form-label fw-bold">8. Comunicación escrita (0-5)</label>
+                            <small class="text-muted d-block mb-1">La redacción es clara y precisa, además no contiene
+                                errores de ortografía.</small>
+                            <div class="star-rating eval-star-rating" id="stars_8">
+                                <input type="hidden" class="star-input" id="r_8" value="0">
+                                <span class="star" data-value="1" onclick="setStar('stars_8',1)">☆</span>
+                                <span class="star" data-value="2" onclick="setStar('stars_8',2)">☆</span>
+                                <span class="star" data-value="3" onclick="setStar('stars_8',3)">☆</span>
+                                <span class="star" data-value="4" onclick="setStar('stars_8',4)">☆</span>
+                                <span class="star" data-value="5" onclick="setStar('stars_8',5)">☆</span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-secondary text-center">
+                            Total: <span id="liveTotal" class="fw-bold fs-5">0</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Comentarios adicionales</label>
+                            <textarea class="form-control" id="liveComments" rows="3"
+                                placeholder="Observaciones sobre la presentación en vivo..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="submitLive()">
+                        ✅ Enviar Calificación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/evaluation-assignment.js"></script>
+    <script>
+        let session = null;
+        let currentAssignmentId = null; // Fase 1
+        let currentWorkId = null;       // Fase 1
+        let currentLiveId = null;       // Fase 2
+        let currentLiveWorkId = null;   // Fase 2
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            session = await window.apiClient.checkAuth();
+            if (!session) return window.location.href = 'login.html';
+            loadPhase1();
+            loadPhase2();
+        });
+
+        // ============================================================
+        // FASE 1 — Evaluación Documental
+        // ============================================================
+
+        // SUSTITUYE LO QUE TIENES POR ESTO:
+
+        async function loadPhase1() {
+            const container = document.getElementById('phase1List');
+            container.innerHTML = `<div class="col-12 text-center py-4"><div class="spinner-border text-primary"></div></div>`;
+
+            const system = new EvaluationAssignment();
+            // Ahora esta función traerá todos (pendientes y completados)
+            const assigns = await system.getAssignedWorks(session.user.id);
+
+            const pending = assigns.filter(a => a.status !== 'completed');
+            const completed = assigns.filter(a => a.status === 'completed');
+
+            let html = '';
+
+            // SECCIÓN 1: PENDIENTES
+            html += `<div class="col-12 mb-3"><h5 class="text-danger fw-bold">⏳ Pendientes por Evaluar (${pending.length})</h5><hr></div>`;
+
+            if (pending.length === 0) {
+                html += `<div class="col-12"><div class="alert alert-light text-center border">No tienes evaluaciones pendientes.</div></div>`;
+            } else {
+                html += pending.map(a => renderWorkCard(a, false)).join('');
+            }
+
+            // SECCIÓN 2: EVALUADOS (HISTORIAL)
+            if (completed.length > 0) {
+                html += `<div class="col-12 mb-3 mt-5"><h5 class="text-success fw-bold">✅ Evaluados / Historial (${completed.length})</h5><hr></div>`;
+                html += completed.map(a => renderWorkCard(a, true)).join('');
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ESTA FUNCIÓN TAMBIÉN ES NUEVA Y NECESARIA
+        function renderWorkCard(a, isCompleted) {
+            const work = a.works || {};
+            const title = (work.title || 'Sin título').replace(/'/g, ""); // Quita comillas simples
+            const shortId = work.short_id || '---';
+            const pdfUrl = work.file_url || work.url || '';
+            const semester = work.semester || '';
+
+            return `
+      <div class="col-md-6 mb-3">
+        <div class="card work-card h-100 shadow-sm ${isCompleted ? 'opacity-75 border-success' : ''}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge ${isCompleted ? 'bg-success' : 'bg-primary'}">${shortId}</span>
+                ${isCompleted ? '<span class="badge bg-light text-success border border-success">Evaluado</span>' : ''}
+            </div>
+            <h5 class="text-dark fw-bold mb-1" style="font-size: 1.1rem;">${title}</h5>
+            <p class="mb-1 text-muted small">👤 Alumno: ${work.student_name || 'N/D'}</p>
+            <p class="mb-2 text-muted small">📅 Semestre: ${semester}</p>
+            
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <a href="${pdfUrl}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 ${!pdfUrl ? 'disabled' : ''}">
+                        📄 Ver PDF
+                    </a>
+                </div>
+                <div class="col-6">
+                    <button class="btn ${isCompleted ? 'btn-success' : 'btn-primary'} btn-sm w-100"
+                        onclick="openEval('${a.id}', '${a.work_id}', '${title}', '${pdfUrl}', '${semester}')">
+                        ${isCompleted ? '📝 Ver/Editar' : '📝 Evaluar'}
+                    </button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+        }
+
+        // ✅ RESTAURADO: Envía la evaluación Fase 1
+        // --- Lógica para sumar la rúbrica automáticamente ---
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('rubric-slider')) {
+                // Actualizar el número visual a la derecha del slider
+                const valId = e.target.id.replace('r_', 'val_');
+                const display = document.getElementById(valId);
+                if (display) display.innerText = e.target.value;
+
+                // Calcular el total
+                updateTotalScore();
+            }
+        });
+
+        function updateTotalScore() {
+            let total = 0;
+            document.querySelectorAll('.rubric-slider').forEach(slider => {
+                total += parseInt(slider.value || 0);
+            });
+            document.getElementById('totalRubricScore').innerText = total;
+            return total;
+        }
+
+        function calculateRubricTotal() {
+            let total = 0;
+            document.querySelectorAll('.rubric-input').forEach(input => {
+                let val = parseFloat(input.value) || 0;
+                // Validar que no exceda el máximo permitido por el atributo max
+                const max = parseFloat(input.max);
+                if (val > max) {
+                    val = max;
+                    input.value = max;
+                }
+                total += val;
+            });
+            document.getElementById('totalRubricScore').innerText = Math.round(total);
+            return Math.round(total);
+        }
+
+        // --- Función para limpiar y abrir el modal ---
+        function openEval(assignId, workId, title, url, semester) {
+            currentAssignmentId = assignId;
+            currentWorkId = workId;
+
+            // 1. Asignar textos básicos
+            const titleEl = document.getElementById('evalWorkTitle');
+            const semEl = document.getElementById('evalWorkSemester');
+            if (titleEl) titleEl.innerText = title;
+            if (semEl) semEl.innerText = semester ? `Semestre: ${semester}` : '';
+
+            // 2. Configurar el PDF
+            const urlEl = document.getElementById('evalWorkUrl');
+            if (urlEl) {
+                if (url && url !== '#' && url !== 'undefined' && url !== '') {
+                    urlEl.href = url;
+                    urlEl.style.display = 'inline-block';
+                } else {
+                    urlEl.style.display = 'none';
+                }
+            }
+
+            // 3. REINICIAR SLIDERS
+            // Usamos un selector general para no fallar si falta uno
+            document.querySelectorAll('.rubric-slider').forEach(slider => {
+                slider.value = 0;
+                const valId = slider.id.replace('r_', 'val_');
+                const display = document.getElementById(valId);
+                if (display) display.innerText = '0';
+            });
+
+            // 4. LIMPIAR TOTAL Y COMENTARIOS
+            const totalScoreEl = document.getElementById('totalRubricScore');
+            const commentsEl = document.getElementById('evalComments');
+
+            if (totalScoreEl) totalScoreEl.innerText = '0';
+            if (commentsEl) commentsEl.value = '';
+
+            // 5. CARGAR BORRADOR SI EXISTE
+            cargarBorrador(workId);
+
+            // 6. MOSTRAR MODAL
+            const modalElement = document.getElementById('evalModal');
+            const myModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            myModal.show();
+        }
+
+        // Al cargar el panel, busca la evaluación más cercana a la hora actual
+        function showNextAssignmentNotice(myLiveAssignments) {
+            const now = new Date();
+            // Lógica para comparar la hora actual con el campo work.horario
+            // Si falta poco para la siguiente, quitas 'd-none' al div agendaNotice
+        }
+
+        // Guardar borrador en localStorage
+        function guardarBorrador() {
+            const draft = {
+                workId: currentWorkId,
+                assignmentId: currentAssignmentId,
+                scores: {},
+                comments: document.getElementById('evalComments').value
+            };
+            document.querySelectorAll('.rubric-slider').forEach(slider => {
+                draft.scores[slider.id] = slider.value;
+            });
+            localStorage.setItem('evalDraft_' + currentWorkId, JSON.stringify(draft));
+            showToast('Borrador guardado localmente.', 'success');
+        }
+
+        function cargarBorrador(workId) {
+            const raw = localStorage.getItem('evalDraft_' + workId);
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                if (draft.comments) document.getElementById('evalComments').value = draft.comments;
+                Object.keys(draft.scores).forEach(id => {
+                    const slider = document.getElementById(id);
+                    if (slider) {
+                        slider.value = draft.scores[id];
+                        const valId = id.replace('r_', 'val_');
+                        const display = document.getElementById(valId);
+                        if (display) display.innerText = draft.scores[id];
+                    }
+                });
+                updateTotalScore();
+                showToast('Borrador cargado.', 'info');
+            } catch (e) { /* ignore corrupt drafts */ }
+        }
+
+        // Enviar la evaluación
+        async function submitEval() {
+            // Calculamos el total de la PARTE 2 (Pertinencia)
+            const p2_ids = ['r_factibilidad', 'r_innovacion', 'r_integracion', 'r_programa', 'r_etica'];
+            let scorePertinencia = 0;
+            p2_ids.forEach(id => scorePertinencia += parseInt(document.getElementById(id).value || 0));
+
+            const finalScore = updateTotalScore();
+            const comments = document.getElementById('evalComments').value.trim();
+
+            if (comments.length < 50) {
+                showToast('La retroalimentación es muy corta. Escribe al menos 50 caracteres.', 'warning');
+                return;
+            }
+
+            if (!confirm(`¿Confirmas la evaluación?\nPuntaje Total: ${finalScore}/100\nPertinencia: ${scorePertinencia}/10`)) return;
+
+            const btn = document.querySelector('#evalModal .btn-success');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+            const data = {
+                action: 'submitEvaluation',
+                work_id: currentWorkId,
+                evaluator_id: session.user.id,
+                assignment_id: currentAssignmentId,
+                total_score: finalScore,
+                score_pertinencia: scorePertinencia, // <--- NUEVO DATO
+                modalidad_sugerida: "",
+                comentarios: comments
+            };
+
+            try {
+                const res = await window.apiClient.post(data);
+                if (res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('evalModal')).hide();
+                    showToast('Evaluación enviada con éxito.', 'success');
+                    loadPhase1();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+            } catch (e) {
+                showToast('Error de conexión.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Guardar Evaluación';
+            }
+        }
+        // ============================================================
+        // FASE 2 — Evaluación Presencial
+        // ============================================================
+
+        async function loadPhase2() {
+            const container = document.getElementById('phase2List');
+            const allLive = await window.apiClient.getLiveAssignments();
+            const myLive = allLive.filter(a => a.evaluator_id === session.user.id);
+
+            if (myLive.length === 0) {
+                container.innerHTML = `<div class="col-12">
+        <div class="alert alert-secondary text-center">
+          No tienes evaluaciones de presentaciones orales/cartel asignadas aún.
+        </div>
+      </div>`;
+                return;
+            }
+
+            const orales = myLive.filter(a => (a.works?.status || '').includes('oral'));
+            const carteles = myLive.filter(a => !(a.works?.status || '').includes('oral'));
+
+            let html = '';
+
+            function renderCard(a) {
+                const isOral = (a.works?.status || '').includes('oral');
+                const isCompleted = a.status === 'completed';
+                const modalityLabel = isOral ? '🎤 Ponencia' : '📊 Cartel';
+                const modalityParam = isOral ? 'ponencia' : 'cartel';
+                const score = a.evaluation?.total_score;
+
+                return `
+      <div class="col-md-6 mb-3">
+        <div class="card work-card live h-100 shadow-sm ${isCompleted ? 'border-success opacity-75' : ''}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <span class="badge text-white mb-2" style="background:#6f42c1;">${a.works?.short_id || ''}</span>
+              <small class="text-muted">${a.works?.auditorio || ''}</small>
+            </div>
+            <h5 class="fw-bold mb-1" style="color: #6f42c1;">${a.works?.title || 'Sin título'}</h5>
+            <p class="mb-1"><strong>Modalidad:</strong> ${modalityLabel}</p>
+            <p class="mb-2"><strong>Equipo:</strong> ${a.works?.student_name || 'N/D'}</p>
+            ${isCompleted
+                        ? `<div class="d-flex align-items-center gap-2">
+                         <span class="badge-evaluado">✅ Evaluado</span>
+                         <span class="score-display ms-auto">${score !== undefined ? score + ' pts' : ''}</span>
+                       </div>`
+                        : `<button class="btn w-100 text-white fw-bold" style="background-color:#6f42c1;"
+                  onclick="openLive('${a.id}', '${a.work_id}', \`${(a.works?.title || '').replace(/`/g, "'")}\`, '${modalityParam}')">
+                  ⭐ Evaluar Presentación
+                </button>`
+                    }
+          </div>
+        </div>
+      </div>`;
+            }
+
+            if (orales.length > 0) {
+                html += `<div class="col-12 mb-3"><h5 class="fw-bold" style="color:#6f42c1;">🎤 Ponencia (${orales.length})</h5><hr></div>`;
+                html += orales.map(renderCard).join('');
+            }
+
+            if (carteles.length > 0) {
+                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold" style="color:#198754;">📊 Cartel (${carteles.length})</h5><hr></div>`;
+                html += carteles.map(renderCard).join('');
+            }
+
+            container.innerHTML = html;
+        }
+
+        function openLive(assignId, workId, title, modality) {
+            currentLiveId = assignId;
+            currentLiveWorkId = workId;
+            document.getElementById('liveWorkTitle').innerText = title;
+            document.getElementById('liveForm').reset();
+            document.querySelectorAll('#liveForm .star').forEach(s => s.textContent = '☆');
+            document.querySelectorAll('#liveForm .star').forEach(s => s.classList.remove('active'));
+            document.getElementById('liveTotal').innerText = '0';
+            document.querySelectorAll('.rubric-item').forEach(el => {
+                const mod = el.dataset.modality;
+                if (mod === 'ambos') {
+                    el.style.display = 'block';
+                } else {
+                    el.style.display = mod === modality ? 'block' : 'none';
+                }
+            });
+            new bootstrap.Modal(document.getElementById('liveModal')).show();
+        }
+
+        function updLive() {
+            let sum = 0;
+            document.querySelectorAll('#liveForm .star-input').forEach(r => sum += parseInt(r.value || 0));
+            document.querySelectorAll('#liveForm .contenido-check:checked').forEach(c => sum += parseInt(c.value));
+            document.getElementById('liveTotal').innerText = sum;
+        }
+
+        function setStar(containerId, value) {
+            const container = document.getElementById(containerId);
+            container.querySelector('.star-input').value = value;
+            container.querySelectorAll('.star').forEach(s => {
+                const v = parseInt(s.dataset.value);
+                s.textContent = v <= value ? '★' : '☆';
+                s.classList.toggle('active', v <= value);
+            });
+            updLive();
+        }
+
+        async function submitLive() {
+            if (!confirm('¿Enviar calificación presencial? Esta acción no se puede deshacer.')) return;
+
+            // Validar que todos los radios de Material de Apoyo estén contestados
+            const radioGroups = ['c_titulo', 'c_docente', 'c_participantes', 'c_grupo', 'c_objetivos', 'c_marco', 'c_metodologia', 'c_resultados', 'c_conclusion', 'c_bibliografia'];
+            const missing = radioGroups.filter(name => !document.querySelector(`#liveForm input[name="${name}"]:checked`));
+            if (missing.length > 0) {
+                showToast(`Faltan ${missing.length} campo(s) por contestar en Material de Apoyo.`, 'warning');
+                return;
+            }
+
+            const visibleInputs = document.querySelectorAll('#liveForm .rubric-item:not([style*=\"none\"]) .star-input');
+            const visibleScores = Array.from(visibleInputs).map(i => parseInt(i.value || 0));
+            const checkGroups = {};
+            document.querySelectorAll('#liveForm .contenido-check:checked').forEach(c => {
+                checkGroups[c.name] = parseInt(c.value) || 0;
+            });
+            const radioOrder = radioGroups;
+            const checkScores = radioOrder.map(name => checkGroups[name] || 0);
+            const total = visibleScores.reduce((a, b) => a + b, 0) + checkScores.reduce((a, b) => a + b, 0);
+
+            const data = {
+                assignment_id: currentLiveId,
+                work_id: currentLiveWorkId,
+                evaluator_id: session.user.id,
+                s1: visibleScores[0] || 0, s2: visibleScores[1] || 0, s3: visibleScores[2] || 0,
+                s4: visibleScores[3] || 0, s5: visibleScores[4] || 0, s6: visibleScores[5] || 0, s7: visibleScores[6] || 0, s8: visibleScores[7] || 0,
+                c1: checkScores[0], c2: checkScores[1], c3: checkScores[2],
+                c4: checkScores[3], c5: checkScores[4], c6: checkScores[5],
+                c7: checkScores[6], c8: checkScores[7], c9: checkScores[8],
+                c10: checkScores[9],
+                total_score: total,
+                comments: document.getElementById('liveComments').value
+            };
+
+            const btn = document.querySelector('#liveModal .btn-success');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando...';
+
+            const res = await window.apiClient.submitLiveEvaluation(data);
+
+            btn.disabled = false;
+            btn.innerHTML = '✅ Enviar Calificación';
+
+            if (res.success) {
+                bootstrap.Modal.getInstance(document.getElementById('liveModal')).hide();
+                showToast('Evaluación presencial guardada.', 'success');
+                loadPhase2();
+            } else {
+                showToast('Error: ' + res.error, 'error');
+            }
+        }
+
+        async function logout() {
+            await window.apiClient.logoutUser();
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('PWA lista para instalar'))
+                    .catch(err => console.log('Error al registrar PWA', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

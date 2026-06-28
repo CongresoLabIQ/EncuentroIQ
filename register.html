@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Portal Congreso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002147">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+
+<body>
+    <div id="toastContainer"></div>
+
+    <header class="top-bar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="unam-shield"><span class="shield-inner">U</span></div>
+                <div>
+                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-event">Congreso Estudiantil de Laboratorios de Ingeniería Química</div>
+                </div>
+            </div>
+            <nav class="top-bar-nav d-none d-lg-flex">
+                <a href="index.html" class="top-bar-link">Inicio</a>
+                <a href="login.html" class="top-bar-link">Ingresar</a>
+                <a href="register.html" class="top-bar-link active">Registro</a>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumb-bar">
+        <div class="container">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li class="active">Registro</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <polyline points="17 11 19 13 23 9" />
+                        </svg>
+                        Crear Cuenta
+                    </div>
+                    <div class="content-card-body">
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre Completo</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Usuario</label>
+                                <select class="form-select" id="userType" onchange="toggleAdminCode()" required>
+                                    <option value="student">Alumna/Alumno</option>
+                                    <option value="evaluator">Evaluador</option>
+                                </select>
+                            </div>
+
+                            <!-- CAMPO OCULTO DE CÓDIGO -->
+                            <div class="mb-3 d-none" id="adminCodeGroup">
+                                <label class="form-label text-danger fw-bold">Código de Acceso Docente *</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control border-danger" id="adminCode"
+                                        placeholder="Ingresa la clave de profesor">
+                                    <button class="btn btn-outline-danger" type="button"
+                                        onclick="togglePassword('adminCode', this)">
+                                        👁️
+                                    </button>
+                                </div>
+                                <div class="form-text text-danger">Solo personal autorizado puede registrarse como
+                                    evaluador.</div>
+                                <!-- Campo para grupos del profesor (Solo visible para evaluadores) -->
+                                <div class="mb-3 d-none" id="evaluatorGroupsGroup">
+                                    <label class="form-label fw-bold">Grupos de laboratorio a los que imparte clase
+                                        *</label>
+                                    <input type="text" class="form-control" id="evaluatorGroups"
+                                        placeholder="Ej: 4301, 4852, 4102">
+                                    <div class="form-text">Indica los grupos en los que imparte clase este semestre.
+                                        * Si es profesor de asignatura, deja el espacio en blanco.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña *</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" minlength="6" required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="togglePassword('password', this)">
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Confirmar Contraseña (NUEVO) -->
+                            <div class="mb-3">
+                                <label class="form-label">Confirmar Contraseña *</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirmPassword" minlength="6"
+                                        required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="togglePassword('confirmPassword', this)">
+                                        👁️
+                                    </button>
+                                </div>
+                                <div id="passError" class="form-text text-danger d-none">❌ Las contraseñas no coinciden.
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-unam w-100 py-2 mt-2">Registrarse</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <a href="login.html">¿Ya tienes cuenta? Inicia Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-institutional">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
+    <script>
+        // Mostrar/Ocultar campo de código
+        function toggleAdminCode() {
+            const type = document.getElementById('userType').value;
+            const codeGroup = document.getElementById('adminCodeGroup');
+            const groupsGroup = document.getElementById('evaluatorGroupsGroup'); // Nuevo
+
+            if (type === 'evaluator') {
+                codeGroup.classList.remove('d-none');
+                groupsGroup.classList.remove('d-none'); // Mostrar
+                document.getElementById('adminCode').required = true;
+                document.getElementById('evaluatorGroups').required = true; // Hacerlo obligatorio
+            } else {
+                codeGroup.classList.add('d-none');
+                groupsGroup.classList.add('d-none'); // Ocultar
+                document.getElementById('adminCode').required = false;
+                document.getElementById('evaluatorGroups').required = false;
+                document.getElementById('adminCode').value = '';
+                document.getElementById('evaluatorGroups').value = '';
+            }
+        }
+
+        // Manejo del Registro
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const type = document.getElementById('userType').value;
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirmPassword').value; // Nuevo
+            const adminCode = document.getElementById('adminCode').value;
+            const evaluatorGroups = document.getElementById('evaluatorGroups').value;
+            const passError = document.getElementById('passError');
+
+            // 1. VALIDACIÓN DE COINCIDENCIA DE CONTRASEÑA
+            if (pass !== confirmPass) {
+                passError.classList.remove('d-none');
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                showToast('Las contraseñas no coinciden.', 'error');
+                return;
+            } else {
+                passError.classList.add('d-none');
+                document.getElementById('confirmPassword').classList.remove('is-invalid');
+            }
+
+            const btn = document.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = "Registrando...";
+
+            // 2. LLAMADA A LA API (el código se valida en el backend)
+            const result = await window.apiClient.registerUser(email, pass, name, type, evaluatorGroups, adminCode);
+
+            if (result.success) {
+                showToast('Cuenta creada exitosamente.', 'success');
+                window.location.href = 'login.html';
+            } else {
+                showToast('Error: ' + result.error, 'error');
+                btn.disabled = false;
+                btn.innerText = "Registrarse";
+            }
+        });
+    </script>
+
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerHTML = "🔒";
+            } else {
+                input.type = "password";
+                btn.innerHTML = "👁️";
+            }
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('PWA lista para instalar'))
+                    .catch(err => console.log('Error al registrar PWA', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

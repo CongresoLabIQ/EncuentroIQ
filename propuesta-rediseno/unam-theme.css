@@ -1,0 +1,248 @@
+/* ============================================================
+   UNAM THEME — Tema institucional para implementación directa
+   Colores: Azul #002147 · Oro #C6930C
+   Uso: Copiar y pegar en <style> de cada página, o importar
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
+
+:root {
+  --unam-blue: #002147;
+  --unam-blue-dark: #001530;
+  --unam-blue-light: #003366;
+  --unam-gold: #C6930C;
+  --unam-gold-light: #D4A817;
+  --unam-gold-bg: rgba(198, 147, 12, 0.12);
+  --unam-bg: #F5F0E8;
+  --unam-white: #FFFFFF;
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --radius: 10px;
+  --shadow: 0 2px 16px rgba(0, 33, 71, 0.08);
+}
+
+/* ---- GLOBAL ---- */
+body { font-family: var(--font-body); background: var(--unam-bg); color: #2C2C2C; }
+h1, h2, h3, h4, h5, h6, .display-4 { font-family: var(--font-heading); }
+
+/* ---- NAVBAR ---- */
+.unam-navbar {
+  background: var(--unam-blue) !important;
+  border-bottom: 3px solid var(--unam-gold);
+  box-shadow: 0 4px 20px rgba(0,33,71,0.25);
+}
+.unam-navbar .navbar-brand { color: #fff; font-weight: 700; }
+.unam-navbar .navbar-brand .unam-badge {
+  display: inline-block;
+  background: var(--unam-gold);
+  color: var(--unam-blue);
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  margin-right: 8px;
+}
+.unam-navbar .nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 500; }
+.unam-navbar .nav-link:hover { color: var(--unam-gold) !important; }
+
+/* ---- HERO SECTION ---- */
+.unam-hero {
+  background: linear-gradient(135deg, var(--unam-blue), var(--unam-blue-dark));
+  padding: 4rem 0;
+  border-bottom: 4px solid var(--unam-gold);
+  color: #fff;
+}
+.unam-hero h1 { font-weight: 800; }
+.unam-hero .gold-text { color: var(--unam-gold-light); }
+
+/* ---- BUTTONS ---- */
+.btn-unam {
+  background: var(--unam-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  transition: all 0.25s ease;
+}
+.btn-unam:hover {
+  background: var(--unam-blue-light);
+  color: var(--unam-gold-light);
+  box-shadow: 0 4px 16px rgba(0,33,71,0.3);
+  transform: translateY(-1px);
+}
+.btn-unam-gold {
+  background: var(--unam-gold);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  transition: all 0.25s ease;
+}
+.btn-unam-gold:hover {
+  background: var(--unam-gold-light);
+  color: var(--unam-blue);
+  box-shadow: 0 4px 16px rgba(198,147,12,0.3);
+  transform: translateY(-1px);
+}
+.btn-unam-outline {
+  background: transparent;
+  color: var(--unam-gold);
+  border: 2px solid var(--unam-gold);
+  border-radius: var(--radius);
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  transition: all 0.25s ease;
+}
+.btn-unam-outline:hover {
+  background: var(--unam-gold);
+  color: var(--unam-blue);
+  transform: translateY(-1px);
+}
+
+/* ---- CARDS ---- */
+.card-unam {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.card-unam:hover {
+  box-shadow: 0 8px 30px rgba(0,33,71,0.12);
+}
+.card-unam .card-header {
+  background: var(--unam-blue);
+  color: #fff;
+  font-weight: 700;
+  border-bottom: 2px solid var(--unam-gold);
+}
+.card-unam .card-gold-accent {
+  border-top: 3px solid var(--unam-gold);
+}
+.card-unam .card-blue-accent {
+  border-top: 3px solid var(--unam-blue);
+}
+
+/* ---- STATS CARDS ---- */
+.stat-unam {
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+.stat-unam.blue { background: var(--unam-blue); }
+.stat-unam.gold { background: var(--unam-gold); }
+.stat-unam.light { background: var(--unam-blue-light); }
+.stat-unam.green { background: #1a5c2e; }
+.stat-unam small { font-weight: 500; opacity: 0.85; display: block; margin-top: 4px; }
+
+/* ---- BADGES ---- */
+.badge-unam {
+  background: var(--unam-blue);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.35em 0.75em;
+  border-radius: 6px;
+}
+.badge-unam-gold {
+  background: var(--unam-gold);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.35em 0.75em;
+  border-radius: 6px;
+}
+
+/* ---- FORMS ---- */
+.form-unam:focus {
+  border-color: var(--unam-gold);
+  box-shadow: 0 0 0 0.2rem var(--unam-gold-bg);
+}
+
+/* ---- LINKS ---- */
+a { color: var(--unam-blue); text-decoration: none; }
+a:hover { color: var(--unam-gold); }
+
+/* ---- TABLE ---- */
+.table-unam thead { background: var(--unam-blue); color: #fff; }
+.table-unam th { font-weight: 600; border-bottom: 2px solid var(--unam-gold); }
+
+/* ---- ALERTS ---- */
+.alert-unam {
+  background: var(--unam-gold-bg);
+  border: 1px solid var(--unam-gold);
+  color: var(--unam-blue);
+  border-radius: var(--radius);
+}
+
+/* ---- FOOTER ---- */
+.footer-unam {
+  background: var(--unam-blue-dark);
+  color: rgba(255,255,255,0.8);
+  padding: 2rem 0;
+  border-top: 3px solid var(--unam-gold);
+}
+.footer-unam .gold { color: var(--unam-gold); }
+.footer-unam .muted { color: rgba(255,255,255,0.45); }
+
+/* ---- MODAL ---- */
+.modal-unam .modal-header {
+  background: var(--unam-blue);
+  color: #fff;
+  border-bottom: 3px solid var(--unam-gold);
+}
+.modal-unam .modal-header .btn-close { filter: brightness(0) invert(1); }
+
+/* ---- MISC ---- */
+.section-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--unam-blue);
+  position: relative;
+  padding-bottom: 10px;
+  margin-bottom: 1.5rem;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--unam-gold);
+  border-radius: 2px;
+}
+.section-title-center::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ---- PROGRESS ---- */
+.progress-unam {
+  height: 8px;
+  border-radius: 4px;
+  background: #e0d8cc;
+}
+.progress-unam .progress-bar {
+  background: var(--unam-gold);
+}
+
+/* ---- SIDEBAR ---- */
+.sidebar-unam .nav-item {
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  color: var(--unam-blue);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.sidebar-unam .nav-item:hover,
+.sidebar-unam .nav-item.active {
+  background: var(--unam-blue);
+  color: #fff;
+}

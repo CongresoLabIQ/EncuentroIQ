@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propuesta de Rediseño — Encuentro de Ingeniería Química UNAM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/propuesta.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark unam-navbar">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">
+      <span class="unam-brand-icon">UNAM</span>
+      Encuentro de Ingeniería Química
+    </a>
+  </div>
+</nav>
+
+<section class="hero-unam" style="padding:0; border-bottom:none;">
+  <img src="banner-encuentro.svg" alt="Banner Encuentro de Ingeniería Química" style="width:100%; height:auto; display:block; max-width:1200px; margin:0 auto;">
+</section>
+
+<main class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <!-- JUSTIFICACIÓN -->
+      <div class="card unam-card mb-5">
+        <div class="card-body p-5">
+          <h2 class="unam-title text-center mb-4">Fundamento del Rediseño</h2>
+          <p class="lead text-center text-muted mb-5">
+            El sistema actual emplea <strong>Bootstrap por defecto</strong> (azul <code>#0d6efd</code>) sin identidad institucional.
+            La propuesta integra los colores oficiales de la <strong>UNAM</strong> y un estilo formal y sobrio acorde
+            a un encuentro académico interinstitucional.
+          </p>
+
+          <div class="row g-4 mb-5">
+            <div class="col-md-4">
+              <div class="text-center p-4 rounded" style="background:#f5f0e8;">
+                <div class="color-swatch mx-auto mb-3" style="background:#002147;"></div>
+                <h5 class="fw-bold">Azul UNAM</h5>
+                <p class="small text-muted mb-0"><code>#002147</code><br>Seriedad, tradición, excelencia académica.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-4 rounded" style="background:#f5f0e8;">
+                <div class="color-swatch mx-auto mb-3" style="background:#C6930C;"></div>
+                <h5 class="fw-bold">Oro UNAM</h5>
+                <p class="small text-muted mb-0"><code>#C6930C</code><br>Calidez, distinción, logro académico.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-4 rounded" style="background:#f5f0e8;">
+                <div class="color-swatch mx-auto mb-3" style="background:#F5F0E8;"></div>
+                <h5 class="fw-bold">Fondo Claro</h5>
+                <p class="small text-muted mb-0"><code>#F5F0E8</code><br>Base limpia que contrasta con azul y oro.</p>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="fw-bold mb-3">Cambios principales respecto al diseño actual</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>Elemento</th>
+                  <th>Actual</th>
+                  <th>Propuesto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Navbar</td><td><code>bg-primary #0d6efd</code></td><td>Fondo azul UNAM con detalles dorados</td></tr>
+                <tr><td>Botones primarios</td><td><code>btn-primary #0d6efd</code></td><td>Fondo azul UNAM, hover dorado</td></tr>
+                <tr><td>Tipografía</td><td>Segoe UI / Inter</td><td>Playfair Display + Inter (formal)</td></tr>
+                <tr><td>Tarjetas</td><td><code>shadow-sm</code> genérico</td><td>Sombra suave, bordes redondeados, acentos dorados</td></tr>
+                <tr><td>Header / Hero</td><td>Banner con imagen + overlay</td><td>Degradado institucional con escudo UNAM</td></tr>
+                <tr><td>Emojis</td><td>Uso extensivo (🎓🧪📄)</td><td>Iconos SVG monocromáticos dorados (más formal)</td></tr>
+                <tr><td>Footer</td><td><code>bg-light</code> sin identidad</td><td>Fondo azul UNAM, texto oro, lema institucional</td></tr>
+                <tr><td>Nombre del evento</td><td>"Congreso Estudiantil de Laboratorios de IQ"</td><td>"Encuentro de Ingeniería Química" (incluyente)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOCKUP PÁGINA PRINCIPAL -->
+      <h2 class="unam-title text-center mb-4">Mockup — Página Principal</h2>
+      <div class="card unam-card mb-5">
+        <div class="card-body p-0">
+          <div class="p-4" style="background:linear-gradient(135deg, #002147 0%, #003366 100%); border-radius:12px 12px 0 0;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span style="color:#C6930C; font-weight:800; font-size:1.3rem; letter-spacing:2px;">UNAM</span>
+                <span style="color:rgba(255,255,255,0.8); margin-left:12px; font-weight:500;">Encuentro de Ingeniería Química</span>
+              </div>
+              <div>
+                <span class="badge bg-warning text-dark me-2" style="background:#C6930C !important; color:#fff !important;">Iniciar Sesión</span>
+                <span class="badge border border-light text-light">Registrarse</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 text-center" style="background: linear-gradient(135deg, #002147 0%, #001530 100%);">
+            <div style="width:80px; height:80px; border:3px solid #C6930C; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
+              <span style="color:#C6930C; font-weight:900; font-size:2rem;">U</span>
+            </div>
+            <h3 style="color:#fff; font-weight:700;">1er Encuentro de Ingeniería Química</h3>
+            <p style="color:#C6930C; font-weight:500;">Facultad de Química · FES Cuautitlán · FES Zaragoza</p>
+            <p style="color:rgba(255,255,255,0.6); margin-bottom:25px;">Plataforma oficial para la gestión y evaluación de proyectos estudiantiles.</p>
+            <div class="d-flex justify-content-center gap-3">
+              <span style="padding:10px 30px; background:#C6930C; color:#fff; font-weight:600; border-radius:8px;">Iniciar Sesión</span>
+              <span style="padding:10px 30px; border:2px solid #C6930C; color:#C6930C; font-weight:600; border-radius:8px;">Registrarse</span>
+            </div>
+          </div>
+
+          <div class="p-4" style="background:#F5F0E8;">
+            <div class="row g-3 text-center">
+              <div class="col-md-3">
+                <div style="background:#fff; padding:20px; border-radius:10px; border-top:3px solid #002147;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <h6 class="fw-bold mt-2">1. Envío</h6>
+                  <small class="text-muted">Sube tu resumen en PDF</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div style="background:#fff; padding:20px; border-radius:10px; border-top:3px solid #002147;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <h6 class="fw-bold mt-2">2. Evaluación</h6>
+                  <small class="text-muted">Revisión por pares</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div style="background:#fff; padding:20px; border-radius:10px; border-top:3px solid #002147;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                  <h6 class="fw-bold mt-2">3. Selección</h6>
+                  <small class="text-muted">Los mejores promedios</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div style="background:#fff; padding:20px; border-radius:10px; border-top:3px solid #002147;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><rect x="3" y="3" width="18" height="14" rx="2" ry="2"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                  <h6 class="fw-bold mt-2">4. Evento</h6>
+                  <small class="text-muted">Presentación final</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 text-center" style="background:#002147; border-radius:0 0 12px 12px;">
+            <small style="color:#C6930C;">&copy; 2026 UNAM — <em>"Por mi raza hablará el espíritu"</em></small>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOCKUP DASHBOARD -->
+      <h2 class="unam-title text-center mb-4">Mockup — Panel Administrativo</h2>
+      <div class="card unam-card mb-5">
+        <div class="card-body p-0">
+          <div class="p-3" style="background:#002147; border-radius:12px 12px 0 0;">
+            <div class="d-flex justify-content-between align-items-center text-white">
+              <span class="fw-bold">Panel de Administración</span>
+              <span style="color:#C6930C;">Admin · Cerrar Sesión</span>
+            </div>
+          </div>
+          <div class="p-4" style="background:#F5F0E8;">
+            <div class="row g-3 mb-4">
+              <div class="col-md-3"><div class="p-3 rounded text-white text-center fw-bold" style="background:#002147;">45<br><small>Total Trabajos</small></div></div>
+              <div class="col-md-3"><div class="p-3 rounded text-white text-center fw-bold" style="background:#C6930C;">12<br><small>Pendientes</small></div></div>
+              <div class="col-md-3"><div class="p-3 rounded text-white text-center fw-bold" style="background:#003366;">20<br><small>En Revisión</small></div></div>
+              <div class="col-md-3"><div class="p-3 rounded text-white text-center fw-bold" style="background:#1a5c2e;">13<br><small>Dictaminados</small></div></div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4 mb-3">
+                <div style="background:#fff; border-radius:10px; padding:15px; border-top:3px solid #002147;">
+                  <h6 class="fw-bold" style="color:#002147;">Menú</h6>
+                  <div class="d-grid gap-2">
+                    <span class="p-2 rounded" style="background:#F5F0E8; color:#002147; font-weight:500;">Trabajos Pendientes</span>
+                    <span class="p-2 rounded" style="background:#F5F0E8; color:#002147; font-weight:500;">Asignaciones</span>
+                    <span class="p-2 rounded" style="background:#F5F0E8; color:#002147; font-weight:500;">Por Dictaminar</span>
+                    <span class="p-2 rounded" style="background:#F5F0E8; color:#002147; font-weight:500;">Horarios</span>
+                    <span class="p-2 rounded" style="background:#C6930C; color:#fff; font-weight:600;">Fase 2: Premiación</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-8">
+                <div style="background:#fff; border-radius:10px; padding:20px; border-top:3px solid #C6930C;">
+                  <div class="d-flex justify-content-between mb-3">
+                    <h6 class="fw-bold" style="color:#002147;">Trabajos por Asignar</h6>
+                    <span class="badge" style="background:#C6930C; color:#fff;">Asignar Todos</span>
+                  </div>
+                  <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                    <div class="d-flex justify-content-between">
+                      <div><span class="badge me-2" style="background:#002147; color:#fff;">A01</span> <strong>Optimización de reactores</strong></div>
+                      <small class="text-muted">Alumno A · 4to Semestre</small>
+                    </div>
+                  </div>
+                  <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                    <div class="d-flex justify-content-between">
+                      <div><span class="badge me-2" style="background:#002147; color:#fff;">A02</span> <strong>Tratamiento de aguas residuales</strong></div>
+                      <small class="text-muted">Alumno B · 6to Semestre</small>
+                    </div>
+                  </div>
+                  <div style="padding:10px 0;">
+                    <div class="d-flex justify-content-between">
+                      <div><span class="badge me-2" style="background:#002147; color:#fff;">A03</span> <strong>Bioprocesos fermentativos</strong></div>
+                      <small class="text-muted">Alumno C · 8vo Semestre</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 text-center" style="background:#002147; border-radius:0 0 12px 12px;">
+            <small style="color:#C6930C;"><em>"Por mi raza hablará el espíritu"</em></small>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOCKUP LOGIN -->
+      <h2 class="unam-title text-center mb-4">Mockup — Inicio de Sesión</h2>
+      <div class="row justify-content-center mb-5">
+        <div class="col-md-6">
+          <div style="border-radius:16px; overflow:hidden; box-shadow:0 10px 40px rgba(0,33,71,0.15);">
+            <div class="p-4 text-center" style="background:linear-gradient(135deg, #002147, #003366);">
+              <div style="width:60px; height:60px; border:2px solid #C6930C; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center;">
+                <span style="color:#C6930C; font-weight:900; font-size:1.5rem;">U</span>
+              </div>
+              <h5 class="text-white fw-bold mb-0">Iniciar Sesión</h5>
+              <small style="color:#C6930C;">Portal del Encuentro de Ingeniería Química</small>
+            </div>
+            <div class="p-4" style="background:#fff;">
+              <div style="margin-bottom:15px;">
+                <label style="font-weight:600; color:#002147; font-size:0.85rem;">CORREO ELECTRÓNICO</label>
+                <div style="border:1px solid #ddd; border-radius:8px; padding:10px 15px; color:#999;">tu@correo.com</div>
+              </div>
+              <div style="margin-bottom:20px;">
+                <label style="font-weight:600; color:#002147; font-size:0.85rem;">CONTRASEÑA</label>
+                <div style="border:1px solid #ddd; border-radius:8px; padding:10px 15px; color:#999;">••••••••</div>
+              </div>
+              <div style="background:#002147; color:#fff; text-align:center; padding:12px; border-radius:8px; font-weight:600; cursor:default;">
+                Ingresar al Portal
+              </div>
+              <div class="text-center mt-3">
+                <small style="color:#999;">¿No tienes cuenta? <span style="color:#C6930C; font-weight:600;">Regístrate aquí</span></small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ICONOGRAFÍA -->
+      <h2 class="unam-title text-center mb-4">Propuesta de Iconografía</h2>
+      <div class="card unam-card mb-5">
+        <div class="card-body p-5">
+          <p class="text-muted text-center mb-4">
+            Reemplazar emojis por iconos SVG monocromáticos en dorado <code>#C6930C</code>,
+            integrados dentro de círculos concéntricos con borde azul UNAM.
+          </p>
+          <div class="row text-center g-4">
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <small>Documento</small>
+            </div>
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <small>Evaluación</small>
+            </div>
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              </div>
+              <small>Premiación</small>
+            </div>
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><rect x="3" y="3" width="18" height="14" rx="2" ry="2"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+              </div>
+              <small>Auditorio</small>
+            </div>
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <small>Usuario</small>
+            </div>
+            <div class="col-4 col-md-2">
+              <div class="icon-sample">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6930C" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <small>Correo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOJA DE RUTA -->
+      <h2 class="unam-title text-center mb-4">Hoja de Ruta para Implementación</h2>
+      <div class="card unam-card mb-5">
+        <div class="card-body p-5">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#002147;"></div>
+              <h5 class="fw-bold">1. CSS base institucional</h5>
+              <p class="text-muted mb-0">Crear <code>unam-theme.css</code> con variables de color UNAM, tipografía formal (Playfair Display + Inter), y estilos globales. Reemplazar la paleta Bootstrap por defecto.</p>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#C6930C;"></div>
+              <h5 class="fw-bold">2. Hero/Navbar unificados</h5>
+              <p class="text-muted mb-0">Diseñar un header con fondo degradado azul UNAM, escudo institucional, y nombre completo del encuentro con las tres entidades participantes.</p>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#002147;"></div>
+              <h5 class="fw-bold">3. Migrar emojis a SVGs</h5>
+              <p class="text-muted mb-0">Reemplazar emojis en todas las páginas por iconos SVG con stroke dorado, dentro de contenedores circulares con borde azul UNAM.</p>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#C6930C;"></div>
+              <h5 class="fw-bold">4. Componentes con acentos dorados</h5>
+              <p class="text-muted mb-0">Tarjetas, tablas, badges y botones con bordes superiores dorados o azules. Hover en botones con transición a dorado.</p>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#002147;"></div>
+              <h5 class="fw-bold">5. Footer institucional</h5>
+              <p class="text-muted mb-0">Fondo azul UNAM, texto en oro, escudo de la UNAM y el lema "Por mi raza hablará el espíritu" visible en todas las páginas.</p>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-marker" style="background:#C6930C;"></div>
+              <h5 class="fw-bold">6. Actualizar naming del evento</h5>
+              <p class="text-muted mb-0">Cambiar referencias de "Congreso Estudiantil de Laboratorios de Ingeniería Química" a "Encuentro de Ingeniería Química · UNAM" en títulos, navbars y metadatos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONCLUSIÓN -->
+      <div class="card unam-card border-gold mb-5">
+        <div class="card-body p-5 text-center">
+          <div style="width:70px; height:70px; border:3px solid #C6930C; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
+            <span style="color:#C6930C; font-weight:900; font-size:1.8rem;">U</span>
+          </div>
+          <h3 class="fw-bold" style="color:#002147;">Identidad que nos une</h3>
+          <p class="text-muted mx-auto" style="max-width:600px;">
+            Este rediseño busca reflejar la grandeza institucional de la UNAM y la unión de sus facultades
+            y escuelas. El azul y oro no son solo colores: representan la tradición, la excelencia y el
+            orgullo de pertenecer a la máxima casa de estudios de México.
+          </p>
+          <p class="fw-bold" style="color:#C6930C;">
+            <em>"Por mi raza hablará el espíritu"</em>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="unam-footer">
+  <div class="container text-center">
+    <p class="mb-1 fw-bold">Universidad Nacional Autónoma de México</p>
+    <p class="mb-0"><em>Por mi raza hablará el espíritu</em></p>
+    <hr style="border-color:rgba(198,147,12,0.3); max-width:200px; margin:12px auto;">
+    <small style="color:rgba(255,255,255,0.5);">Facultad de Química · FES Cuautitlán · FES Zaragoza</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- ===== ENLACE A LAS OTRAS PROPUESTAS ===== -->
+      <div class="card unam-card mb-5">
+        <div class="card-body p-5 text-center">
+          <h2 class="unam-title mb-4">Explorar las propuestas</h2>
+          <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+              <a href="propuesta2-moderno/index.html" class="btn d-block p-3" style="background:#002147; color:#fff; border-radius:12px; text-decoration:none;height:100%;">
+                <div class="fw-bold" style="color:#C6930C;font-size:1.1rem;">Moderno-Ligero</div>
+                <small style="color:rgba(255,255,255,0.6);">Mobile-first · Bento grid · Bottom nav</small>
+              </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div style="background:#C6930C; color:#002147; border-radius:12px; padding:1.6rem 0.8rem; font-weight:700; font-size:0.85rem;height:100%;display:flex;flex-direction:column;justify-content:center;">
+                (Esta propuesta)
+                <br><small>Clásico-UNAM · Formal · Hero gradient</small>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <a href="propuesta3-clasico/index.html" class="btn d-block p-3" style="background:#002147; color:#fff; border-radius:12px; text-decoration:none;height:100%;">
+                <div class="fw-bold" style="color:#C6930C;font-size:1.1rem;">Portal Institucional</div>
+                <small style="color:rgba(255,255,255,0.6);">Sidebar · Tablas · Breadcrumbs</small>
+              </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <a href="propuesta4-feszaragoza/index.html" class="btn d-block p-3" style="background:#002147; color:#fff; border-radius:12px; text-decoration:none;height:100%;">
+                <div class="fw-bold" style="color:#C6930C;font-size:1.1rem;">Estilo FES Zaragoza</div>
+                <small style="color:rgba(255,255,255,0.6);">Roboto Slab · Cards 30px · Breadcrumbs</small>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+</body>
+</html>
