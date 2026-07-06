@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="favicon.ico">
     <link href="css/style.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#002147">
+    <meta name="theme-color" content="#003D79">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LABIQ">
@@ -45,7 +45,7 @@
 
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0" style="color: var(--unam-blue); font-family: var(--font-heading);">Mis Trabajos
+            <h2 class="fw-bold mb-0" style="color: var(--primary); font-family: var(--font-heading);">Mis Trabajos
             </h2>
             <span class="btn btn-outline-unam fw-bold" style="cursor: not-allowed; opacity: 0.65;">🚫 La recepción de
                 trabajos terminó</span>
@@ -61,7 +61,7 @@
     <div class="modal fade" id="feedbackModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--unam-blue); color: white;">
+                <div class="modal-header" style="background: var(--primary); color: white;">
                     <h5 class="modal-title">📝 Retroalimentación del Comité</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -126,8 +126,8 @@
             <div class="content-card-body">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h5 class="fw-bold" style="color: var(--unam-blue);">
-                            <span class="badge" style="background: var(--unam-blue);">${w.short_id || 'S/N'}</span> 
+                        <h5 class="fw-bold" style="color: var(--primary);">
+                            <span class="badge" style="background: var(--primary);">${w.short_id || 'S/N'}</span> 
                             ${w.title}
                         </h5>
                         <p class="mb-1"><strong>Estado:</strong> ${statusData.badge}</p>
@@ -148,8 +148,8 @@
             const map = {
                 'pending': { badge: '<span class="badge bg-warning text-dark">Pendiente de revisión</span>' },
                 'under_review': { badge: '<span class="badge bg-info text-dark">En evaluación</span>' },
-                'accepted_oral': { badge: '<span class="badge" style="background: var(--unam-blue);">✅ ACEPTADO PARA PONENCIA (ORAL)</span>' },
-                'accepted_poster': { badge: '<span class="badge" style="background: var(--unam-gold); color: var(--unam-blue);">✅ ACEPTADO PARA CARTEL (PÓSTER)</span>' },
+                'accepted_oral': { badge: '<span class="badge" style="background: var(--primary);">✅ ACEPTADO PARA PONENCIA (ORAL)</span>' },
+                'accepted_poster': { badge: '<span class="badge" style="background: var(--accent); color: var(--primary);">✅ ACEPTADO PARA CARTEL (PÓSTER)</span>' },
                 'rejected': { badge: '<span class="badge bg-danger">❌ NO ACEPTADO</span>' }
             };
             return map[status] || { badge: '<span class="badge bg-secondary">Desconocido</span>' };

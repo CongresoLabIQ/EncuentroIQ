@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="favicon.ico">
     <link href="css/style.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#002147">
+    <meta name="theme-color" content="#003D79">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LABIQ">
@@ -106,7 +106,7 @@
     <div class="modal fade" id="evalModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--unam-blue); color: white;">
+                <div class="modal-header" style="background: var(--primary); color: white;">
                     <h5 class="modal-title">📋 Evaluación de Resumenes</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -331,12 +331,12 @@
     <div class="modal fade" id="liveModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--unam-blue); color: white;">
+                <div class="modal-header" style="background: var(--primary); color: white;">
                     <h5 class="modal-title">🎤 Evaluación de Presentación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h5 id="liveWorkTitle" class="mb-3" style="color: var(--unam-blue);"></h5>
+                    <h5 id="liveWorkTitle" class="mb-3" style="color: var(--primary);"></h5>
 
                     <div id="liveReadOnlyBanner" class="alert alert-success d-none text-center fw-bold mb-3">
                         ✅ Evaluación enviada — solo vista previa
@@ -1074,10 +1074,10 @@
         <div class="card work-card live h-100 shadow-sm ${isCompleted ? 'border-success opacity-75' : ''}">
           <div class="card-body">
             <div class="d-flex justify-content-between">
-              <span class="badge text-white mb-2" style="background:#6f42c1;">${a.works?.short_id || ''}</span>
+              <span class="badge text-white mb-2" style="background:var(--primary);">${a.works?.short_id || ''}</span>
               <small class="text-muted">${a.works?.auditorio || ''}</small>
             </div>
-            <h5 class="fw-bold mb-1" style="color: #6f42c1;">${a.works?.title || 'Sin título'}</h5>
+            <h5 class="fw-bold mb-1" style="color: var(--primary);">${a.works?.title || 'Sin título'}</h5>
             <p class="mb-1"><strong>Modalidad:</strong> ${modalityLabel}</p>
             <p class="mb-2"><strong>Equipo:</strong> ${a.works?.student_name || 'N/D'}</p>
             ${isCompleted
@@ -1091,7 +1091,7 @@
                             👁️ Ver
                           </button>
                         </div>`
-                        : `<button class="btn w-100 text-white fw-bold" style="background-color:#6f42c1;"
+                        : `<button class="btn w-100 text-white fw-bold" style="background-color:var(--primary);"
                   onclick="openLive('${a.id}', '${a.work_id}', \`${(a.works?.title || '').replace(/`/g, "'")}\`, '${modalityParam}')">
                   ⭐ Evaluar Presentación
                 </button>`
@@ -1102,12 +1102,12 @@
             }
 
             if (orales.length > 0) {
-                html += `<div class="col-12 mb-3"><h5 class="fw-bold" style="color:#6f42c1;">🎤 Ponencia (${orales.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3"><h5 class="fw-bold" style="color:var(--primary);">🎤 Ponencia (${orales.length})</h5><hr></div>`;
                 html += orales.map(renderCard).join('');
             }
 
             if (carteles.length > 0) {
-                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold" style="color:#198754;">📊 Cartel (${carteles.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold" style="color:var(--success);">📊 Cartel (${carteles.length})</h5><hr></div>`;
                 html += carteles.map(renderCard).join('');
             }
 

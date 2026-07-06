@@ -1,11 +1,11 @@
 {
-    "name": "Congreso LABIQ - Sistema de Evaluación",
-    "short_name": "LABIQ",
-    "description": "Sistema de gestión y evaluación del Congreso Estudiantil LABIQ",
+    "name": "Encuentro IQ - Sistema de Evaluación",
+    "short_name": "EncuentroIQ",
+    "description": "Sistema de gestión y evaluación del Encuentro de Ingeniería Química",
     "start_url": "index.html",
     "display": "standalone",
-    "background_color": "#0d6efd",
-    "theme_color": "#0d6efd",
+    "background_color": "#003D79",
+    "theme_color": "#003D79",
     "orientation": "portrait",
     "icons": [
         {
