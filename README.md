@@ -1,5 +1,15 @@
 # EncuentroIQ — Sistema de Gestión y Evaluación
 
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/congresolabiq/EncuentroIQ/actions/workflows/ci.yml/badge.svg)](https://github.com/congresolabiq/EncuentroIQ/actions/workflows/ci.yml)
+[![PWA](https://img.shields.io/badge/PWA-ready-5C0D34.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+[![GitHub last commit](https://img.shields.io/github/last-commit/congresolabiq/EncuentroIQ)](https://github.com/congresolabiq/EncuentroIQ/commits/main)
+[![GitHub release](https://img.shields.io/github/v/release/congresolabiq/EncuentroIQ)](https://github.com/congresolabiq/EncuentroIQ/releases)
+
+</div>
+
 Plataforma web para el **Encuentro Estudiantil de Ingeniería Química**, evento académico que reúne a tres entidades de la UNAM: **Facultad de Química**, **FES Cuautitlán** y **FES Zaragoza**. Permite la publicación, evaluación y administración de trabajos académicos (modalidad oral y cartel) en un entorno tipo congreso.
 
 ---

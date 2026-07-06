@@ -24,7 +24,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="unam-shield"><span class="shield-inner">U</span></div>
                 <div>
-                    <div class="top-bar-entity">Facultad de Estudios Superiores Zaragoza</div>
+                    <div class="top-bar-entity">9no Encuentro Estudiantil de Ingeniería Química</div>
                     <div class="top-bar-event">Panel Evaluador</div>
                 </div>
             </div>
@@ -128,185 +128,190 @@
                     </div>
 
                     <!-- ✅ ¿Cumple con la extensión? -->
-                    <div class="alert alert-warning border-start border-4 border-warning mb-3" id="cumpleExtensionSection">
+                    <div class="alert alert-warning border-start border-4 border-warning mb-3"
+                        id="cumpleExtensionSection">
                         <div class="d-flex align-items-center gap-3 flex-wrap">
                             <strong class="fs-6">📏 ¿Cumple con la extensión?</strong>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleSi" value="si" onchange="toggleCumpleExtension()">
+                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleSi"
+                                    value="si" onchange="toggleCumpleExtension()">
                                 <label class="form-check-label fw-bold text-success" for="cumpleSi">Sí</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleNo" value="no" onchange="toggleCumpleExtension()">
+                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleNo"
+                                    value="no" onchange="toggleCumpleExtension()">
                                 <label class="form-check-label fw-bold text-danger" for="cumpleNo">No</label>
                             </div>
                         </div>
                         <div id="cumpleWarning" class="d-none mt-2">
-                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", el trabajo será rechazado directamente. No es necesario evaluar la rúbrica.</small>
+                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", el trabajo será rechazado
+                                directamente. No es necesario evaluar la rúbrica.</small>
                         </div>
                     </div>
 
                     <div id="rubricContainer">
-                    <div class="row">
-                        <!-- PARTE 1: ESTRUCTURA (90%) -->
-                        <div class="col-lg-7 border-end">
-                            <h6 class="bg-light p-2 fw-bold border-start border-primary border-4 mb-3">Parte 1:
-                                Contenido del Documento (90 pts)</h6>
+                        <div class="row">
+                            <!-- PARTE 1: ESTRUCTURA (90%) -->
+                            <div class="col-lg-7 border-end">
+                                <h6 class="bg-light p-2 fw-bold border-start border-primary border-4 mb-3">Parte 1:
+                                    Contenido del Documento (90 pts)</h6>
 
-                            <!-- Criterio: Resumen -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Resumen (0-10%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_resumen">0</span>
+                                <!-- Criterio: Resumen -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Resumen (0-10%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_resumen">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Estructura, ¿Qué se hizo?, ¿Cuál fue el
+                                        resultado?</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_resumen" min="0" max="10"
+                                        step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Estructura, ¿Qué se hizo?, ¿Cuál fue el
-                                    resultado?</small>
-                                <input type="range" class="form-range rubric-slider" id="r_resumen" min="0" max="10"
-                                    step="1" value="0">
+
+                                <!-- Criterio: Justificación -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Justificación (0-10%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_justificacion">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Problema detectado e ideas clave
+                                        claras.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_justificacion" min="0"
+                                        max="10" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Objetivos -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Objetivos (0-15%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_objetivos">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Taxonomía de Bloom, objetivo general y
+                                        específicos.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_objetivos" min="0"
+                                        max="15" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Introducción -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Introducción (0-10%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_introduccion">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Contraste de teorías y referencias
+                                        bibliográficas.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_introduccion" min="0"
+                                        max="10" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Metodología -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Metodología (0-10%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_metodologia">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Materiales, herramientas y
+                                        procedimientos.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_metodologia" min="0"
+                                        max="10" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Resultados -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Resultados y Análisis (0-15%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_resultados">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Tratamiento de datos, cuadros, figuras y
+                                        formato.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_resultados" min="0"
+                                        max="15" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Conclusiones -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Conclusiones (0-15%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_conclusiones">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Relación con el cumplimiento de
+                                        objetivos.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_conclusiones" min="0"
+                                        max="15" step="1" value="0">
+                                </div>
+
+                                <!-- Criterio: Referencias -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="fw-bold">Referencias (0-5%)</label>
+                                        <span class="badge bg-primary fs-6 rubric-val" id="val_referencias">0</span>
+                                    </div>
+                                    <small class="text-muted d-block mb-1">Bibliografía actual y formato APA 7.</small>
+                                    <input type="range" class="form-range rubric-slider" id="r_referencias" min="0"
+                                        max="5" step="1" value="0">
+                                </div>
                             </div>
 
-                            <!-- Criterio: Justificación -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Justificación (0-10%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_justificacion">0</span>
-                                </div>
-                                <small class="text-muted d-block mb-1">Problema detectado e ideas clave claras.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_justificacion" min="0"
-                                    max="10" step="1" value="0">
-                            </div>
+                            <!-- PARTE 2: PERTINENCIA (10%) -->
+                            <div class="col-lg-5">
+                                <h6 class="bg-light p-2 fw-bold border-start border-success border-4 mb-3">Parte 2:
+                                    Pertinencia e Innovación (10 pts)</h6>
 
-                            <!-- Criterio: Objetivos -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Objetivos (0-15%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_objetivos">0</span>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Factibilidad y pertinencia (0-2)</span>
+                                        <span class="fw-bold text-success rubric-val" id="val_factibilidad">0</span>
+                                    </div>
+                                    <input type="range" class="form-range rubric-slider" id="r_factibilidad" min="0"
+                                        max="2" step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Taxonomía de Bloom, objetivo general y
-                                    específicos.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_objetivos" min="0" max="15"
-                                    step="1" value="0">
-                            </div>
 
-                            <!-- Criterio: Introducción -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Introducción (0-10%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_introduccion">0</span>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Innovación (0-2)</span>
+                                        <span class="fw-bold text-success rubric-val" id="val_innovacion">0</span>
+                                    </div>
+                                    <input type="range" class="form-range rubric-slider" id="r_innovacion" min="0"
+                                        max="2" step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Contraste de teorías y referencias
-                                    bibliográficas.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_introduccion" min="0"
-                                    max="10" step="1" value="0">
-                            </div>
 
-                            <!-- Criterio: Metodología -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Metodología (0-10%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_metodologia">0</span>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Integración de conocimientos (0-2)</span>
+                                        <span class="fw-bold text-success rubric-val" id="val_integracion">0</span>
+                                    </div>
+                                    <input type="range" class="form-range rubric-slider" id="r_integracion" min="0"
+                                        max="2" step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Materiales, herramientas y
-                                    procedimientos.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_metodologia" min="0" max="10"
-                                    step="1" value="0">
-                            </div>
 
-                            <!-- Criterio: Resultados -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Resultados y Análisis (0-15%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_resultados">0</span>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Cumplimiento del Programa (0-2)</span>
+                                        <span class="fw-bold text-success rubric-val" id="val_programa">0</span>
+                                    </div>
+                                    <input type="range" class="form-range rubric-slider" id="r_programa" min="0" max="2"
+                                        step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Tratamiento de datos, cuadros, figuras y
-                                    formato.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_resultados" min="0" max="15"
-                                    step="1" value="0">
-                            </div>
 
-                            <!-- Criterio: Conclusiones -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Conclusiones (0-15%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_conclusiones">0</span>
+                                <div class="mb-3 border-bottom pb-2">
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Ética y valores (0-2)</span>
+                                        <span class="fw-bold text-success rubric-val" id="val_etica">0</span>
+                                    </div>
+                                    <input type="range" class="form-range rubric-slider" id="r_etica" min="0" max="2"
+                                        step="1" value="0">
                                 </div>
-                                <small class="text-muted d-block mb-1">Relación con el cumplimiento de
-                                    objetivos.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_conclusiones" min="0"
-                                    max="15" step="1" value="0">
-                            </div>
 
-                            <!-- Criterio: Referencias -->
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between">
-                                    <label class="fw-bold">Referencias (0-5%)</label>
-                                    <span class="badge bg-primary fs-6 rubric-val" id="val_referencias">0</span>
+                                <!-- TOTAL -->
+                                <div class="card bg-dark text-white text-center mb-4 shadow">
+                                    <div class="card-body py-2">
+                                        <small class="text-uppercase opacity-75">Calificación Final</small>
+                                        <h2 class="mb-0 fw-bold"><span id="totalRubricScore">0</span> / 100</h2>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block mb-1">Bibliografía actual y formato APA 7.</small>
-                                <input type="range" class="form-range rubric-slider" id="r_referencias" min="0" max="5"
-                                    step="1" value="0">
+
                             </div>
                         </div>
-
-                        <!-- PARTE 2: PERTINENCIA (10%) -->
-                        <div class="col-lg-5">
-                            <h6 class="bg-light p-2 fw-bold border-start border-success border-4 mb-3">Parte 2:
-                                Pertinencia e Innovación (10 pts)</h6>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>Factibilidad y pertinencia (0-2)</span>
-                                    <span class="fw-bold text-success rubric-val" id="val_factibilidad">0</span>
-                                </div>
-                                <input type="range" class="form-range rubric-slider" id="r_factibilidad" min="0" max="2"
-                                    step="1" value="0">
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>Innovación (0-2)</span>
-                                    <span class="fw-bold text-success rubric-val" id="val_innovacion">0</span>
-                                </div>
-                                <input type="range" class="form-range rubric-slider" id="r_innovacion" min="0" max="2"
-                                    step="1" value="0">
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>Integración de conocimientos (0-2)</span>
-                                    <span class="fw-bold text-success rubric-val" id="val_integracion">0</span>
-                                </div>
-                                <input type="range" class="form-range rubric-slider" id="r_integracion" min="0" max="2"
-                                    step="1" value="0">
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>Cumplimiento del Programa (0-2)</span>
-                                    <span class="fw-bold text-success rubric-val" id="val_programa">0</span>
-                                </div>
-                                <input type="range" class="form-range rubric-slider" id="r_programa" min="0" max="2"
-                                    step="1" value="0">
-                            </div>
-
-                            <div class="mb-3 border-bottom pb-2">
-                                <div class="d-flex justify-content-between small">
-                                    <span>Ética y valores (0-2)</span>
-                                    <span class="fw-bold text-success rubric-val" id="val_etica">0</span>
-                                </div>
-                                <input type="range" class="form-range rubric-slider" id="r_etica" min="0" max="2"
-                                    step="1" value="0">
-                            </div>
-
-                            <!-- TOTAL -->
-                            <div class="card bg-dark text-white text-center mb-4 shadow">
-                                <div class="card-body py-2">
-                                    <small class="text-uppercase opacity-75">Calificación Final</small>
-                                    <h2 class="mb-0 fw-bold"><span id="totalRubricScore">0</span> / 100</h2>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
                     </div>
 
                     <div class="mb-3">
@@ -347,309 +352,332 @@
                         <div class="d-flex align-items-center gap-3 flex-wrap">
                             <strong class="fs-6">🎤 ¿Se presentó el trabajo?</strong>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoSi" value="si" onchange="toggleSePresento()">
+                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoSi"
+                                    value="si" onchange="toggleSePresento()">
                                 <label class="form-check-label fw-bold text-success" for="sePresentoSi">Sí</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoNo" value="no" onchange="toggleSePresento()">
+                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoNo"
+                                    value="no" onchange="toggleSePresento()">
                                 <label class="form-check-label fw-bold text-danger" for="sePresentoNo">No</label>
                             </div>
                         </div>
                         <div id="sePresentoWarning" class="d-none mt-2">
-                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", la calificación será 0 automáticamente.</small>
+                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", la calificación será 0
+                                automáticamente.</small>
                         </div>
                     </div>
 
                     <div id="liveEvaluationContainer">
-                    <form id="liveForm">
+                        <form id="liveForm">
 
-                        <div class="mb-4 p-4 border rounded bg-light">
-                            <label class="form-label fw-bold mb-2">Revisión del Material de Apoyo</label>
-                            <small class="text-muted d-block mb-3">Verifique si el material contiene cada elemento (1
-                                punto c/u)</small>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Título</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_titulo" id="c_titulo_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_titulo_si">Sí</label>
+                            <div class="mb-4 p-4 border rounded bg-light">
+                                <label class="form-label fw-bold mb-2">Revisión del Material de Apoyo</label>
+                                <small class="text-muted d-block mb-3">Verifique si el material contiene cada elemento
+                                    (1
+                                    punto c/u)</small>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Título</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_titulo" id="c_titulo_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_titulo_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_titulo" id="c_titulo_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_titulo_no">No</label>
+                                                    </div>
                                                 </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_titulo" id="c_titulo_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_titulo_no">No</label>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Nombre del docente</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_docente" id="c_docente_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_docente_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_docente" id="c_docente_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_docente_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Participantes</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_participantes" id="c_participantes_si" value="1"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_participantes_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_participantes" id="c_participantes_no" value="0"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_participantes_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Semestre</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_grupo" id="c_grupo_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_grupo_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_grupo" id="c_grupo_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_grupo_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Objetivos</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_objetivos" id="c_objetivos_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_objetivos_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_objetivos" id="c_objetivos_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_objetivos_no">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Nombre del docente</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_docente" id="c_docente_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_docente_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_docente" id="c_docente_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_docente_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Participantes</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_participantes" id="c_participantes_si" value="1"
-                                                        required onchange="updLive()">
-                                                    <label class="form-check-label" for="c_participantes_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_participantes" id="c_participantes_no" value="0"
-                                                        required onchange="updLive()">
-                                                    <label class="form-check-label" for="c_participantes_no">No</label>
+                                    <div class="col-12 col-md-6">
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Introducción</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_marco" id="c_marco_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_marco_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_marco" id="c_marco_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_marco_no">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Semestre</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_grupo" id="c_grupo_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_grupo_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_grupo" id="c_grupo_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_grupo_no">No</label>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Metodología</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_metodologia" id="c_metodologia_si" value="1"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_metodologia_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_metodologia" id="c_metodologia_no" value="0"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_metodologia_no">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="py-2 px-3">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Objetivos</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_objetivos" id="c_objetivos_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_objetivos_si">Sí</label>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Resultados</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_resultados" id="c_resultados_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_resultados_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_resultados" id="c_resultados_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_resultados_no">No</label>
+                                                    </div>
                                                 </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_objetivos" id="c_objetivos_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_objetivos_no">No</label>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3 border-bottom border-light">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Conclusión</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_conclusion" id="c_conclusion_si" value="1" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_conclusion_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_conclusion" id="c_conclusion_no" value="0" required
+                                                            onchange="updLive()">
+                                                        <label class="form-check-label" for="c_conclusion_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Bibliografía</span>
+                                                <div class="d-flex gap-3">
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_bibliografia" id="c_bibliografia_si" value="1"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_bibliografia_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check mb-0">
+                                                        <input class="form-check-input contenido-check" type="radio"
+                                                            name="c_bibliografia" id="c_bibliografia_no" value="0"
+                                                            required onchange="updLive()">
+                                                        <label class="form-check-label"
+                                                            for="c_bibliografia_no">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Introducción</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_marco" id="c_marco_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_marco_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_marco" id="c_marco_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_marco_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Metodología</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_metodologia" id="c_metodologia_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_metodologia_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_metodologia" id="c_metodologia_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_metodologia_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Resultados</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_resultados" id="c_resultados_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_resultados_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_resultados" id="c_resultados_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_resultados_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="py-2 px-3 border-bottom border-light">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Conclusión</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_conclusion" id="c_conclusion_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_conclusion_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_conclusion" id="c_conclusion_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_conclusion_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="py-2 px-3">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>Bibliografía</span>
-                                            <div class="d-flex gap-3">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_bibliografia" id="c_bibliografia_si" value="1" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_bibliografia_si">Sí</label>
-                                                </div>
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input contenido-check" type="radio"
-                                                        name="c_bibliografia" id="c_bibliografia_no" value="0" required
-                                                        onchange="updLive()">
-                                                    <label class="form-check-label" for="c_bibliografia_no">No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            </div>
+
+                            <div class="mb-3 rubric-item" data-modality="ambos">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">1. Tono de voz (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_1">0</span>
                                 </div>
+                                <small class="text-muted d-block mb-1">Las y los ponentes modulan correcta y
+                                    apropiadamente
+                                    el tono de voz. La comunicación fluye con naturalidad y corrección. Utilizan el
+                                    vocabulario correcto y adecuado</small>
+                                <input type="range" class="form-range live-slider" id="r_1" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
                             </div>
-                        </div>
+                            <div class="mb-3 rubric-item" data-modality="ambos">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">2. Calidad de presentación (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_2">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Mantienen la atención de la audiencia. Evitan
+                                    limitarse a leer lo que está escrito en las diapositivas.</small>
+                                <input type="range" class="form-range live-slider" id="r_2" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="ambos">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">3. Dominio del contenido (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_3">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Demuestran dominio del tema al exponer y al
+                                    responder
+                                    las preguntas de la audiencia.</small>
+                                <input type="range" class="form-range live-slider" id="r_3" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="ambos">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">4. Lenguaje corporal (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_4">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Utilizan un lenguaje corporal correcto
+                                    (movimientos,
+                                    gestos, vestimenta adecuada, etc.). </small>
+                                <input type="range" class="form-range live-slider" id="r_4" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="ambos">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">5. Trabajo en equipo (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_5">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Se distribuyen actividades en el momento de la
+                                    presentación.</small>
+                                <input type="range" class="form-range live-slider" id="r_5" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="ponencia">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">6. Uso de recursos visuales (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_6">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">Se apoyan en las diapositivas para su exposición
+                                    y
+                                    éstas guardan una adecuada proporción de texto/imagen.</small>
+                                <input type="range" class="form-range live-slider" id="r_6" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="cartel">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">7. Uso de recursos visuales (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_7">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">El cartel es original y creativo, logra captar la
+                                    atención de la audiencia por su combinación y uso de colores e imágenes alusivas al
+                                    tema.</small>
+                                <input type="range" class="form-range live-slider" id="r_7" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
+                            <div class="mb-3 rubric-item" data-modality="cartel">
+                                <div class="d-flex justify-content-between">
+                                    <label class="fw-bold">8. Comunicación escrita (0-5)</label>
+                                    <span class="badge bg-primary fs-6 rubric-val" id="val_8">0</span>
+                                </div>
+                                <small class="text-muted d-block mb-1">La redacción es clara y precisa, además no
+                                    contiene
+                                    errores de ortografía.</small>
+                                <input type="range" class="form-range live-slider" id="r_8" min="0" max="5" step="1"
+                                    value="0" oninput="updLive()">
+                            </div>
 
-                        <div class="mb-3 rubric-item" data-modality="ambos">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">1. Tono de voz (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_1">0</span>
+                            <div class="alert alert-secondary text-center">
+                                Total: <span id="liveTotal" class="fw-bold fs-5">0</span>
                             </div>
-                            <small class="text-muted d-block mb-1">Las y los ponentes modulan correcta y apropiadamente
-                                el tono de voz. La comunicación fluye con naturalidad y corrección. Utilizan el
-                                vocabulario correcto y adecuado</small>
-                            <input type="range" class="form-range live-slider" id="r_1" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="ambos">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">2. Calidad de presentación (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_2">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">Mantienen la atención de la audiencia. Evitan
-                                limitarse a leer lo que está escrito en las diapositivas.</small>
-                            <input type="range" class="form-range live-slider" id="r_2" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="ambos">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">3. Dominio del contenido (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_3">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">Demuestran dominio del tema al exponer y al responder
-                                las preguntas de la audiencia.</small>
-                            <input type="range" class="form-range live-slider" id="r_3" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="ambos">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">4. Lenguaje corporal (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_4">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">Utilizan un lenguaje corporal correcto (movimientos,
-                                gestos, vestimenta adecuada, etc.). </small>
-                            <input type="range" class="form-range live-slider" id="r_4" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="ambos">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">5. Trabajo en equipo (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_5">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">Se distribuyen actividades en el momento de la
-                                presentación.</small>
-                            <input type="range" class="form-range live-slider" id="r_5" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="ponencia">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">6. Uso de recursos visuales (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_6">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">Se apoyan en las diapositivas para su exposición y
-                                éstas guardan una adecuada proporción de texto/imagen.</small>
-                            <input type="range" class="form-range live-slider" id="r_6" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="cartel">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">7. Uso de recursos visuales (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_7">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">El cartel es original y creativo, logra captar la
-                                atención de la audiencia por su combinación y uso de colores e imágenes alusivas al
-                                tema.</small>
-                            <input type="range" class="form-range live-slider" id="r_7" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
-                        <div class="mb-3 rubric-item" data-modality="cartel">
-                            <div class="d-flex justify-content-between">
-                                <label class="fw-bold">8. Comunicación escrita (0-5)</label>
-                                <span class="badge bg-primary fs-6 rubric-val" id="val_8">0</span>
-                            </div>
-                            <small class="text-muted d-block mb-1">La redacción es clara y precisa, además no contiene
-                                errores de ortografía.</small>
-                            <input type="range" class="form-range live-slider" id="r_8" min="0" max="5" step="1" value="0" oninput="updLive()">
-                        </div>
 
-                        <div class="alert alert-secondary text-center">
-                            Total: <span id="liveTotal" class="fw-bold fs-5">0</span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Comentarios adicionales</label>
-                            <textarea class="form-control" id="liveComments" rows="3"
-                                placeholder="Observaciones sobre la presentación en vivo..."></textarea>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <label class="form-label">Comentarios adicionales</label>
+                                <textarea class="form-control" id="liveComments" rows="3"
+                                    placeholder="Observaciones sobre la presentación en vivo..."></textarea>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1322,7 +1350,13 @@
                 <div class="col-md-4">
                     <h6>Entidades participantes</h6>
                     <ul>
+                        <li>Facultad de Estudios Superiores Cuautitlán</li>
+                    </ul>
+                    <ul>
                         <li>Facultad de Estudios Superiores Zaragoza</li>
+                    </ul>
+                    <ul>
+                        <li>Facultad de Química</li>
                     </ul>
                 </div>
                 <div class="col-md-4">

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for broken internal links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --no-progress --exclude-mail -- './**/*.html' './**/*.md'
+        continue-on-error: true
+
+      - name: Validate HTML files
+        uses: Cyb3r-Jak/html-validate-action@v7
+        with:
+          directory: "."
+        continue-on-error: true
