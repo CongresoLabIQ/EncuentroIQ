@@ -6,7 +6,6 @@
 [![CI](https://github.com/congresolabiq/EncuentroIQ/actions/workflows/ci.yml/badge.svg)](https://github.com/congresolabiq/EncuentroIQ/actions/workflows/ci.yml)
 [![PWA](https://img.shields.io/badge/PWA-ready-5C0D34.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 [![GitHub last commit](https://img.shields.io/github/last-commit/congresolabiq/EncuentroIQ)](https://github.com/congresolabiq/EncuentroIQ/commits/main)
-[![GitHub release](https://img.shields.io/github/v/release/congresolabiq/EncuentroIQ)](https://github.com/congresolabiq/EncuentroIQ/releases)
 
 </div>
 
