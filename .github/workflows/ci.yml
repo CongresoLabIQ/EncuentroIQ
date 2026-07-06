@@ -12,14 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for broken internal links
+      - name: Check for broken links
         uses: lycheeverse/lychee-action@v1
         with:
           args: --no-progress --exclude-mail -- './**/*.html' './**/*.md'
         continue-on-error: true
 
-      - name: Validate HTML files
-        uses: Cyb3r-Jak/html-validate-action@v7
-        with:
-          directory: "."
+      - name: Validate HTML
+        run: npx html-validate --ext .html .
         continue-on-error: true
