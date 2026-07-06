@@ -174,21 +174,6 @@ El backend opera sobre las siguientes hojas dentro del libro de Google Sheets:
 
 ---
 
-## Propuestas de Rediseño
-
-El directorio `propuesta-rediseno/` contiene tres propuestas de rediseño que migran del tema Bootstrap por defecto a la identidad institucional UNAM:
-
-| Propuesta | Enfoque | Archivo CSS |
-|---|---|---|
-| **Moderno-Ligero** (`propuesta2-moderno/`) | Mobile-first, bento grid, sticky nav, bottom nav móvil | `propuesta2.css` (422 líneas) |
-| **Clásico-Institucional** (`propuesta3-clasico/`) | Portal académico clásico con sidebar, breadcrumbs, cards | `propuesta3.css` (598 líneas) |
-| **Estilo FES Zaragoza** (`propuesta4-feszaragoza/`) | Portal completo con top bar, header, footer columnas, print styles | `propuesta4.css` (531 líneas) |
-
-Incluye también:
-- `banner-encuentro.svg` — Banner vectorizado con branding UNAM
-- `unam-theme.css` — Tema UNAM autocontenido listo para copiar
-- `prompt-implementacion.md` — Guía para implementar el rediseño
-
 ---
 
 ## Progressive Web App (PWA)
@@ -243,10 +228,6 @@ EncuentroIQ/
 ├── assets/                    # Iconos PWA (22 archivos)
 ├── banner.jpg                 # Banner principal
 ├── bannerprev.jpg             # Vista previa del banner
-├── propuesta-rediseno/        # Propuestas de rediseño UNAM
-│   ├── index.html
-│   ├── unam-theme.css
-│   ├── banner-encuentro.svg
-│   └── propuesta{2,3,4}-*/
+├── ...
 └── README.md                  # Este archivo
 ```
