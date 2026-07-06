@@ -123,6 +123,29 @@
                         </div>
                     </div>
 
+                    <div id="evalReadOnlyBanner" class="alert alert-success d-none text-center fw-bold mb-3">
+                        ✅ Evaluación enviada — solo vista previa
+                    </div>
+
+                    <!-- ✅ ¿Cumple con la extensión? -->
+                    <div class="alert alert-warning border-start border-4 border-warning mb-3" id="cumpleExtensionSection">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <strong class="fs-6">📏 ¿Cumple con la extensión?</strong>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleSi" value="si" onchange="toggleCumpleExtension()">
+                                <label class="form-check-label fw-bold text-success" for="cumpleSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleNo" value="no" onchange="toggleCumpleExtension()">
+                                <label class="form-check-label fw-bold text-danger" for="cumpleNo">No</label>
+                            </div>
+                        </div>
+                        <div id="cumpleWarning" class="d-none mt-2">
+                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", el trabajo será rechazado directamente. No es necesario evaluar la rúbrica.</small>
+                        </div>
+                    </div>
+
+                    <div id="rubricContainer">
                     <div class="row">
                         <!-- PARTE 1: ESTRUCTURA (90%) -->
                         <div class="col-lg-7 border-end">
@@ -282,12 +305,14 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Comentarios y Retroalimentación</label>
-                                <textarea class="form-control" id="evalComments" rows="4"
-                                    placeholder="Escribe aquí las observaciones para el alumno..."></textarea>
-                            </div>
                         </div>
+                    </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Comentarios y Retroalimentación</label>
+                        <textarea class="form-control" id="evalComments" rows="4"
+                            placeholder="Escribe aquí las observaciones para el alumno..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
@@ -312,6 +337,30 @@
                 </div>
                 <div class="modal-body">
                     <h5 id="liveWorkTitle" class="mb-3" style="color: var(--unam-blue);"></h5>
+
+                    <div id="liveReadOnlyBanner" class="alert alert-success d-none text-center fw-bold mb-3">
+                        ✅ Evaluación enviada — solo vista previa
+                    </div>
+
+                    <!-- ✅ ¿Se presentó el trabajo? -->
+                    <div class="alert alert-warning border-start border-4 border-warning mb-3" id="sePresentoSection">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <strong class="fs-6">🎤 ¿Se presentó el trabajo?</strong>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoSi" value="si" onchange="toggleSePresento()">
+                                <label class="form-check-label fw-bold text-success" for="sePresentoSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="sePresento" id="sePresentoNo" value="no" onchange="toggleSePresento()">
+                                <label class="form-check-label fw-bold text-danger" for="sePresentoNo">No</label>
+                            </div>
+                        </div>
+                        <div id="sePresentoWarning" class="d-none mt-2">
+                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", la calificación será 0 automáticamente.</small>
+                        </div>
+                    </div>
+
+                    <div id="liveEvaluationContainer">
                     <form id="liveForm">
 
                         <div class="mb-4 p-4 border rounded bg-light">
@@ -517,110 +566,78 @@
                         </div>
 
                         <div class="mb-3 rubric-item" data-modality="ambos">
-                            <label class="form-label fw-bold">1. Tono de voz (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">1. Tono de voz (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_1">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Las y los ponentes modulan correcta y apropiadamente
                                 el tono de voz. La comunicación fluye con naturalidad y corrección. Utilizan el
                                 vocabulario correcto y adecuado</small>
-                            <div class="star-rating eval-star-rating" id="stars_1">
-                                <input type="hidden" class="star-input" id="r_1" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_1',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_1',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_1',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_1',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_1',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_1" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="ambos">
-                            <label class="form-label fw-bold">2. Calidad de presentación (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">2. Calidad de presentación (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_2">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Mantienen la atención de la audiencia. Evitan
                                 limitarse a leer lo que está escrito en las diapositivas.</small>
-                            <div class="star-rating eval-star-rating" id="stars_2">
-                                <input type="hidden" class="star-input" id="r_2" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_2',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_2',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_2',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_2',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_2',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_2" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="ambos">
-                            <label class="form-label fw-bold">3. Dominio del contenido (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">3. Dominio del contenido (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_3">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Demuestran dominio del tema al exponer y al responder
                                 las preguntas de la audiencia.</small>
-                            <div class="star-rating eval-star-rating" id="stars_3">
-                                <input type="hidden" class="star-input" id="r_3" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_3',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_3',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_3',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_3',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_3',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_3" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="ambos">
-                            <label class="form-label fw-bold">4. Lenguaje corporal (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">4. Lenguaje corporal (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_4">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Utilizan un lenguaje corporal correcto (movimientos,
                                 gestos, vestimenta adecuada, etc.). </small>
-                            <div class="star-rating eval-star-rating" id="stars_4">
-                                <input type="hidden" class="star-input" id="r_4" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_4',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_4',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_4',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_4',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_4',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_4" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="ambos">
-                            <label class="form-label fw-bold">5. Trabajo en equipo (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">5. Trabajo en equipo (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_5">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Se distribuyen actividades en el momento de la
                                 presentación.</small>
-                            <div class="star-rating eval-star-rating" id="stars_5">
-                                <input type="hidden" class="star-input" id="r_5" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_5',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_5',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_5',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_5',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_5',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_5" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="ponencia">
-                            <label class="form-label fw-bold">6. Uso de recursos visuales (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">6. Uso de recursos visuales (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_6">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">Se apoyan en las diapositivas para su exposición y
                                 éstas guardan una adecuada proporción de texto/imagen.</small>
-                            <div class="star-rating eval-star-rating" id="stars_6">
-                                <input type="hidden" class="star-input" id="r_6" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_6',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_6',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_6',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_6',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_6',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_6" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="cartel">
-                            <label class="form-label fw-bold">7. Uso de recursos visuales (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">7. Uso de recursos visuales (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_7">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">El cartel es original y creativo, logra captar la
                                 atención de la audiencia por su combinación y uso de colores e imágenes alusivas al
                                 tema.</small>
-                            <div class="star-rating eval-star-rating" id="stars_7">
-                                <input type="hidden" class="star-input" id="r_7" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_7',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_7',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_7',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_7',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_7',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_7" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
                         <div class="mb-3 rubric-item" data-modality="cartel">
-                            <label class="form-label fw-bold">8. Comunicación escrita (0-5)</label>
+                            <div class="d-flex justify-content-between">
+                                <label class="fw-bold">8. Comunicación escrita (0-5)</label>
+                                <span class="badge bg-primary fs-6 rubric-val" id="val_8">0</span>
+                            </div>
                             <small class="text-muted d-block mb-1">La redacción es clara y precisa, además no contiene
                                 errores de ortografía.</small>
-                            <div class="star-rating eval-star-rating" id="stars_8">
-                                <input type="hidden" class="star-input" id="r_8" value="0">
-                                <span class="star" data-value="1" onclick="setStar('stars_8',1)">☆</span>
-                                <span class="star" data-value="2" onclick="setStar('stars_8',2)">☆</span>
-                                <span class="star" data-value="3" onclick="setStar('stars_8',3)">☆</span>
-                                <span class="star" data-value="4" onclick="setStar('stars_8',4)">☆</span>
-                                <span class="star" data-value="5" onclick="setStar('stars_8',5)">☆</span>
-                            </div>
+                            <input type="range" class="form-range live-slider" id="r_8" min="0" max="5" step="1" value="0" oninput="updLive()">
                         </div>
 
                         <div class="alert alert-secondary text-center">
@@ -633,6 +650,7 @@
                                 placeholder="Observaciones sobre la presentación en vivo..."></textarea>
                         </div>
                     </form>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -654,6 +672,8 @@
         let currentWorkId = null;       // Fase 1
         let currentLiveId = null;       // Fase 2
         let currentLiveWorkId = null;   // Fase 2
+        let allAssignments = [];
+        let allLiveAssignments = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
             session = await window.apiClient.checkAuth();
@@ -675,6 +695,7 @@
             const system = new EvaluationAssignment();
             // Ahora esta función traerá todos (pendientes y completados)
             const assigns = await system.getAssignedWorks(session.user.id);
+            allAssignments = assigns;
 
             const pending = assigns.filter(a => a.status !== 'completed');
             const completed = assigns.filter(a => a.status === 'completed');
@@ -728,7 +749,7 @@
                 <div class="col-6">
                     <button class="btn ${isCompleted ? 'btn-success' : 'btn-primary'} btn-sm w-100"
                         onclick="openEval('${a.id}', '${a.work_id}', '${title}', '${pdfUrl}', '${semester}')">
-                        ${isCompleted ? '📝 Ver/Editar' : '📝 Evaluar'}
+                        ${isCompleted ? '👁️ Ver' : '📝 Evaluar'}
                     </button>
                 </div>
             </div>
@@ -782,6 +803,10 @@
             currentAssignmentId = assignId;
             currentWorkId = workId;
 
+            const assignment = allAssignments.find(a => a.id === assignId);
+            const isReadOnly = assignment && assignment.status === 'completed';
+            const evalData = assignment ? assignment.evaluation : null;
+
             // 1. Asignar textos básicos
             const titleEl = document.getElementById('evalWorkTitle');
             const semEl = document.getElementById('evalWorkSemester');
@@ -800,7 +825,6 @@
             }
 
             // 3. REINICIAR SLIDERS
-            // Usamos un selector general para no fallar si falta uno
             document.querySelectorAll('.rubric-slider').forEach(slider => {
                 slider.value = 0;
                 const valId = slider.id.replace('r_', 'val_');
@@ -815,10 +839,49 @@
             if (totalScoreEl) totalScoreEl.innerText = '0';
             if (commentsEl) commentsEl.value = '';
 
-            // 5. CARGAR BORRADOR SI EXISTE
-            cargarBorrador(workId);
+            // 5. RESETEAR RADIO DE EXTENSIÓN
+            document.getElementById('cumpleSi').checked = false;
+            document.getElementById('cumpleNo').checked = false;
+            document.getElementById('cumpleWarning').classList.add('d-none');
+            document.getElementById('rubricContainer').style.display = '';
 
-            // 6. MOSTRAR MODAL
+            // 6. MODO LECTURA (evaluación ya completada)
+            const banner = document.getElementById('evalReadOnlyBanner');
+            const btnBorrador = document.querySelector('#evalModal .btn-outline-primary');
+            const btnSubmit = document.querySelector('#evalModal .btn-success');
+
+            if (isReadOnly && evalData) {
+                banner.classList.remove('d-none');
+                document.getElementById('totalRubricScore').innerText = evalData.total_score || 0;
+                document.getElementById('evalComments').value = evalData.comentarios || '';
+
+                if (String(evalData.cumple_extension || '').toLowerCase() === 'no') {
+                    document.getElementById('cumpleNo').checked = true;
+                    document.getElementById('rubricContainer').style.display = 'none';
+                } else {
+                    document.getElementById('cumpleSi').checked = true;
+                }
+
+                document.querySelectorAll('#evalModal .rubric-slider').forEach(el => el.disabled = true);
+                document.querySelectorAll('#evalModal input[type="radio"]').forEach(el => el.disabled = true);
+                document.getElementById('evalComments').readOnly = true;
+
+                if (btnBorrador) btnBorrador.style.display = 'none';
+                if (btnSubmit) btnSubmit.style.display = 'none';
+            } else {
+                banner.classList.add('d-none');
+
+                document.querySelectorAll('#evalModal .rubric-slider').forEach(el => el.disabled = false);
+                document.querySelectorAll('#evalModal input[type="radio"]').forEach(el => el.disabled = false);
+                document.getElementById('evalComments').readOnly = false;
+
+                if (btnBorrador) btnBorrador.style.display = '';
+                if (btnSubmit) btnSubmit.style.display = '';
+
+                cargarBorrador(workId);
+            }
+
+            // 7. MOSTRAR MODAL
             const modalElement = document.getElementById('evalModal');
             const myModal = bootstrap.Modal.getOrCreateInstance(modalElement);
             myModal.show();
@@ -833,6 +896,8 @@
 
         // Guardar borrador en localStorage
         function guardarBorrador() {
+            const assignment = allAssignments.find(a => a.id === currentAssignmentId);
+            if (assignment && assignment.status === 'completed') return;
             const draft = {
                 workId: currentWorkId,
                 assignmentId: currentAssignmentId,
@@ -866,8 +931,66 @@
             } catch (e) { /* ignore corrupt drafts */ }
         }
 
+        function toggleCumpleExtension() {
+            const isNo = document.getElementById('cumpleNo').checked;
+            const warning = document.getElementById('cumpleWarning');
+            const rubric = document.getElementById('rubricContainer');
+            if (isNo) {
+                warning.classList.remove('d-none');
+                rubric.style.display = 'none';
+            } else {
+                warning.classList.add('d-none');
+                rubric.style.display = '';
+            }
+        }
+
         // Enviar la evaluación
         async function submitEval() {
+            const cumpleSi = document.getElementById('cumpleSi').checked;
+            const cumpleNo = document.getElementById('cumpleNo').checked;
+
+            if (!cumpleSi && !cumpleNo) {
+                showToast('Debes indicar si el trabajo cumple con la extensión.', 'warning');
+                return;
+            }
+
+            if (cumpleNo) {
+                if (!confirm('¿Confirmas que el trabajo NO cumple con la extensión? Será rechazado directamente.')) return;
+
+                const btn = document.querySelector('#evalModal .btn-success');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+                const data = {
+                    action: 'submitEvaluation',
+                    work_id: currentWorkId,
+                    evaluator_id: session.user.id,
+                    assignment_id: currentAssignmentId,
+                    total_score: 0,
+                    score_pertinencia: 0,
+                    modalidad_sugerida: "",
+                    comentarios: document.getElementById('evalComments').value.trim() || 'Rechazado por no cumplir con la extensión.',
+                    cumple_extension: false
+                };
+
+                try {
+                    const res = await window.apiClient.post(data);
+                    if (res.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('evalModal')).hide();
+                        showToast('Trabajo rechazado por extensión.', 'success');
+                        loadPhase1();
+                    } else {
+                        showToast('Error: ' + res.error, 'error');
+                    }
+                } catch (e) {
+                    showToast('Error de conexión.', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Guardar Evaluación';
+                }
+                return;
+            }
+
             // Calculamos el total de la PARTE 2 (Pertinencia)
             const p2_ids = ['r_factibilidad', 'r_innovacion', 'r_integracion', 'r_programa', 'r_etica'];
             let scorePertinencia = 0;
@@ -893,9 +1016,10 @@
                 evaluator_id: session.user.id,
                 assignment_id: currentAssignmentId,
                 total_score: finalScore,
-                score_pertinencia: scorePertinencia, // <--- NUEVO DATO
+                score_pertinencia: scorePertinencia,
                 modalidad_sugerida: "",
-                comentarios: comments
+                comentarios: comments,
+                cumple_extension: true
             };
 
             try {
@@ -922,6 +1046,7 @@
             const container = document.getElementById('phase2List');
             const allLive = await window.apiClient.getLiveAssignments();
             const myLive = allLive.filter(a => a.evaluator_id === session.user.id);
+            allLiveAssignments = myLive;
 
             if (myLive.length === 0) {
                 container.innerHTML = `<div class="col-12">
@@ -956,10 +1081,16 @@
             <p class="mb-1"><strong>Modalidad:</strong> ${modalityLabel}</p>
             <p class="mb-2"><strong>Equipo:</strong> ${a.works?.student_name || 'N/D'}</p>
             ${isCompleted
-                        ? `<div class="d-flex align-items-center gap-2">
-                         <span class="badge-evaluado">✅ Evaluado</span>
-                         <span class="score-display ms-auto">${score !== undefined ? score + ' pts' : ''}</span>
-                       </div>`
+                        ? `<div class="d-flex flex-column gap-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="badge-evaluado">✅ Evaluado</span>
+                            <span class="score-display ms-auto">${score !== undefined ? score + ' pts' : ''}</span>
+                          </div>
+                          <button class="btn btn-outline-secondary btn-sm w-100"
+                            onclick="openLive('${a.id}', '${a.work_id}', \`${(a.works?.title || '').replace(/`/g, "'")}\`, '${modalityParam}')">
+                            👁️ Ver
+                          </button>
+                        </div>`
                         : `<button class="btn w-100 text-white fw-bold" style="background-color:#6f42c1;"
                   onclick="openLive('${a.id}', '${a.work_id}', \`${(a.works?.title || '').replace(/`/g, "'")}\`, '${modalityParam}')">
                   ⭐ Evaluar Presentación
@@ -986,10 +1117,19 @@
         function openLive(assignId, workId, title, modality) {
             currentLiveId = assignId;
             currentLiveWorkId = workId;
+
+            const assignment = allLiveAssignments.find(a => a.id === assignId);
+            const isReadOnly = assignment && assignment.status === 'completed';
+            const evalData = assignment ? assignment.evaluation : null;
+
             document.getElementById('liveWorkTitle').innerText = title;
             document.getElementById('liveForm').reset();
-            document.querySelectorAll('#liveForm .star').forEach(s => s.textContent = '☆');
-            document.querySelectorAll('#liveForm .star').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('#liveForm .live-slider').forEach(s => {
+                s.value = 0;
+                const valId = s.id.replace('r_', 'val_');
+                const display = document.getElementById(valId);
+                if (display) display.innerText = '0';
+            });
             document.getElementById('liveTotal').innerText = '0';
             document.querySelectorAll('.rubric-item').forEach(el => {
                 const mod = el.dataset.modality;
@@ -999,28 +1139,121 @@
                     el.style.display = mod === modality ? 'block' : 'none';
                 }
             });
+            document.getElementById('sePresentoSi').checked = false;
+            document.getElementById('sePresentoNo').checked = false;
+            document.getElementById('sePresentoWarning').classList.add('d-none');
+            document.getElementById('liveEvaluationContainer').style.display = '';
+
+            const banner = document.getElementById('liveReadOnlyBanner');
+            const btnSubmit = document.querySelector('#liveModal .btn-success');
+
+            if (isReadOnly && evalData) {
+                banner.classList.remove('d-none');
+
+                document.getElementById('sePresentoSi').checked = true;
+                document.getElementById('liveEvaluationContainer').style.display = '';
+
+                const sliders = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
+                const sliderIds = ['r_1', 'r_2', 'r_3', 'r_4', 'r_5', 'r_6', 'r_7', 'r_8'];
+                sliders.forEach((key, i) => {
+                    const val = parseInt(evalData[key]) || 0;
+                    const slider = document.getElementById(sliderIds[i]);
+                    if (slider) {
+                        slider.value = val;
+                        const display = document.getElementById('val_' + (i + 1));
+                        if (display) display.innerText = val;
+                    }
+                });
+
+                const total = parseInt(evalData.total_score) || 0;
+                document.getElementById('liveTotal').innerText = total;
+
+                document.getElementById('liveComments').value = evalData.comments || '';
+
+                document.querySelectorAll('#liveForm .live-slider').forEach(el => el.disabled = true);
+                document.querySelectorAll('#liveForm input[type="radio"]').forEach(el => el.disabled = true);
+                document.getElementById('liveComments').readOnly = true;
+
+                if (btnSubmit) btnSubmit.style.display = 'none';
+            } else {
+                banner.classList.add('d-none');
+
+                document.querySelectorAll('#liveForm .live-slider').forEach(el => el.disabled = false);
+                document.querySelectorAll('#liveForm input[type="radio"]').forEach(el => el.disabled = false);
+                document.getElementById('liveComments').readOnly = false;
+
+                if (btnSubmit) btnSubmit.style.display = '';
+            }
+
             new bootstrap.Modal(document.getElementById('liveModal')).show();
+        }
+
+        function toggleSePresento() {
+            const isNo = document.getElementById('sePresentoNo').checked;
+            const warning = document.getElementById('sePresentoWarning');
+            const container = document.getElementById('liveEvaluationContainer');
+            if (isNo) {
+                warning.classList.remove('d-none');
+                container.style.display = 'none';
+            } else {
+                warning.classList.add('d-none');
+                container.style.display = '';
+            }
         }
 
         function updLive() {
             let sum = 0;
-            document.querySelectorAll('#liveForm .star-input').forEach(r => sum += parseInt(r.value || 0));
+            document.querySelectorAll('#liveForm .live-slider').forEach(r => {
+                sum += parseInt(r.value || 0);
+                const valId = r.id.replace('r_', 'val_');
+                const display = document.getElementById(valId);
+                if (display) display.innerText = r.value;
+            });
             document.querySelectorAll('#liveForm .contenido-check:checked').forEach(c => sum += parseInt(c.value));
             document.getElementById('liveTotal').innerText = sum;
         }
 
-        function setStar(containerId, value) {
-            const container = document.getElementById(containerId);
-            container.querySelector('.star-input').value = value;
-            container.querySelectorAll('.star').forEach(s => {
-                const v = parseInt(s.dataset.value);
-                s.textContent = v <= value ? '★' : '☆';
-                s.classList.toggle('active', v <= value);
-            });
-            updLive();
-        }
-
         async function submitLive() {
+            const sePresentoSi = document.getElementById('sePresentoSi').checked;
+            const sePresentoNo = document.getElementById('sePresentoNo').checked;
+
+            if (!sePresentoSi && !sePresentoNo) {
+                showToast('Debes indicar si el trabajo se presentó.', 'warning');
+                return;
+            }
+
+            if (sePresentoNo) {
+                if (!confirm('¿Confirmas que el trabajo NO se presentó? La calificación será 0.')) return;
+
+                const btn = document.querySelector('#liveModal .btn-success');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando...';
+
+                const data = {
+                    assignment_id: currentLiveId,
+                    work_id: currentLiveWorkId,
+                    evaluator_id: session.user.id,
+                    s1: 0, s2: 0, s3: 0, s4: 0, s5: 0, s6: 0, s7: 0, s8: 0,
+                    c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0, c7: 0, c8: 0, c9: 0, c10: 0,
+                    total_score: 0,
+                    comments: document.getElementById('liveComments').value || 'No se presentó.'
+                };
+
+                const res = await window.apiClient.submitLiveEvaluation(data);
+
+                btn.disabled = false;
+                btn.innerHTML = '✅ Enviar Calificación';
+
+                if (res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('liveModal')).hide();
+                    showToast('Calificación registrada: no se presentó.', 'success');
+                    loadPhase2();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+                return;
+            }
+
             if (!confirm('¿Enviar calificación presencial? Esta acción no se puede deshacer.')) return;
 
             // Validar que todos los radios de Material de Apoyo estén contestados
@@ -1031,7 +1264,7 @@
                 return;
             }
 
-            const visibleInputs = document.querySelectorAll('#liveForm .rubric-item:not([style*=\"none\"]) .star-input');
+            const visibleInputs = document.querySelectorAll('#liveForm .rubric-item:not([style*=\"none\"]) .live-slider');
             const visibleScores = Array.from(visibleInputs).map(i => parseInt(i.value || 0));
             const checkGroups = {};
             document.querySelectorAll('#liveForm .contenido-check:checked').forEach(c => {

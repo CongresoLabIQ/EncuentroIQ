@@ -1,6 +1,8 @@
 const DRIVE_FOLDER_ID = '15uaMvkO2toWBxgyhrWZB-jH7c229iiEO';
 const TEMPLATE_ID = '1z8LMJqXj_Nj4L0bIBJjaH2-PaXiTCYhkTSgNuVjO6iQ';
 const CERTIFICATES_FOLDER_ID = '1slHOhYFi-lArwC8ocHgBqAWrrxgRlGf3';
+const FRONTEND_URL = 'https://congresolabiq.github.io/Sistema';
+const RESET_TOKEN_EXPIRY_HOURS = 1;
 
 // --- FUNCIONES DE ENTRADA (GET) ---
 
@@ -43,7 +45,8 @@ function doGet(e) {
           ...a,
           works: { ...work },
           user_profiles: evaluator,
-          total_score: evalDoc ? evalDoc.total_score : null
+          total_score: evalDoc ? evalDoc.total_score : null,
+          evaluation: evalDoc || null
         };
       });
       result = { success: true, data: enriched };
@@ -60,7 +63,7 @@ function doGet(e) {
         return {
           ...a,
           works: { ...work, student_name: student ? student.name : '' },
-          evaluation: myEval ? { total_score: myEval.total_score } : null
+          evaluation: myEval || null
         };
       });
       result = { success: true, data: enriched };
@@ -317,6 +320,7 @@ function doPost(e) {
       row[h.indexOf('comentarios')] = data.comentarios;
       row[h.indexOf('timestamp')] = new Date();
       if (h.indexOf('score_pertinencia') > -1) row[h.indexOf('score_pertinencia')] = data.score_pertinencia;
+      if (h.indexOf('cumple_extension') > -1) row[h.indexOf('cumple_extension')] = data.cumple_extension === false ? 'no' : 'si';
       
       eSheet.appendRow(row);
 
@@ -348,6 +352,14 @@ function doPost(e) {
         if (w.status === 'rejected' || w.status === 'accepted_oral' || w.status === 'accepted_poster') return;
         const wEvals = evals.filter(e => e.work_id === w.id);
         if (wEvals.length < 2) return;
+
+        // Si algún evaluador marcó que NO cumple con la extensión, se rechaza directamente
+        const algunaNoCumple = wEvals.some(e => String(e.cumple_extension || '').toLowerCase() === 'no');
+        if (algunaNoCumple) {
+          if (!semesterPools[w.semester]) semesterPools[w.semester] = [];
+          semesterPools[w.semester].push({ rowIndex: idx + 2, ...w, avgScore: 0, avgPertinencia: 0, ApprovedPert: false, feedback: wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n') });
+          return;
+        }
 
         const avgTotal = parseFloat((wEvals.reduce((s, c) => s + Number(c.total_score), 0) / wEvals.length).toFixed(1));
         const avgPert = parseFloat((wEvals.reduce((s, c) => s + Number(c.score_pertinencia || 0), 0) / wEvals.length).toFixed(1));
@@ -469,6 +481,76 @@ function doPost(e) {
       const prof = work.profesor_cargo || "No asignado";
       const url = crearSlideEditable(work, prof, "Participación");
       result = { success: true, fileUrl: url };
+    }
+
+    else if (data.action === 'forgotPassword') {
+      const users = getSheetData(db, 'users');
+      const user = users.find(u => u.email === data.email);
+      if (user) {
+        const token = Utilities.getUuid();
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+        const sheet = db.getSheetByName('reset_tokens');
+        let headers;
+        if (!sheet) {
+          const newSheet = db.insertSheet('reset_tokens');
+          headers = ['token', 'email', 'created_at', 'expires_at', 'used'];
+          newSheet.appendRow(headers);
+        } else {
+          headers = sheet.getDataRange().getValues()[0];
+        }
+        const row = new Array(headers.length).fill("");
+        row[headers.indexOf('token')] = token;
+        row[headers.indexOf('email')] = data.email;
+        row[headers.indexOf('created_at')] = now;
+        row[headers.indexOf('expires_at')] = expiresAt;
+        row[headers.indexOf('used')] = 'false';
+        sheet.appendRow(row);
+        const resetLink = FRONTEND_URL + '/set-new-password.html?token=' + token;
+        const subject = 'Recuperación de contraseña - Congreso LABIQ';
+        const body = 'Hola,\n\nHas solicitado restablecer tu contraseña.\n\nHaz clic en el siguiente enlace para crear una nueva contraseña:\n' + resetLink + '\n\nEste enlace expirará en ' + RESET_TOKEN_EXPIRY_HOURS + ' hora(s).\n\nSi no solicitaste esto, ignora este mensaje.\n\nAtentamente,\nSistema Congreso LABIQ';
+        try { MailApp.sendEmail(data.email, subject, body); } catch (e) {}
+      }
+      result = { success: true };
+    }
+
+    else if (data.action === 'resetPassword') {
+      const sheet = db.getSheetByName('reset_tokens');
+      if (!sheet) throw new Error('Token inválido o expirado.');
+      const rows = sheet.getDataRange().getValues();
+      const headers = rows[0];
+      const tIdx = headers.indexOf('token');
+      const eIdx = headers.indexOf('email');
+      const expIdx = headers.indexOf('expires_at');
+      const usedIdx = headers.indexOf('used');
+      let foundRow = -1, email = '';
+      for (let i = 1; i < rows.length; i++) {
+        if (rows[i][tIdx] === data.token && String(rows[i][usedIdx]).toLowerCase() === 'false') {
+          const expires = new Date(rows[i][expIdx]);
+          if (expires > new Date()) {
+            foundRow = i;
+            email = rows[i][eIdx];
+          }
+          break;
+        }
+      }
+      if (foundRow === -1) throw new Error('El enlace ha expirado o ya fue utilizado.');
+      const usersSheet = db.getSheetByName('users');
+      const userRows = usersSheet.getDataRange().getValues();
+      const uHeaders = userRows[0];
+      const emailIdx = uHeaders.indexOf('email');
+      const pwdIdx = uHeaders.indexOf('password');
+      let userFound = false;
+      for (let i = 1; i < userRows.length; i++) {
+        if (String(userRows[i][emailIdx]).toLowerCase() === String(email).toLowerCase()) {
+          usersSheet.getRange(i + 1, pwdIdx + 1).setValue("'" + hashPassword(data.password));
+          userFound = true;
+          break;
+        }
+      }
+      if (!userFound) throw new Error('Usuario no encontrado.');
+      sheet.getRange(foundRow + 1, usedIdx + 1).setValue('true');
+      result = { success: true };
     }
 
   } catch (error) {

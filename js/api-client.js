@@ -155,6 +155,22 @@ const apiClient = {
         } catch (e) { return { success: false, data: [] }; }
     },
 
+    // Recuperación de contraseña
+    async forgotPassword(email) {
+        return await postData({
+            action: 'forgotPassword',
+            email
+        });
+    },
+
+    async resetPassword(token, password) {
+        return await postData({
+            action: 'resetPassword',
+            token,
+            password
+        });
+    },
+
     // ✅ Método genérico POST expuesto para llamadas directas desde el HTML
     async post(data) {
         return await postData(data);
