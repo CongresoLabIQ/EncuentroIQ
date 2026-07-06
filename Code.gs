@@ -1,7 +1,7 @@
-const DRIVE_FOLDER_ID = '15uaMvkO2toWBxgyhrWZB-jH7c229iiEO';
-const TEMPLATE_ID = '1z8LMJqXj_Nj4L0bIBJjaH2-PaXiTCYhkTSgNuVjO6iQ';
-const CERTIFICATES_FOLDER_ID = '1slHOhYFi-lArwC8ocHgBqAWrrxgRlGf3';
-const FRONTEND_URL = 'https://congresolabiq.github.io/Sistema';
+const DRIVE_FOLDER_ID = '1L9IHjQpTBVgb5TC0cD-OB2pkrRRNKm_o';
+const TEMPLATE_ID = '1DNdoBL30o2hG77INqP4shV9Dtv-77yWyaIhnnKPT6j0';
+const CERTIFICATES_FOLDER_ID = '1A6ZuVHobxHtu3S3incdUk_HAbTMrrHGc';
+const FRONTEND_URL = 'https://congresolabiq.github.io/EncuentroIQ';
 const RESET_TOKEN_EXPIRY_HOURS = 1;
 
 // --- FUNCIONES DE ENTRADA (GET) ---
@@ -77,29 +77,12 @@ function doGet(e) {
     else if (action === 'getWinners') {
       const works = getSheetData(db, 'works');
       const users = getSheetData(db, 'users');
-      const ciclos = {
-        "Básico": ["1er Semestre", "2do Semestre", "3er Semestre"],
-        "Intermedio": ["4to Semestre", "5to Semestre", "6to Semestre"],
-        "Terminal": ["7mo Semestre", "8vo Semestre", "9no Semestre"]
-      };
       const scoredWorks = works.filter(w => w.live_score !== "" && Number(w.live_score) > 0).map(w => ({
           ...w, student_name: (users.find(u => u.id === w.student_id) || {}).name || 'N/A'
       }));
       const oral = scoredWorks.filter(w => w.status === 'accepted_oral').sort((a, b) => b.live_score - a.live_score).slice(0, 3);
       const poster = scoredWorks.filter(w => w.status === 'accepted_poster').sort((a, b) => b.live_score - a.live_score).slice(0, 3);
-      let porCiclo = [];
-      Object.keys(ciclos).forEach(nombre => {
-        const semestres = ciclos[nombre];
-        const worksInCycle = scoredWorks.filter(w => semestres.includes(w.semester));
-        const mejoresOral = worksInCycle.filter(w => w.status === 'accepted_oral').sort((a, b) => b.live_score - a.live_score).slice(0, 2);
-        const mejoresPoster = worksInCycle.filter(w => w.status === 'accepted_poster').sort((a, b) => b.live_score - a.live_score).slice(0, 2);
-        porCiclo.push({
-          ciclo_nombre: nombre,
-          oral: mejoresOral.length ? mejoresOral : null,
-          poster: mejoresPoster.length ? mejoresPoster : null
-        });
-      });
-      result = { success: true, data: { oral, poster, porCiclo } };
+      result = { success: true, data: { oral, poster } };
     }
   } catch (error) {
     result = { success: false, error: error.toString() };
@@ -109,11 +92,11 @@ function doGet(e) {
 
 // --- LOGICA DE APOYO ---
 
-function tieneConflictoDeGrupo(grupoTrabajo, gruposProfesorString) {
-  if (!grupoTrabajo || !gruposProfesorString) return false;
-  const gB = String(grupoTrabajo).trim().toUpperCase();
-  const lista = String(gruposProfesorString).split(',').map(g => g.trim().toUpperCase());
-  return lista.includes(gB);
+function tieneConflictoDeFacultad(work, evaluator) {
+  if (!work || !evaluator) return false;
+  const wFac = String(work.facultad || '').trim().toUpperCase();
+  const eFac = String(evaluator.facultad || '').trim().toUpperCase();
+  return wFac !== '' && eFac !== '' && wFac === eFac;
 }
 
 function generarShortId(db, semestre) {
@@ -227,7 +210,8 @@ function doPost(e) {
       row[h.indexOf('name')] = data.name;
       row[h.indexOf('user_type')] = data.user_type;
       row[h.indexOf('timestamp')] = new Date();
-      if (h.indexOf('grupos_imparte') > -1) row[h.indexOf('grupos_imparte')] = data.grupos_imparte || "";
+      if (h.indexOf('grupos_imparte') > -1) row[h.indexOf('grupos_imparte')] = "";
+      if (h.indexOf('facultad') > -1) row[h.indexOf('facultad')] = data.facultad || "";
       uSheet.appendRow(row);
       result = { success: true };
     }
@@ -261,6 +245,11 @@ function doPost(e) {
       row[h.indexOf('team_members')] = data.team_members;
       if (h.indexOf('grupo') > -1) row[h.indexOf('grupo')] = data.group;
       if (h.indexOf('profesor_cargo') > -1) row[h.indexOf('profesor_cargo')] = data.professor_cargo;
+      if (h.indexOf('facultad') > -1) {
+        const users = getSheetData(db, 'users');
+        const student = users.find(u => u.id === data.student_id);
+        row[h.indexOf('facultad')] = (student && student.facultad) || "";
+      }
       
       wSheet.appendRow(row);
       SpreadsheetApp.flush();
@@ -273,8 +262,8 @@ function doPost(e) {
       
       const esAutoEval = (String(ev.name).trim().toUpperCase() === String(work.profesor_cargo).trim().toUpperCase());
 
-      if (tieneConflictoDeGrupo(work.grupo, ev.grupos_imparte) || esAutoEval) {
-        result = { success: false, error: `Conflicto: El profesor tiene relación directa con este trabajo.` };
+      if (tieneConflictoDeFacultad(work, ev) || esAutoEval) {
+        result = { success: false, error: `Conflicto: El evaluador pertenece a la misma facultad que el autor del trabajo.` };
       } else {
         db.getSheetByName('assignments').appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
         updateRow(db, 'works', 'id', data.work_id, { status: 'under_review' });
@@ -294,7 +283,7 @@ function doPost(e) {
       works.filter(w => w.status === 'pending').forEach(work => {
         let aptos = evaluators.filter(ev => {
           const esMismoProf = (String(ev.name).trim().toUpperCase() === String(work.profesor_cargo).trim().toUpperCase());
-          return !tieneConflictoDeGrupo(work.grupo, ev.grupos_imparte) && !esMismoProf;
+          return !tieneConflictoDeFacultad(work, ev) && !esMismoProf;
         });
 
         if (aptos.length < 2) return; 
@@ -345,19 +334,16 @@ function doPost(e) {
       const users = getSheetData(db, 'users');
       const h = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
       
-      const mappingCiclos = { "1er Semestre": "Básico", "2do Semestre": "Básico", "3er Semestre": "Básico", "4to Semestre": "Intermedio", "5to Semestre": "Intermedio", "6to Semestre": "Intermedio", "7mo Semestre": "Terminal", "8vo Semestre": "Terminal", "9no Semestre": "Terminal" };
-      let semesterPools = {}; 
+      let workPool = [];
 
       works.forEach((w, idx) => {
         if (w.status === 'rejected' || w.status === 'accepted_oral' || w.status === 'accepted_poster') return;
         const wEvals = evals.filter(e => e.work_id === w.id);
         if (wEvals.length < 2) return;
 
-        // Si algún evaluador marcó que NO cumple con la extensión, se rechaza directamente
         const algunaNoCumple = wEvals.some(e => String(e.cumple_extension || '').toLowerCase() === 'no');
         if (algunaNoCumple) {
-          if (!semesterPools[w.semester]) semesterPools[w.semester] = [];
-          semesterPools[w.semester].push({ rowIndex: idx + 2, ...w, avgScore: 0, avgPertinencia: 0, ApprovedPert: false, feedback: wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n') });
+          workPool.push({ rowIndex: idx + 2, ...w, avgScore: 0, avgPertinencia: 0, ApprovedPert: false, feedback: wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n') });
           return;
         }
 
@@ -365,60 +351,56 @@ function doPost(e) {
         const avgPert = parseFloat((wEvals.reduce((s, c) => s + Number(c.score_pertinencia || 0), 0) / wEvals.length).toFixed(1));
         const fb = wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n');
         
-        if (!semesterPools[w.semester]) semesterPools[w.semester] = [];
-        semesterPools[w.semester].push({ rowIndex: idx + 2, ...w, avgScore: avgTotal, avgPertinencia: avgPert, ApprovedPert: (avgPert >= 6), feedback: fb });
+        workPool.push({ rowIndex: idx + 2, ...w, avgScore: avgTotal, avgPertinencia: avgPert, ApprovedPert: (avgPert >= 6), feedback: fb });
       });
 
-      let salas = { "UMIEZ": { "Básico": [], "Intermedio": [], "Terminal": [] }, "Auditorio Principal": { "Básico": [], "Intermedio": [], "Terminal": [] } };
+      let facultadPools = {};
+      workPool.forEach(w => {
+        const fac = w.facultad || 'Sin Facultad';
+        if (!facultadPools[fac]) facultadPools[fac] = [];
+        facultadPools[fac].push(w);
+      });
 
-      Object.keys(semesterPools).forEach(sem => {
-        let group = semesterPools[sem].sort((a, b) => b.avgScore - a.avgScore);
-        let ciclo = mappingCiclos[sem] || "Básico";
-        group.forEach((w, rank) => {
-          if (w.avgScore < 60 || !w.ApprovedPert) { 
+      let salas = { "UMIEZ": [], "Auditorio Principal": [] };
+
+      Object.keys(facultadPools).forEach(fac => {
+        let group = facultadPools[fac].sort((a, b) => b.avgScore - a.avgScore);
+        let oralCount = 0;
+        group.forEach(w => {
+          if (w.avgScore < 60 || !w.ApprovedPert) {
             w.fStat = 'rejected'; w.fAud = ''; w.fHor = '';
-          }
-          else if (rank === 0) { 
-            w.fStat = 'accepted_oral'; w.fAud = 'UMIEZ'; salas["UMIEZ"][ciclo].push(w); 
-          }
-          else if (rank === 1) { 
-            w.fStat = 'accepted_oral'; w.fAud = 'Auditorio Principal'; salas["Auditorio Principal"][ciclo].push(w); 
-          }
-          else { 
-            w.fStat = 'accepted_poster'; w.fAud = ''; w.fHor = 'Sesión Carteles'; 
+          } else if (oralCount < 3) {
+            w.fStat = 'accepted_oral'; w.fAud = 'Auditorio Principal';
+            salas["Auditorio Principal"].push(w); oralCount++;
+          } else if (oralCount < 6) {
+            w.fStat = 'accepted_oral'; w.fAud = 'UMIEZ';
+            salas["UMIEZ"].push(w); oralCount++;
+          } else {
+            w.fStat = 'accepted_poster'; w.fAud = ''; w.fHor = 'Sesión Carteles';
           }
         });
       });
 
       const hInicio = 10, mTurno = 20;
       ["UMIEZ", "Auditorio Principal"].forEach(sala => {
-        const b = shuffleArray(salas[sala]["Básico"]), i = shuffleArray(salas[sala]["Intermedio"]), t = shuffleArray(salas[sala]["Terminal"]);
-        let res = [];
-        for (let j = 0; j < 3; j++) {
-          let sec = [];
-          if (b[j]) sec.push(b[j]); if (i[j]) sec.push(i[j]); if (t[j]) sec.push(t[j]);
-          res = res.concat(shuffleArray(sec));
-        }
-        res.forEach((work, idx) => {
+        shuffleArray(salas[sala]).forEach((work, idx) => {
           let totalMins = idx * mTurno;
           work.fHor = (hInicio + Math.floor(totalMins/60)) + ":" + (totalMins % 60).toString().padStart(2,'0');
         });
       });
 
-      Object.keys(semesterPools).forEach(sem => {
-        semesterPools[sem].forEach(w => {
-          wSheet.getRange(w.rowIndex, h.indexOf('status')+1).setValue(w.fStat);
-          wSheet.getRange(w.rowIndex, h.indexOf('final_score')+1).setValue(w.avgScore);
-          wSheet.getRange(w.rowIndex, h.indexOf('feedback')+1).setValue(w.feedback);
-          if (h.indexOf('auditorio')>-1) wSheet.getRange(w.rowIndex, h.indexOf('auditorio')+1).setValue(w.fAud || "");
-          if (h.indexOf('horario')>-1) wSheet.getRange(w.rowIndex, h.indexOf('horario')+1).setValue("'" + (w.fHor || ""));
-          
-          const student = users.find(u => u.id === w.student_id);
-          if (student) {
-            let msg = `Dictamen: ${w.fStat}\nLugar: ${w.fAud || 'N/A'}\nHora: ${w.fHor || 'N/A'}\n\nRetroalimentación:\n${w.feedback}`;
-            try { MailApp.sendEmail(student.email, "Resultado Congreso LABIQ", msg); } catch(e) {}
-          }
-        });
+      workPool.forEach(w => {
+        wSheet.getRange(w.rowIndex, h.indexOf('status')+1).setValue(w.fStat);
+        wSheet.getRange(w.rowIndex, h.indexOf('final_score')+1).setValue(w.avgScore);
+        wSheet.getRange(w.rowIndex, h.indexOf('feedback')+1).setValue(w.feedback);
+        if (h.indexOf('auditorio')>-1) wSheet.getRange(w.rowIndex, h.indexOf('auditorio')+1).setValue(w.fAud || "");
+        if (h.indexOf('horario')>-1) wSheet.getRange(w.rowIndex, h.indexOf('horario')+1).setValue("'" + (w.fHor || ""));
+        
+        const student = users.find(u => u.id === w.student_id);
+        if (student) {
+          let msg = `Dictamen: ${w.fStat}\nLugar: ${w.fAud || 'N/A'}\nHora: ${w.fHor || 'N/A'}\n\nRetroalimentación:\n${w.feedback}`;
+          try { MailApp.sendEmail(student.email, "Resultado Encuentro IQ", msg); } catch(e) {}
+        }
       });
       result = { success: true };
     }
@@ -437,7 +419,7 @@ function doPost(e) {
           if (w) html += `<tr><td>${w.horario || 'N/A'}</td><td>${w.auditorio || 'Carteles'}</td><td><b>${w.short_id}</b> - ${w.title}</td></tr>`;
         });
         html += `</table>`;
-        try { MailApp.sendEmail({ to: ev.email, subject: "Agenda de Evaluación - Congreso LABIQ", htmlBody: html }); } catch(e) {}
+        try { MailApp.sendEmail({ to: ev.email, subject: "Agenda de Evaluación - Encuentro IQ", htmlBody: html }); } catch(e) {}
       });
       result = { success: true };
     }
@@ -455,7 +437,7 @@ function doPost(e) {
       function asignar(lista, w) {
         let aptos = lista.filter(ev => {
            const esMismoProf = (String(ev.name).trim().toUpperCase() === String(w.profesor_cargo).trim().toUpperCase());
-           return !tieneConflictoDeGrupo(w.grupo, ev.grupos_imparte) && !esMismoProf;
+           return !tieneConflictoDeFacultad(w, ev) && !esMismoProf;
         });
         aptos.sort((a,b) => workload[a.id] - workload[b.id]).slice(0,3).forEach(ev => {
           lSheet.appendRow([Utilities.getUuid(), w.id, ev.id, 'assigned', new Date(), '']);
@@ -507,8 +489,8 @@ function doPost(e) {
         row[headers.indexOf('used')] = 'false';
         sheet.appendRow(row);
         const resetLink = FRONTEND_URL + '/set-new-password.html?token=' + token;
-        const subject = 'Recuperación de contraseña - Congreso LABIQ';
-        const body = 'Hola,\n\nHas solicitado restablecer tu contraseña.\n\nHaz clic en el siguiente enlace para crear una nueva contraseña:\n' + resetLink + '\n\nEste enlace expirará en ' + RESET_TOKEN_EXPIRY_HOURS + ' hora(s).\n\nSi no solicitaste esto, ignora este mensaje.\n\nAtentamente,\nSistema Congreso LABIQ';
+        const subject = 'Recuperación de contraseña - Encuentro IQ';
+        const body = 'Hola,\n\nHas solicitado restablecer tu contraseña.\n\nHaz clic en el siguiente enlace para crear una nueva contraseña:\n' + resetLink + '\n\nEste enlace expirará en ' + RESET_TOKEN_EXPIRY_HOURS + ' hora(s).\n\nSi no solicitaste esto, ignora este mensaje.\n\nAtentamente,\nSistema Encuentro IQ';
         try { MailApp.sendEmail(data.email, subject, body); } catch (e) {}
       }
       result = { success: true };
@@ -567,27 +549,15 @@ function generarPremiacionMasiva() {
   const db = SpreadsheetApp.getActiveSpreadsheet();
   const works = getSheetData(db, 'works');
   const scored = works.filter(w => w.live_score && Number(w.live_score) > 0);
-  const ciclos = { 
-    "Básico": ["1er Semestre", "2do Semestre", "3er Semestre"], 
-    "Intermedio": ["4to Semestre", "5to Semestre", "6to Semestre"], 
-    "Terminal": ["7mo Semestre", "8vo Semestre", "9no Semestre"] 
-  };
 
   let listaGanadores = [];
 
-  Object.keys(ciclos).forEach(nombreCiclo => {
-    const semCiclo = ciclos[nombreCiclo];
-    const trCiclo = scored.filter(w => semCiclo.includes(w.semester));
+  scored.filter(w => w.status === 'accepted_oral').sort((a,b) => b.live_score - a.live_score).slice(0, 3).forEach((w,i) => {
+    listaGanadores.push({ w, l: `${i + 1}er Lugar Ponencia Oral` });
+  });
 
-    // Top 2 Ponencia del ciclo
-    trCiclo.filter(w => w.status === 'accepted_oral').sort((a,b) => b.live_score - a.live_score).slice(0, 2).forEach((w,i) => {
-      listaGanadores.push({ w, l: `${i + 1}er Lugar Ponencia - Ciclo ${nombreCiclo}` });
-    });
-
-    // Top 2 Cartel del ciclo
-    trCiclo.filter(w => w.status === 'accepted_poster').sort((a,b) => b.live_score - a.live_score).slice(0, 2).forEach((w,i) => {
-      listaGanadores.push({ w, l: `${i + 1}er Lugar Cartel - Ciclo ${nombreCiclo}` });
-    });
+  scored.filter(w => w.status === 'accepted_poster').sort((a,b) => b.live_score - a.live_score).slice(0, 3).forEach((w,i) => {
+    listaGanadores.push({ w, l: `${i + 1}er Lugar Cartel` });
   });
 
   listaGanadores.forEach(g => crearSlideEditable(g.w, g.w.profesor_cargo || "No asignado", g.l));

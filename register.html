@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#003D79">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LABIQ">
+    <meta name="apple-mobile-web-app-title" content="EncuentroIQ">
     <link rel="apple-touch-icon" href="favicon.ico">
 </head>
 
@@ -65,6 +65,16 @@
                                 <input type="text" class="form-control" id="name" required>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Facultad / Entidad</label>
+                                <select class="form-select" id="facultad" required>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="FES Cuautitlán">Facultad de Estudios Superiores Cuautitlán</option>
+                                    <option value="FES Zaragoza">Facultad de Estudios Superiores Zaragoza</option>
+                                    <option value="Facultad de Química">Facultad de Química</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">Correo Electrónico</label>
                                 <input type="email" class="form-control" id="email" required>
                             </div>
@@ -90,16 +100,6 @@
                                 </div>
                                 <div class="form-text text-danger">Solo personal autorizado puede registrarse como
                                     evaluador.</div>
-                                <!-- Campo para grupos del profesor (Solo visible para evaluadores) -->
-                                <div class="mb-3 d-none" id="evaluatorGroupsGroup">
-                                    <label class="form-label fw-bold">Grupos de laboratorio a los que imparte clase
-                                        *</label>
-                                    <input type="text" class="form-control" id="evaluatorGroups"
-                                        placeholder="Ej: 4301, 4852, 4102">
-                                    <div class="form-text">Indica los grupos en los que imparte clase este semestre.
-                                        * Si es profesor de asignatura, deja el espacio en blanco.
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Contraseña -->
@@ -173,20 +173,14 @@
         function toggleAdminCode() {
             const type = document.getElementById('userType').value;
             const codeGroup = document.getElementById('adminCodeGroup');
-            const groupsGroup = document.getElementById('evaluatorGroupsGroup'); // Nuevo
 
             if (type === 'evaluator') {
                 codeGroup.classList.remove('d-none');
-                groupsGroup.classList.remove('d-none'); // Mostrar
                 document.getElementById('adminCode').required = true;
-                document.getElementById('evaluatorGroups').required = true; // Hacerlo obligatorio
             } else {
                 codeGroup.classList.add('d-none');
-                groupsGroup.classList.add('d-none'); // Ocultar
                 document.getElementById('adminCode').required = false;
-                document.getElementById('evaluatorGroups').required = false;
                 document.getElementById('adminCode').value = '';
-                document.getElementById('evaluatorGroups').value = '';
             }
         }
 
@@ -196,11 +190,11 @@
 
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
+            const facultad = document.getElementById('facultad').value;
             const type = document.getElementById('userType').value;
             const pass = document.getElementById('password').value;
             const confirmPass = document.getElementById('confirmPassword').value; // Nuevo
             const adminCode = document.getElementById('adminCode').value;
-            const evaluatorGroups = document.getElementById('evaluatorGroups').value;
             const passError = document.getElementById('passError');
 
             // 1. VALIDACIÓN DE COINCIDENCIA DE CONTRASEÑA
@@ -219,7 +213,7 @@
             btn.innerText = "Registrando...";
 
             // 2. LLAMADA A LA API (el código se valida en el backend)
-            const result = await window.apiClient.registerUser(email, pass, name, type, evaluatorGroups, adminCode);
+            const result = await window.apiClient.registerUser(email, pass, name, type, adminCode, facultad);
 
             if (result.success) {
                 showToast('Cuenta creada exitosamente.', 'success');

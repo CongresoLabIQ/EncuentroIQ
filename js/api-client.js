@@ -17,15 +17,15 @@ const apiClient = {
     },
 
     // En api-client.js
-    async registerUser(email, password, name, userType, groups = "", adminCode = "") {
+    async registerUser(email, password, name, userType, adminCode = "", facultad = "") {
         return await postData({
             action: 'register',
             email,
             password,
             name,
             user_type: userType,
-            grupos_imparte: groups,
-            admin_code: adminCode
+            admin_code: adminCode,
+            facultad
         });
     },
 
