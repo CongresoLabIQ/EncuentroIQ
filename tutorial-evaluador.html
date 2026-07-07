@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Evaluador - EncuentroIQ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#003D79">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EncuentroIQ">
+  <link rel="apple-touch-icon" href="favicon.ico">
+  <style>
+    .tutorial-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 46, 85, 0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1050;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .tutorial-overlay.active { opacity: 1; pointer-events: all; }
+    .tutorial-card {
+      background: #fff; border-radius: 20px;
+      max-width: 780px; width: 92%;
+      max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .tutorial-overlay.active .tutorial-card { transform: scale(1) translateY(0); }
+    .tutorial-card-header {
+      background: var(--primary); color: #fff;
+      padding: 22px 32px 18px;
+      border-radius: 20px 20px 0 0;
+    }
+    .tutorial-card-header .step-badge {
+      display: inline-block;
+      background: var(--accent); color: var(--primary-dark);
+      font-weight: 800; font-size: 0.7rem;
+      padding: 3px 14px; border-radius: 20px;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .tutorial-card-header h3 {
+      color: #fff; font-family: var(--font-heading);
+      font-weight: 700; margin: 0; font-size: 1.35rem;
+    }
+    .tutorial-card-header p {
+      color: rgba(255,255,255,0.8); margin: 4px 0 0; font-size: 0.9rem;
+    }
+    .tutorial-card-body { padding: 24px 32px 16px; }
+    .tutorial-card-footer {
+      padding: 12px 32px 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .step-dots { display: flex; gap: 7px; align-items: center; }
+    .step-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ccc; transition: all 0.3s;
+      border: none; padding: 0; cursor: pointer;
+    }
+    .step-dot.active { background: var(--primary); transform: scale(1.3); }
+    .step-dot.completed { background: var(--accent); }
+    .step-dot.done { background: var(--success); }
+
+    .interactive-area {
+      background: var(--bg-light);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px 22px; margin: 14px 0;
+      position: relative;
+    }
+    .interactive-area .area-label {
+      position: absolute; top: 0; left: 0;
+      background: var(--primary); color: #fff;
+      font-size: 0.6rem; font-weight: 700;
+      padding: 3px 12px; border-radius: 0 0 12px 0;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .tip-box {
+      background: var(--accent-bg);
+      border-left: 4px solid var(--accent);
+      padding: 10px 16px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 10px 0; font-size: 0.88rem;
+    }
+    .tip-box strong { color: var(--primary-dark); }
+    .feedback-box {
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      margin: 8px 0; font-size: 0.85rem; display: none;
+    }
+    .feedback-box.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .feedback-box.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .feedback-box.info { display: block; background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .feedback-box.warning { display: block; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+    .btn-tutorial { border-radius: 30px; padding: 8px 24px; font-weight: 600; }
+    .btn-tutorial-primary { background: var(--primary); color: #fff; border: none; }
+    .btn-tutorial-primary:hover { background: var(--primary-dark); color: #fff; }
+    .btn-tutorial-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-tutorial-outline:hover { background: var(--primary); color: #fff; }
+    .btn-tutorial-success { background: var(--success); color: #fff; border: none; }
+    .btn-tutorial-success:hover { background: #044a25; color: #fff; }
+
+    .tutorial-score-card {
+      background: var(--primary-dark); color: #fff;
+      text-align: center; padding: 10px; border-radius: 12px; margin-top: 10px;
+    }
+    .tutorial-score-card .num { font-weight: 800; font-size: 1.6rem; }
+
+    .rubric-slider-practice { width: 100%; }
+    .rubric-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    }
+    .rubric-row label { font-size: 0.82rem; font-weight: 600; min-width: 110px; color: var(--text); }
+    .rubric-row .range-wrap { flex: 1; }
+    .rubric-row .val-badge {
+      background: var(--primary); color: #fff;
+      font-weight: 700; font-size: 0.75rem;
+      padding: 2px 10px; border-radius: 10px;
+      min-width: 28px; text-align: center;
+    }
+    .contenido-practice label { font-size: 0.8rem; }
+
+    .quiz-option {
+      display: block;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .quiz-option:hover { border-color: var(--primary); background: var(--accent-bg); }
+    .quiz-option input { display: none; }
+    .quiz-option.selected { border-color: var(--primary); background: var(--accent-bg); font-weight: 600; }
+    .quiz-option.correct { border-color: var(--success); background: #d4edda; }
+    .quiz-option.wrong { border-color: var(--danger); background: #f8d7da; }
+
+    .progress-tracker {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .progress-tracker .pstep {
+      flex: 1; height: 4px; border-radius: 4px;
+      background: #e0e0e0; transition: background 0.4s;
+    }
+    .progress-tracker .pstep.done { background: var(--success); }
+    .progress-tracker .pstep.active { background: var(--primary); }
+
+    @media (max-width: 576px) {
+      .tutorial-card-header { padding: 18px 18px 14px; }
+      .tutorial-card-body { padding: 16px 18px 10px; }
+      .tutorial-card-footer { padding: 10px 18px 16px; flex-direction: column; align-items: stretch; }
+      .tutorial-card-footer .d-flex { justify-content: center; }
+      .rubric-row { flex-wrap: wrap; gap: 4px; }
+      .rubric-row label { min-width: 80px; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toastContainer"></div>
+
+  <header class="top-bar">
+    <div class="container d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <div class="unam-shield"><span class="shield-inner">U</span></div>
+        <div>
+          <div class="top-bar-entity">9no Encuentro Estudiantil de Ingeniería Química</div>
+          <div class="top-bar-event">Tutorial para Evaluadores</div>
+        </div>
+      </div>
+      <nav class="top-bar-nav d-none d-lg-flex">
+        <a href="index.html" class="top-bar-link">Inicio</a>
+        <a href="login.html" class="top-bar-link">Ingresar</a>
+        <a href="register.html" class="top-bar-link">Registro</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Inicio</a></li>
+        <li class="active">Tutorial Evaluador</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="container py-5 text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <span class="badge bg-primary mb-2" style="font-size:0.8rem;letter-spacing:1px;">🧪 GUÍA INTERACTIVA</span>
+        <h1 class="display-6 fw-bold mb-3" style="color:var(--primary);">Capacitación para Evaluadores</h1>
+        <p class="lead text-muted mb-4">
+          Practica con los sliders, escribe retroalimentación y responde preguntas
+          para aprender a usar el sistema de evaluación.
+        </p>
+        <button class="btn btn-lg btn-tutorial-primary btn-tutorial" onclick="startTutorial()">
+          ▶ Iniciar tutorial interactivo
+        </button>
+        <a href="evaluator-dashboard.html" class="btn btn-lg btn-tutorial-outline btn-tutorial ms-2">
+          Ir al panel
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-5">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">📝</div>
+            <h5 class="fw-bold" style="color:var(--primary);">1. Regístrate</h5>
+            <p class="text-muted small mb-0">Crea tu cuenta con correo institucional y código de evaluador.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">🎮</div>
+            <h5 class="fw-bold" style="color:var(--primary);">2. Practica</h5>
+            <p class="text-muted small mb-0">Usa sliders interactivos y escribe retroalimentación simulada.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">✅</div>
+            <h5 class="fw-bold" style="color:var(--primary);">3. Verifica</h5>
+            <p class="text-muted small mb-0">Responde un breve quiz al final para confirmar lo aprendido.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== TUTORIAL OVERLAY ====== -->
+  <div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-card" id="tutorialCard">
+
+      <div class="tutorial-card-header">
+        <span class="step-badge" id="stepBadge">Paso 1 de 8</span>
+        <div class="progress-tracker" id="progressTracker"></div>
+        <h3 id="stepTitle">Bienvenido al tutorial</h3>
+        <p id="stepSubtitle">Aprendamos juntos el proceso de evaluación</p>
+      </div>
+
+      <div class="tutorial-card-body" id="stepBody"></div>
+
+      <div class="tutorial-card-footer">
+        <div class="step-dots" id="stepDots"></div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-tutorial-outline btn-tutorial" id="btnPrev" onclick="prevStep()">← Anterior</button>
+          <button class="btn btn-tutorial-primary btn-tutorial" id="btnNext" onclick="nextStep()">Siguiente →</button>
+          <button class="btn btn-tutorial-success btn-tutorial d-none" id="btnFinish" onclick="finishTutorial()">✔ Finalizar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer-institutional">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="footer-shield">UNAM</div>
+          <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+        </div>
+        <div class="col-md-4">
+          <h6>Entidades participantes</h6>
+          <ul><li>Facultad de Estudios Superiores Cuautitlán</li></ul>
+          <ul><li>Facultad de Estudios Superiores Zaragoza</li></ul>
+          <ul><li>Facultad de Química</li></ul>
+        </div>
+        <div class="col-md-4">
+          <h6>Contacto</h6>
+          <ul>
+            <li>sistema.congresolabiq@gmail.com</li>
+            <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+          </ul>
+        </div>
+      </div>
+      <hr class="footer-hr">
+      <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const STEPS = [{
+      id: 0,
+      title: 'Bienvenido al tutorial',
+      subtitle: 'Interactúa, practica y aprende',
+      body: () => `
+        <div class="text-center mb-2"><span style="font-size:2.8rem;">👋</span></div>
+        <p class="fw-bold" style="color:var(--primary);font-size:1.05rem;">
+          Este tutorial no es solo para leer — <u>vas a practicar</u>.
+        </p>
+        <p>En cada paso tendrás que <strong>hacer algo</strong>:</p>
+        <div class="interactive-area">
+          <span class="area-label">Lo que harás</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">✍️</span>
+              <div style="font-size:0.8rem;font-weight:600;">Escribir</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">en campos de texto</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">🎚️</span>
+              <div style="font-size:0.8rem;font-weight:600;">Mover sliders</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">como en la rúbrica real</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">🖱️</span>
+              <div style="font-size:0.8rem;font-weight:600;">Seleccionar</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">opciones y radios</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">🧠</span>
+              <div style="font-size:0.8rem;font-weight:600;">Responder quiz</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">al final del tutorial</small>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          <strong>🎯 Importante:</strong> Todas las actividades son de práctica — nadie guarda tus respuestas.
+          Si te equivocas, solo intenta de nuevo.
+        </div>
+        <p class="text-muted mb-0" style="font-size:0.9rem;">Duración aproximada: 8-10 minutos.</p>
+      `
+    }, {
+      id: 1,
+      title: 'Registro de evaluador',
+      subtitle: 'Crea tu cuenta en el sistema',
+      body: () => `
+        <p>Para evaluar trabajos debes <strong>registrarte</strong>. Llena los campos de abajo como si fueras a registrarte de verdad:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Simulador de registro</span>
+          <div style="margin-top:8px;">
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Nombre completo</label>
+              <input type="text" class="form-control form-control-sm" id="tutName" placeholder="Ej: Dr. Juan Pérez López" oninput="updatePreview()">
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Facultad</label>
+              <select class="form-select form-select-sm" id="tutFaculty" onchange="updatePreview()">
+                <option value="">Selecciona...</option>
+                <option value="FQ">Facultad de Química</option>
+                <option value="FESC">FES Cuautitlán</option>
+                <option value="FESZ">FES Zaragoza</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Correo electrónico</label>
+              <input type="email" class="form-control form-control-sm" id="tutEmail" placeholder="ejemplo@unam.mx" oninput="updatePreview()">
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Código de evaluador</label>
+              <input type="text" class="form-control form-control-sm" id="tutCode" placeholder="Te lo proporciona la coordinación" oninput="updatePreview()">
+              <small class="text-muted">Sin este código no podrás registrarte como evaluador.</small>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Contraseña</label>
+              <input type="password" class="form-control form-control-sm" id="tutPass" placeholder="Mínimo 8 caracteres" oninput="updatePreview()">
+            </div>
+            <button class="btn btn-tutorial-success btn-sm w-100 mt-1" onclick="simulateRegister()">📝 Simular registro</button>
+            <div id="registerFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div id="previewCard" style="display:none;background:#fff;border-radius:12px;padding:14px;border:2px solid var(--success);margin:10px 0;">
+          <div style="font-weight:700;color:var(--success);font-size:0.85rem;">👤 Vista previa de tu perfil</div>
+          <div style="font-size:0.85rem;margin-top:6px;">
+            <div><strong>Nombre:</strong> <span id="previewName">—</span></div>
+            <div><strong>Facultad:</strong> <span id="previewFaculty">—</span></div>
+            <div><strong>Correo:</strong> <span id="previewEmail">—</span></div>
+          </div>
+        </div>
+
+        <p class="mb-0 mt-1">
+          <a href="register.html" target="_blank" class="fw-bold" style="font-size:0.9rem;">Ir al registro real →</a>
+        </p>
+      `
+    }, {
+      id: 2,
+      title: 'Inicio de sesión',
+      subtitle: 'Accede a tu panel',
+      body: () => `
+        <p>Una vez registrado, inicia sesión. Escribe cualquier correo y contraseña de prueba para simular el acceso:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Simulador de acceso</span>
+          <div style="max-width:320px;margin:10px auto 0;">
+            <div style="text-align:center;font-weight:700;color:var(--primary);margin-bottom:12px;">🔐 Iniciar Sesión</div>
+            <div class="mb-2">
+              <input type="email" class="form-control form-control-sm" id="tutLoginEmail" placeholder="Correo electrónico">
+            </div>
+            <div class="mb-2">
+              <input type="password" class="form-control form-control-sm" id="tutLoginPass" placeholder="Contraseña">
+            </div>
+            <button class="btn btn-tutorial-primary btn-sm w-100" onclick="simulateLogin()">Ingresar</button>
+            <div id="loginFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>🔐 ¿Olvidaste tu contraseña?</strong> Usa la opción
+          <em>"¿Olvidaste tu contraseña?"</em> en la página de inicio de sesión para recuperarla.
+        </div>
+
+        <p class="mb-0"><a href="login.html" target="_blank" class="fw-bold" style="font-size:0.9rem;">Ir a iniciar sesión real →</a></p>
+      `
+    }, {
+      id: 3,
+      title: 'Tu panel de evaluador',
+      subtitle: 'Conoce la interfaz principal',
+      body: () => `
+        <p>Al entrar al sistema, ves tu <strong>panel</strong> con los trabajos asignados. Abajo hay una simulación funcional:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Dashboard simulado</span>
+          <div style="margin-top:8px;">
+            <div style="display:flex;gap:4px;margin-bottom:10px;">
+              <span onclick="switchMockTab(0)" id="mockTab0" style="cursor:pointer;background:var(--primary);color:#fff;padding:6px 16px;border-radius:8px 8px 0 0;font-size:0.8rem;font-weight:600;">📄 Fase 1: Resúmenes</span>
+              <span onclick="switchMockTab(1)" id="mockTab1" style="cursor:pointer;background:#e0e0e0;padding:6px 16px;border-radius:8px 8px 0 0;font-size:0.8rem;font-weight:600;color:var(--text-light);">🎤 Fase 2: Oral/Cartel</span>
+            </div>
+            <div id="mockTabContent0">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <strong style="color:var(--danger);font-size:0.9rem;">⏳ Pendientes por Evaluar</strong>
+                <span class="badge bg-primary">3 trabajos</span>
+              </div>
+              <div id="mockWorkList">
+                <div class="mock-work-card" data-index="0" onclick="selectWork(0)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:6px;border:2px solid transparent;display:flex;align-items:center;gap:10px;">
+                  <span class="badge" style="background:var(--primary-mid);">IQ-042</span>
+                  <span style="flex:1;font-size:0.85rem;">Evaluación de biosorbentes para remoción de metales</span>
+                  <span style="color:var(--success);font-weight:700;font-size:0.8rem;">Evaluar →</span>
+                </div>
+                <div class="mock-work-card" data-index="1" onclick="selectWork(1)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:6px;border:2px solid transparent;display:flex;align-items:center;gap:10px;">
+                  <span class="badge" style="background:var(--primary-mid);">IQ-057</span>
+                  <span style="flex:1;font-size:0.85rem;">Producción de bioetanol a partir de residuos agrícolas</span>
+                  <span style="color:var(--success);font-weight:700;font-size:0.8rem;">Evaluar →</span>
+                </div>
+                <div class="mock-work-card" data-index="2" onclick="selectWork(2)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:6px;border:2px solid transparent;display:flex;align-items:center;gap:10px;">
+                  <span class="badge" style="background:var(--primary-mid);">IQ-089</span>
+                  <span style="flex:1;font-size:0.85rem;">Tratamiento de aguas residuales con humedales artificiales</span>
+                  <span style="color:var(--success);font-weight:700;font-size:0.8rem;">Evaluar →</span>
+                </div>
+              </div>
+              <div id="workFeedback" class="feedback-box mt-2" style="font-size:0.85rem;"></div>
+            </div>
+            <div id="mockTabContent1" style="display:none;">
+              <div class="text-center py-3" style="color:var(--text-light);font-size:0.9rem;">
+                🎤 Aquí verás las asignaciones de presentaciones orales y carteles.
+                <br><small>Cambia a la pestaña Fase 1 para explorar.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>💡 Prueba:</strong> Haz clic en los trabajos de la lista para ver cómo se seleccionan.
+        </div>
+      `
+    }, {
+      id: 4,
+      title: 'Fase 1: Evaluación documental',
+      subtitle: 'Practica con la rúbrica',
+      body: () => `
+        <p>Cuando evaluas un trabajo, se abre un modal con la rúbrica completa. <strong>Practica abajo:</strong> mueve los sliders para calificar este trabajo de ejemplo.</p>
+
+        <div class="interactive-area">
+          <span class="area-label">🧪 Práctica: Rúbrica Fase 1</span>
+          <div style="margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <strong style="color:var(--primary);">📋 Evaluación: IQ-042</strong>
+              <span class="badge bg-warning text-dark" id="practiceExtensionBadge" style="font-size:0.7rem;">Extensión: Pendiente</span>
+            </div>
+
+            <div style="background:#fff;border-radius:10px;padding:8px 12px;margin-bottom:10px;border:1px solid var(--border);">
+              <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">📏 ¿Cumple con la extensión?</div>
+              <div style="display:flex;gap:12px;">
+                <label style="font-size:0.85rem;cursor:pointer;">
+                  <input type="radio" name="pExtension" value="si" onchange="togglePracticeExtension(true)"> Sí
+                </label>
+                <label style="font-size:0.85rem;cursor:pointer;">
+                  <input type="radio" name="pExtension" value="no" onchange="togglePracticeExtension(false)"> No
+                </label>
+              </div>
+              <div id="practiceExtNotice" style="display:none;font-size:0.8rem;color:var(--danger);font-weight:600;margin-top:4px;">
+                ⚠️ Si no cumple extensión → rechazo automático, no se evalúa rúbrica.
+              </div>
+            </div>
+
+            <div id="practiceRubric">
+              <div style="font-weight:700;font-size:0.82rem;color:var(--primary);margin-bottom:6px;">Parte 1: Contenido del Documento (90 pts)</div>
+
+              <div class="rubric-row"><label>Resumen (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Justificación (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Objetivos (0-15)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="15" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Introducción (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Metodología (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Resultados (0-15)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="15" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Conclusiones (0-15)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="15" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Referencias (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+
+              <hr style="margin:8px 0;">
+
+              <div style="font-weight:700;font-size:0.82rem;color:var(--success);margin-bottom:6px;">Parte 2: Pertinencia e Innovación (10 pts)</div>
+
+              <div class="rubric-row"><label>Factibilidad (0-2)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="2" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Innovación (0-2)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="2" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Integración (0-2)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="2" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Programa (0-2)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="2" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Ética (0-2)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="2" step="1" value="0" oninput="updatePracticeTotal()"></div><span class="val-badge">0</span></div>
+            </div>
+
+            <div class="tutorial-score-card" id="practiceScoreCard">
+              <small>Calificación Final</small>
+              <div class="num"><span id="practiceTotalScore">0</span> / 100</div>
+            </div>
+
+            <div style="margin-top:8px;">
+              <label style="font-size:0.8rem;font-weight:600;">Comentarios y retroalimentación</label>
+              <textarea class="form-control form-control-sm" id="practiceComments" rows="2" placeholder="Escribe retroalimentación para el alumno..." oninput="updateCommentCounter()"></textarea>
+              <small id="commentCounter" style="color:var(--danger);">0 caracteres (mín. 50)</small>
+            </div>
+
+            <button class="btn btn-tutorial-success btn-sm w-100 mt-2" onclick="submitPracticeEval()">🚀 Simular envío de evaluación</button>
+            <div id="practiceEvalFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>✏️ Recuerda:</strong> En el sistema real, la retroalimentación debe tener al menos <strong>50 caracteres</strong>.
+        </div>
+      `
+    }, {
+      id: 5,
+      title: 'Fase 2: Evaluación presencial',
+      subtitle: 'Oral y cartel en vivo',
+      body: () => `
+        <p>En la <strong>Fase 2</strong> evalúas presentaciones durante el evento. Practica con esta simulación:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">🧪 Práctica: Evaluación en vivo</span>
+          <div style="margin-top:8px;">
+            <div style="font-weight:700;color:var(--primary);margin-bottom:8px;">🎤 Evaluación: IQ-042 — "Evaluación de biosorbentes"</div>
+
+            <div style="background:#fff;border-radius:10px;padding:8px 12px;margin-bottom:8px;border:1px solid var(--border);">
+              <div style="font-size:0.8rem;font-weight:600;">🎤 ¿Se presentó el trabajo?</div>
+              <div style="display:flex;gap:12px;">
+                <label style="font-size:0.85rem;cursor:pointer;"><input type="radio" name="livePresented" value="si" onchange="toggleLivePresented(true)"> Sí</label>
+                <label style="font-size:0.85rem;cursor:pointer;"><input type="radio" name="livePresented" value="no" onchange="toggleLivePresented(false)"> No</label>
+              </div>
+              <div id="liveNotPresentedNotice" style="display:none;font-size:0.8rem;color:var(--danger);font-weight:600;margin-top:4px;">
+                ⚠️ Si no se presentó → calificación 0 automática.
+              </div>
+            </div>
+
+            <div id="liveRubric">
+              <div style="font-weight:600;font-size:0.82rem;margin-bottom:6px;">Revisión del Material de Apoyo</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Título <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Docente <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Participantes <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Objetivos <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Resultados <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
+                  Conclusión <input type="checkbox" onchange="updateLiveTotal()"> 
+                </label>
+              </div>
+
+              <div style="font-weight:600;font-size:0.82rem;margin-bottom:6px;">Criterios de presentación</div>
+
+              <div class="rubric-row"><label>Tono de voz (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Calidad (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Dominio (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Lenguaje corporal (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Trabajo en equipo (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+
+              <div class="tutorial-score-card" style="margin-top:8px;">
+                <small>Puntaje Total</small>
+                <div class="num"><span id="liveTotalScore">0</span> pts</div>
+              </div>
+
+              <button class="btn btn-tutorial-success btn-sm w-100 mt-2" onclick="submitPracticeLive()">✅ Simular envío de calificación</button>
+              <div id="practiceLiveFeedback" class="feedback-box mt-2"></div>
+            </div>
+            <div id="liveNoShow" style="display:none;">
+              <div class="tutorial-score-card" style="background:var(--danger);">
+                <small>Resultado</small>
+                <div class="num">0 pts — No se presentó</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    }, {
+      id: 6,
+      title: 'Verifica lo aprendido',
+      subtitle: 'Mini-quiz de 3 preguntas',
+      body: () => `
+        <p>Responde estas preguntas para confirmar que entendiste el proceso. <strong>No hay penalización</strong> por equivocarte.</p>
+
+        <div id="quizArea">
+          <div class="mb-3" id="q1">
+            <p style="font-weight:600;font-size:0.9rem;">1️⃣ ¿Qué pasa si seleccionas "No" en la pregunta de extensión?</p>
+            <div class="quiz-option" onclick="selectQuiz('q1',0)"><input type="radio" name="q1" value="0"> El trabajo se marca como pendiente</div>
+            <div class="quiz-option" onclick="selectQuiz('q1',1)"><input type="radio" name="q1" value="1"> El trabajo se rechaza automáticamente</div>
+            <div class="quiz-option" onclick="selectQuiz('q1',2)"><input type="radio" name="q1" value="2"> El evaluador debe escribir una justificación extra</div>
+          </div>
+
+          <div class="mb-3" id="q2">
+            <p style="font-weight:600;font-size:0.9rem;">2️⃣ ¿Cuántos caracteres debe tener la retroalimentación como mínimo?</p>
+            <div class="quiz-option" onclick="selectQuiz('q2',0)"><input type="radio" name="q2" value="0"> 10 caracteres</div>
+            <div class="quiz-option" onclick="selectQuiz('q2',1)"><input type="radio" name="q2" value="1"> 25 caracteres</div>
+            <div class="quiz-option" onclick="selectQuiz('q2',2)"><input type="radio" name="q2" value="2"> 50 caracteres</div>
+          </div>
+
+          <div class="mb-3" id="q3">
+            <p style="font-weight:600;font-size:0.9rem;">3️⃣ ¿Cómo se asignan los trabajos a los evaluadores?</p>
+            <div class="quiz-option" onclick="selectQuiz('q3',0)"><input type="radio" name="q3" value="0"> El evaluador elige qué trabajos evaluar</div>
+            <div class="quiz-option" onclick="selectQuiz('q3',1)"><input type="radio" name="q3" value="1"> El administrador asigna trabajos manual o aleatoriamente</div>
+            <div class="quiz-option" onclick="selectQuiz('q3',2)"><input type="radio" name="q3" value="2"> Los estudiantes eligen a su evaluador</div>
+          </div>
+
+          <div id="quizFeedback" class="feedback-box"></div>
+          <button class="btn btn-tutorial-primary btn-sm w-100 mt-1" onclick="checkQuiz()">✅ Verificar respuestas</button>
+        </div>
+      `
+    }, {
+      id: 7,
+      title: '¡Listo! Ya estás capacitado',
+      subtitle: 'Resumen y pasos siguientes',
+      body: () => `
+        <div class="text-center mb-2"><span style="font-size:2.8rem;">🎉</span></div>
+        <p class="fw-bold" style="color:var(--primary);font-size:1.1rem;text-align:center;">
+          ¡Felicidades! Completaste la capacitación interactiva.
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;" id="finalChecklist">
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>📝</span>
+            <div style="font-size:0.8rem;font-weight:600;">Registrarme</div>
+            <small style="font-size:0.7rem;color:var(--text-light);">Creé mi cuenta</small>
+            <span id="check1" style="display:block;font-size:0.7rem;margin-top:4px;">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>🎚️</span>
+            <div style="font-size:0.8rem;font-weight:600;">Practiqué sliders</div>
+            <small style="font-size:0.7rem;color:var(--text-light);">Evaluación Fase 1</small>
+            <span id="check2" style="display:block;font-size:0.7rem;margin-top:4px;">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>🎤</span>
+            <div style="font-size:0.8rem;font-weight:600;">Practiqué Fase 2</div>
+            <small style="font-size:0.7rem;color:var(--text-light);">Evaluación en vivo</small>
+            <span id="check3" style="display:block;font-size:0.7rem;margin-top:4px;">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>🧠</span>
+            <div style="font-size:0.8rem;font-weight:600;">Respondí el quiz</div>
+            <small style="font-size:0.7rem;color:var(--text-light);">Verifiqué lo aprendido</small>
+            <span id="check4" style="display:block;font-size:0.7rem;margin-top:4px;">⬜ Pendiente</span>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>📌 Recordatorio final:</strong>
+          <ul class="mb-0 mt-1" style="font-size:0.85rem;">
+            <li>Solo evaluarás los trabajos que te sean <strong>asignados</strong></li>
+            <li>En Fase 1 lee el <strong>PDF completo</strong> antes de calificar</li>
+            <li>En Fase 2 marca primero si <strong>se presentó</strong> el trabajo</li>
+            <li>Puedes <strong>guardar borradores</strong> y continuar después</li>
+            <li>La <strong>retroalimentación</strong> debe ser útil y tener al menos 50 caracteres</li>
+          </ul>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+          <a href="register.html" class="btn btn-tutorial-outline btn-tutorial">📝 Registrarme</a>
+          <a href="login.html" class="btn btn-tutorial-outline btn-tutorial">🔐 Iniciar sesión</a>
+          <a href="evaluator-dashboard.html" class="btn btn-tutorial-primary btn-tutorial">📋 Ir al panel</a>
+        </div>
+      `
+    }];
+
+    let currentStep = 0;
+    let quizAnswered = [false, false, false];
+    let quizCorrect = [false, false, false];
+    const QUIZ_ANSWERS = [1, 2, 1];
+
+    function startTutorial() {
+      currentStep = 0;
+      document.getElementById('tutorialOverlay').classList.add('active');
+      renderStep(currentStep);
+      renderDots();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function finishTutorial() {
+      document.getElementById('tutorialOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function nextStep() {
+      if (currentStep < STEPS.length - 1) {
+        currentStep++;
+        renderStep(currentStep);
+        renderDots();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        renderStep(currentStep);
+        renderDots();
+      }
+    }
+
+    function goToStep(index) {
+      currentStep = index;
+      renderStep(currentStep);
+      renderDots();
+    }
+
+    function renderDots() {
+      const c = document.getElementById('stepDots');
+      c.innerHTML = STEPS.map((_, i) => {
+        let cls = 'step-dot';
+        if (i === currentStep) cls += ' active';
+        else if (i < currentStep) cls += ' completed';
+        return `<button class="${cls}" onclick="goToStep(${i})" aria-label="Paso ${i+1}"></button>`;
+      }).join('');
+    }
+
+    function renderStep(index) {
+      const step = STEPS[index];
+      document.getElementById('stepBadge').textContent = `Paso ${index+1} de ${STEPS.length}`;
+
+      // Progress tracker
+      const pt = document.getElementById('progressTracker');
+      pt.innerHTML = STEPS.map((_, i) => {
+        let cls = 'pstep';
+        if (i < index) cls += ' done';
+        else if (i === index) cls += ' active';
+        return `<div class="${cls}"></div>`;
+      }).join('');
+
+      document.getElementById('stepTitle').textContent = step.title;
+      document.getElementById('stepSubtitle').textContent = step.subtitle;
+      document.getElementById('stepBody').innerHTML = step.body();
+
+      const bp = document.getElementById('btnPrev');
+      const bn = document.getElementById('btnNext');
+      const bf = document.getElementById('btnFinish');
+      bp.style.display = index === 0 ? 'none' : '';
+      bn.style.display = index === STEPS.length - 1 ? 'none' : '';
+      bf.classList.toggle('d-none', index !== STEPS.length - 1);
+
+      // Run step-specific init
+      if (index === 3) initMockTab();
+    }
+
+    // ======== STEP 1: Registration ========
+    function updatePreview() {
+      const name = document.getElementById('tutName').value.trim();
+      const faculty = document.getElementById('tutFaculty').value;
+      const email = document.getElementById('tutEmail').value.trim();
+      const code = document.getElementById('tutCode').value.trim();
+      const pass = document.getElementById('tutPass').value;
+
+      const card = document.getElementById('previewCard');
+      if (name || faculty || email) {
+        card.style.display = 'block';
+        document.getElementById('previewName').textContent = name || '—';
+        document.getElementById('previewFaculty').textContent =
+          faculty ? document.getElementById('tutFaculty').options[document.getElementById('tutFaculty').selectedIndex].text : '—';
+        document.getElementById('previewEmail').textContent = email || '—';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    function simulateRegister() {
+      const name = document.getElementById('tutName').value.trim();
+      const faculty = document.getElementById('tutFaculty').value;
+      const email = document.getElementById('tutEmail').value.trim();
+      const code = document.getElementById('tutCode').value.trim();
+      const pass = document.getElementById('tutPass').value;
+
+      const fb = document.getElementById('registerFeedback');
+      if (!name || !faculty || !email || !code || !pass) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Todos los campos son obligatorios.';
+        return;
+      }
+      if (pass.length < 4) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ La contraseña debe tener al menos 4 caracteres.';
+        return;
+      }
+      if (code.length < 3) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ El código de evaluador parece incorrecto.';
+        return;
+      }
+      fb.className = 'feedback-box success';
+      fb.textContent = '✅ ¡Registro simulado exitoso! (en el sistema real recibirás un correo de confirmación)';
+      document.getElementById('previewCard').style.display = 'block';
+    }
+
+    // ======== STEP 2: Login ========
+    function simulateLogin() {
+      const email = document.getElementById('tutLoginEmail').value.trim();
+      const pass = document.getElementById('tutLoginPass').value.trim();
+      const fb = document.getElementById('loginFeedback');
+      if (!email || !pass) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Ingresa correo y contraseña.';
+        return;
+      }
+      if (!email.includes('@')) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ El correo no tiene formato válido.';
+        return;
+      }
+      fb.className = 'feedback-box success';
+      fb.textContent = '✅ ¡Inicio de sesión simulado correctamente!';
+    }
+
+    // ======== STEP 3: Mock Dashboard ========
+    let selectedWork = null;
+
+    function initMockTab() {
+      selectedWork = null;
+    }
+
+    function switchMockTab(tab) {
+      document.getElementById('mockTab0').style.background = tab === 0 ? 'var(--primary)' : '#e0e0e0';
+      document.getElementById('mockTab0').style.color = tab === 0 ? '#fff' : 'var(--text-light)';
+      document.getElementById('mockTab1').style.background = tab === 1 ? 'var(--primary)' : '#e0e0e0';
+      document.getElementById('mockTab1').style.color = tab === 1 ? '#fff' : 'var(--text-light)';
+      document.getElementById('mockTabContent0').style.display = tab === 0 ? 'block' : 'none';
+      document.getElementById('mockTabContent1').style.display = tab === 1 ? 'block' : 'none';
+    }
+
+    function selectWork(idx) {
+      selectedWork = idx;
+      document.querySelectorAll('.mock-work-card').forEach((el, i) => {
+        el.style.borderColor = i === idx ? 'var(--primary)' : 'transparent';
+        el.style.background = i === idx ? 'var(--accent-bg)' : '#fff';
+      });
+      const names = ['Evaluación de biosorbentes', 'Producción de bioetanol', 'Tratamiento de aguas residuales'];
+      const fb = document.getElementById('workFeedback');
+      fb.className = 'feedback-box success';
+      fb.textContent = `✅ Seleccionaste: ${names[idx]} — Ahora presiona "Evaluar" (en el sistema real se abre un modal con la rúbrica)`;
+    }
+
+    // ======== STEP 4: Practice Rubric ========
+    let practiceExtOk = null;
+
+    function togglePracticeExtension(ok) {
+      practiceExtOk = ok;
+      const badge = document.getElementById('practiceExtensionBadge');
+      const notice = document.getElementById('practiceExtNotice');
+      if (!ok) {
+        badge.textContent = 'Extensión: No cumple ❌';
+        badge.className = 'badge bg-danger';
+        notice.style.display = 'block';
+      } else {
+        badge.textContent = 'Extensión: Cumple ✅';
+        badge.className = 'badge bg-success';
+        notice.style.display = 'none';
+      }
+    }
+
+    function updatePracticeTotal() {
+      const sliders = document.querySelectorAll('.interactive-area .rubric-slider-practice');
+      let total = 0;
+      sliders.forEach(s => {
+        total += parseInt(s.value) || 0;
+        const badge = s.closest('.rubric-row').querySelector('.val-badge');
+        if (badge) badge.textContent = s.value;
+      });
+      document.getElementById('practiceTotalScore').textContent = total;
+    }
+
+    function updateCommentCounter() {
+      const len = document.getElementById('practiceComments').value.length;
+      const c = document.getElementById('commentCounter');
+      c.textContent = len + ' caracteres (mín. 50)';
+      c.style.color = len >= 50 ? 'var(--success)' : 'var(--danger)';
+    }
+
+    function submitPracticeEval() {
+      const fb = document.getElementById('practiceEvalFeedback');
+      const total = parseInt(document.getElementById('practiceTotalScore').textContent);
+      const comments = document.getElementById('practiceComments').value.trim();
+
+      if (practiceExtOk === null) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Debes indicar si el trabajo cumple con la extensión.';
+        return;
+      }
+      if (practiceExtOk === false) {
+        fb.className = 'feedback-box warning';
+        fb.textContent = '⚠️ Simulación: Trabajo rechazado por no cumplir extensión. No se requiere rúbrica.';
+        return;
+      }
+      if (comments.length < 10) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ La retroalimentación es muy corta. Escribe al menos 10 caracteres (en el sistema real son 50).';
+        return;
+      }
+      fb.className = 'feedback-box success';
+      fb.textContent = `✅ ¡Evaluación simulada enviada! Puntaje: ${total}/100. Comentarios: ${comments.length} caracteres.`;
+
+      // Mark checklist
+      document.getElementById('check2').textContent = '✅ Completado';
+      document.getElementById('check2').style.color = 'var(--success)';
+    }
+
+    // ======== STEP 5: Live Practice ========
+    let livePresented = null;
+
+    function toggleLivePresented(ok) {
+      livePresented = ok;
+      const notice = document.getElementById('liveNotPresentedNotice');
+      const rubric = document.getElementById('liveRubric');
+      const noshow = document.getElementById('liveNoShow');
+      if (!ok) {
+        notice.style.display = 'block';
+        rubric.style.display = 'none';
+        noshow.style.display = 'block';
+      } else {
+        notice.style.display = 'none';
+        rubric.style.display = 'block';
+        noshow.style.display = 'none';
+      }
+    }
+
+    function updateLiveTotal() {
+      const checks = document.querySelectorAll('#liveRubric .contenido-practice input:checked');
+      const checkSum = checks.length;
+      const sliders = document.querySelectorAll('#liveRubric .rubric-slider-practice');
+      let sliderSum = 0;
+      sliders.forEach(s => {
+        sliderSum += parseInt(s.value) || 0;
+        const badge = s.closest('.rubric-row').querySelector('.val-badge');
+        if (badge) badge.textContent = s.value;
+      });
+      document.getElementById('liveTotalScore').textContent = checkSum + sliderSum;
+    }
+
+    function submitPracticeLive() {
+      const fb = document.getElementById('practiceLiveFeedback');
+      if (livePresented === null) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Indica si el trabajo se presentó o no.';
+        return;
+      }
+      if (livePresented === false) {
+        fb.className = 'feedback-box warning';
+        fb.textContent = '⚠️ Simulación: Trabajo marcado como no presentado. Calificación: 0 pts.';
+        document.getElementById('check3').textContent = '✅ Completado';
+        document.getElementById('check3').style.color = 'var(--success)';
+        return;
+      }
+      const total = document.getElementById('liveTotalScore').textContent;
+      fb.className = 'feedback-box success';
+      fb.textContent = `✅ ¡Evaluación en vivo simulada! Puntaje total: ${total} pts.`;
+      document.getElementById('check3').textContent = '✅ Completado';
+      document.getElementById('check3').style.color = 'var(--success)';
+    }
+
+    // ======== STEP 6: Quiz ========
+    function selectQuiz(q, opt) {
+      const container = document.getElementById(q);
+      container.querySelectorAll('.quiz-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === opt);
+        el.classList.remove('correct', 'wrong');
+      });
+      const radio = container.querySelectorAll('.quiz-option input')[opt];
+      if (radio) radio.checked = true;
+    }
+
+    function checkQuiz() {
+      const results = [false, false, false];
+      const labels = ['q1', 'q2', 'q3'];
+
+      labels.forEach((q, idx) => {
+        const container = document.getElementById(q);
+        const selected = container.querySelector('.quiz-option.selected');
+        if (!selected) return;
+        const val = parseInt(selected.querySelector('input').value);
+        const isCorrect = val === QUIZ_ANSWERS[idx];
+        results[idx] = isCorrect;
+        selected.classList.remove('selected');
+        selected.classList.add(isCorrect ? 'correct' : 'wrong');
+        quizAnswered[idx] = true;
+        quizCorrect[idx] = isCorrect;
+      });
+
+      const fb = document.getElementById('quizFeedback');
+      const allOk = results.every(r => r);
+      if (allOk) {
+        fb.className = 'feedback-box success';
+        fb.innerHTML = '🎉 <strong>¡Todas correctas!</strong> Has aprendido bien el proceso.';
+        document.getElementById('check4').textContent = '✅ Completado';
+        document.getElementById('check4').style.color = 'var(--success)';
+      } else {
+        const count = results.filter(r => r).length;
+        fb.className = 'feedback-box warning';
+        fb.innerHTML = `⚠️ <strong>${count}/3 correctas.</strong> Revisa los recuadros: verde = correcto, rojo = incorrecto.`;
+      }
+    }
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') finishTutorial();
+    });
+    // Click outside
+    document.getElementById('tutorialOverlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('tutorialOverlay')) finishTutorial();
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
