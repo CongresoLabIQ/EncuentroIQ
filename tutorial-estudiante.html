@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Estudiante - EncuentroIQ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#003D79">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EncuentroIQ">
+  <link rel="apple-touch-icon" href="favicon.ico">
+  <style>
+    .tutorial-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 46, 85, 0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1050;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .tutorial-overlay.active { opacity: 1; pointer-events: all; }
+    .tutorial-card {
+      background: #fff; border-radius: 20px;
+      max-width: 780px; width: 92%;
+      max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .tutorial-overlay.active .tutorial-card { transform: scale(1) translateY(0); }
+    .tutorial-card-header {
+      background: var(--primary); color: #fff;
+      padding: 22px 32px 18px;
+      border-radius: 20px 20px 0 0;
+    }
+    .tutorial-card-header .step-badge {
+      display: inline-block;
+      background: var(--accent); color: var(--primary-dark);
+      font-weight: 800; font-size: 0.7rem;
+      padding: 3px 14px; border-radius: 20px;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .tutorial-card-header h3 {
+      color: #fff; font-family: var(--font-heading);
+      font-weight: 700; margin: 0; font-size: 1.35rem;
+    }
+    .tutorial-card-header p {
+      color: rgba(255,255,255,0.8); margin: 4px 0 0; font-size: 0.9rem;
+    }
+    .tutorial-card-body { padding: 24px 32px 16px; }
+    .tutorial-card-footer {
+      padding: 12px 32px 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .step-dots { display: flex; gap: 7px; align-items: center; }
+    .step-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ccc; transition: all 0.3s;
+      border: none; padding: 0; cursor: pointer;
+    }
+    .step-dot.active { background: var(--primary); transform: scale(1.3); }
+    .step-dot.completed { background: var(--accent); }
+
+    .interactive-area {
+      background: var(--bg-light);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px 22px; margin: 14px 0;
+      position: relative;
+    }
+    .interactive-area .area-label {
+      position: absolute; top: 0; left: 0;
+      background: var(--primary); color: #fff;
+      font-size: 0.6rem; font-weight: 700;
+      padding: 3px 12px; border-radius: 0 0 12px 0;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .tip-box {
+      background: var(--accent-bg);
+      border-left: 4px solid var(--accent);
+      padding: 10px 16px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 10px 0; font-size: 0.88rem;
+    }
+    .tip-box strong { color: var(--primary-dark); }
+    .feedback-box {
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      margin: 8px 0; font-size: 0.85rem; display: none;
+    }
+    .feedback-box.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .feedback-box.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .feedback-box.info { display: block; background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .feedback-box.warning { display: block; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+    .btn-tutorial { border-radius: 30px; padding: 8px 24px; font-weight: 600; }
+    .btn-tutorial-primary { background: var(--primary); color: #fff; border: none; }
+    .btn-tutorial-primary:hover { background: var(--primary-dark); color: #fff; }
+    .btn-tutorial-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-tutorial-outline:hover { background: var(--primary); color: #fff; }
+    .btn-tutorial-success { background: var(--success); color: #fff; border: none; }
+    .btn-tutorial-success:hover { background: #044a25; color: #fff; }
+
+    .progress-tracker { display: flex; gap: 6px; margin-bottom: 10px; }
+    .progress-tracker .pstep { flex: 1; height: 4px; border-radius: 4px; background: #e0e0e0; transition: background 0.4s; }
+    .progress-tracker .pstep.done { background: var(--success); }
+    .progress-tracker .pstep.active { background: var(--primary); }
+
+    .quiz-option {
+      display: block; padding: 10px 16px; margin-bottom: 8px;
+      border: 2px solid var(--border); border-radius: 12px;
+      cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+    }
+    .quiz-option:hover { border-color: var(--primary); background: var(--accent-bg); }
+    .quiz-option input { display: none; }
+    .quiz-option.selected { border-color: var(--primary); background: var(--accent-bg); font-weight: 600; }
+    .quiz-option.correct { border-color: var(--success); background: #d4edda; }
+    .quiz-option.wrong { border-color: var(--danger); background: #f8d7da; }
+
+    .status-badge {
+      display: inline-block; padding: 4px 14px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-review { background: #cce5ff; color: #004085; }
+    .status-accepted { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    .status-presented { background: #d1ecf1; color: #0c5460; }
+
+    @media (max-width: 576px) {
+      .tutorial-card-header { padding: 18px 18px 14px; }
+      .tutorial-card-body { padding: 16px 18px 10px; }
+      .tutorial-card-footer { padding: 10px 18px 16px; flex-direction: column; align-items: stretch; }
+      .tutorial-card-footer .d-flex { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toastContainer"></div>
+
+  <header class="top-bar">
+    <div class="container d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <div class="unam-shield"><span class="shield-inner">U</span></div>
+        <div>
+          <div class="top-bar-entity">9no Encuentro Estudiantil de Ingeniería Química</div>
+          <div class="top-bar-event">Tutorial para Estudiantes</div>
+        </div>
+      </div>
+      <nav class="top-bar-nav d-none d-lg-flex">
+        <a href="index.html" class="top-bar-link">Inicio</a>
+        <a href="login.html" class="top-bar-link">Ingresar</a>
+        <a href="register.html" class="top-bar-link">Registro</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumb-bar">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="index.html">Inicio</a></li>
+        <li class="active">Tutorial Estudiante</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="container py-5 text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <span class="badge bg-primary mb-2" style="font-size:0.8rem;letter-spacing:1px;">🎓 GUÍA INTERACTIVA</span>
+        <h1 class="display-6 fw-bold mb-3" style="color:var(--primary);">Capacitación para Estudiantes</h1>
+        <p class="lead text-muted mb-4">
+          Aprende a registrarte, enviar tu trabajo y dar seguimiento a tus evaluaciones
+          con ejercicios prácticos paso a paso.
+        </p>
+        <button class="btn btn-lg btn-tutorial-primary btn-tutorial" onclick="startTutorial()">
+          ▶ Iniciar tutorial interactivo
+        </button>
+        <a href="student-dashboard.html" class="btn btn-lg btn-tutorial-outline btn-tutorial ms-2">
+          Ir a mi panel
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container pb-5">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">📝</div>
+            <h5 class="fw-bold" style="color:var(--primary);">1. Regístrate</h5>
+            <p class="text-muted small mb-0">Crea tu cuenta con tu correo institucional.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">📄</div>
+            <h5 class="fw-bold" style="color:var(--primary);">2. Envía tu trabajo</h5>
+            <p class="text-muted small mb-0">Llena los datos, agrega integrantes y sube tu PDF.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="mb-2" style="font-size:2rem;">🔍</div>
+            <h5 class="fw-bold" style="color:var(--primary);">3. Da seguimiento</h5>
+            <p class="text-muted small mb-0">Revisa el estado de tu trabajo y la retroalimentación.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== TUTORIAL OVERLAY ====== -->
+  <div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-card" id="tutorialCard">
+
+      <div class="tutorial-card-header">
+        <span class="step-badge" id="stepBadge">Paso 1 de 8</span>
+        <div class="progress-tracker" id="progressTracker"></div>
+        <h3 id="stepTitle">Bienvenido al tutorial</h3>
+        <p id="stepSubtitle">Aprendamos juntos el proceso</p>
+      </div>
+
+      <div class="tutorial-card-body" id="stepBody"></div>
+
+      <div class="tutorial-card-footer">
+        <div class="step-dots" id="stepDots"></div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-tutorial-outline btn-tutorial" id="btnPrev" onclick="prevStep()">← Anterior</button>
+          <button class="btn btn-tutorial-primary btn-tutorial" id="btnNext" onclick="nextStep()">Siguiente →</button>
+          <button class="btn btn-tutorial-success btn-tutorial d-none" id="btnFinish" onclick="finishTutorial()">✔ Finalizar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer-institutional">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="footer-shield">UNAM</div>
+          <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+        </div>
+        <div class="col-md-4">
+          <h6>Entidades participantes</h6>
+          <ul><li>Facultad de Estudios Superiores Cuautitlán</li></ul>
+          <ul><li>Facultad de Estudios Superiores Zaragoza</li></ul>
+          <ul><li>Facultad de Química</li></ul>
+        </div>
+        <div class="col-md-4">
+          <h6>Contacto</h6>
+          <ul>
+            <li>sistema.congresolabiq@gmail.com</li>
+            <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+          </ul>
+        </div>
+      </div>
+      <hr class="footer-hr">
+      <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const STEPS = [{
+      id: 0,
+      title: 'Bienvenido al tutorial',
+      subtitle: 'Interactúa, practica y aprende',
+      body: () => `
+        <div class="text-center mb-2"><span style="font-size:2.8rem;">🎓</span></div>
+        <p class="fw-bold" style="color:var(--primary);font-size:1.05rem;">
+          Este tutorial te guiará paso a paso para que puedas participar en el
+          Encuentro Estudiantil de Ingeniería Química.
+        </p>
+        <p><strong>Vas a practicar cada paso</strong> antes de hacerlo en el sistema real:</p>
+        <div class="interactive-area">
+          <span class="area-label">Lo que harás</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">✍️</span>
+              <div style="font-size:0.8rem;font-weight:600;">Registrarte</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">como estudiante</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">📄</span>
+              <div style="font-size:0.8rem;font-weight:600;">Enviar trabajo</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">con todos los datos</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">👥</span>
+              <div style="font-size:0.8rem;font-weight:600;">Agregar equipo</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">hasta 10 integrantes</small>
+            </div>
+            <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+              <span style="font-size:1.6rem;">🔍</span>
+              <div style="font-size:0.8rem;font-weight:600;">Seguimiento</div>
+              <small style="font-size:0.7rem;color:var(--text-light);">estados y retroalimentación</small>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          <strong>🎯 Importante:</strong> Todas las actividades son simuladas — nada se guarda.
+          Si te equivocas, solo intenta de nuevo.
+        </div>
+        <p class="text-muted mb-0" style="font-size:0.9rem;">Duración aproximada: 8-10 minutos.</p>
+      `
+    }, {
+      id: 1,
+      title: 'Registro de estudiante',
+      subtitle: 'Crea tu cuenta en el sistema',
+      body: () => `
+        <p>Para participar, primero debes <strong>registrarte</strong>. Practica llenando los campos de abajo:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Simulador de registro</span>
+          <div style="margin-top:8px;">
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Nombre completo</label>
+              <input type="text" class="form-control form-control-sm" id="tutName" placeholder="Ej: María García López" oninput="updatePreview()">
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Facultad</label>
+              <select class="form-select form-select-sm" id="tutFaculty" onchange="updatePreview()">
+                <option value="">Selecciona...</option>
+                <option value="FQ">Facultad de Química</option>
+                <option value="FESC">FES Cuautitlán</option>
+                <option value="FESZ">FES Zaragoza</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Correo electrónico</label>
+              <input type="email" class="form-control form-control-sm" id="tutEmail" placeholder="ejemplo@unam.mx" oninput="updatePreview()">
+              <small class="text-muted">Usa tu correo institucional (@unam.mx, @comunidad.unam.mx, etc.)</small>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Tipo de usuario</label>
+              <select class="form-select form-select-sm" id="tutType">
+                <option value="estudiante">Estudiante</option>
+                <option value="evaluador">Evaluador</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Contraseña</label>
+              <input type="password" class="form-control form-control-sm" id="tutPass" placeholder="Mínimo 6 caracteres">
+            </div>
+            <button class="btn btn-tutorial-success btn-sm w-100 mt-1" onclick="simulateRegister()">📝 Simular registro</button>
+            <div id="registerFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div id="previewCard" style="display:none;background:#fff;border-radius:12px;padding:14px;border:2px solid var(--success);margin:10px 0;">
+          <div style="font-weight:700;color:var(--success);font-size:0.85rem;">👤 Vista previa de tu perfil</div>
+          <div style="font-size:0.85rem;margin-top:6px;">
+            <div><strong>Nombre:</strong> <span id="previewName">—</span></div>
+            <div><strong>Facultad:</strong> <span id="previewFaculty">—</span></div>
+            <div><strong>Correo:</strong> <span id="previewEmail">—</span></div>
+          </div>
+        </div>
+
+        <p class="mb-0 mt-1">
+          <a href="register.html" target="_blank" class="fw-bold" style="font-size:0.9rem;">Ir al registro real →</a>
+        </p>
+      `
+    }, {
+      id: 2,
+      title: 'Inicio de sesión',
+      subtitle: 'Accede a tu panel',
+      body: () => `
+        <p>Una vez registrado, inicia sesión con tu correo y contraseña. Practica aquí:</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Simulador de acceso</span>
+          <div style="max-width:320px;margin:10px auto 0;">
+            <div style="text-align:center;font-weight:700;color:var(--primary);margin-bottom:12px;">🔐 Iniciar Sesión</div>
+            <div class="mb-2">
+              <input type="email" class="form-control form-control-sm" id="tutLoginEmail" placeholder="Correo electrónico">
+            </div>
+            <div class="mb-2">
+              <input type="password" class="form-control form-control-sm" id="tutLoginPass" placeholder="Contraseña">
+            </div>
+            <button class="btn btn-tutorial-primary btn-sm w-100" onclick="simulateLogin()">Ingresar</button>
+            <div id="loginFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>🔐 ¿Olvidaste tu contraseña?</strong> Usa la opción
+          <em>"¿Olvidaste tu contraseña?"</em> en la página de inicio de sesión.
+        </div>
+
+        <p class="mb-0"><a href="login.html" target="_blank" class="fw-bold" style="font-size:0.9rem;">Ir a iniciar sesión real →</a></p>
+      `
+    }, {
+      id: 3,
+      title: 'Tu panel de estudiante',
+      subtitle: 'Conoce tu dashboard',
+      body: () => `
+        <p>Al iniciar sesión, ves tu <strong>panel de alumno</strong> donde puedes ver tus trabajos enviados y su estado.</p>
+
+        <div class="interactive-area">
+          <span class="area-label">Dashboard simulado</span>
+          <div style="margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="color:var(--primary);font-size:1rem;">📋 Mis Trabajos</strong>
+              <span class="btn btn-tutorial-outline btn-sm" style="font-size:0.75rem;padding:4px 14px;" onclick="showSubmitHint()">+ Nuevo trabajo</span>
+            </div>
+
+            <div id="mockWorksList">
+              <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:8px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px;">
+                  <span class="badge bg-primary">IQ-042</span>
+                  <span class="status-badge status-review">En revisión</span>
+                </div>
+                <div style="font-weight:600;font-size:0.9rem;">Evaluación de biosorbentes para remoción de metales pesados en aguas residuales</div>
+                <div style="font-size:0.8rem;color:var(--text-light);margin-top:4px;">
+                  Enviado: 15/03/2026 · Modalidad: Cartel
+                </div>
+                <div style="margin-top:8px;">
+                  <button class="btn btn-outline-primary btn-sm" style="font-size:0.75rem;" onclick="showMockFeedback(0)">📝 Ver retroalimentación</button>
+                </div>
+              </div>
+
+              <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:8px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px;">
+                  <span class="badge bg-primary">IQ-089</span>
+                  <span class="status-badge status-accepted">Aceptado - Oral</span>
+                </div>
+                <div style="font-weight:600;font-size:0.9rem;">Producción de bioetanol a partir de residuos agrícolas</div>
+                <div style="font-size:0.8rem;color:var(--text-light);margin-top:4px;">
+                  Enviado: 10/03/2026 · Modalidad: Ponencia
+                </div>
+                <div style="margin-top:8px;">
+                  <button class="btn btn-outline-primary btn-sm" style="font-size:0.75rem;" onclick="showMockFeedback(1)">📝 Ver retroalimentación</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="mockFeedbackArea" class="feedback-box mt-2" style="font-size:0.85rem;"></div>
+            <div id="submitHint" class="feedback-box info" style="font-size:0.85rem;">
+              💡 En el sistema real, aquí aparece un botón <strong>"Enviar nuevo trabajo"</strong> que te lleva al formulario de envío.
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>📌 Estados posibles:</strong>
+          <span class="status-badge status-pending" style="font-size:0.7rem;">Pendiente</span>
+          <span class="status-badge status-review" style="font-size:0.7rem;">En revisión</span>
+          <span class="status-badge status-accepted" style="font-size:0.7rem;">Aceptado</span>
+          <span class="status-badge status-rejected" style="font-size:0.7rem;">Rechazado</span>
+        </div>
+      `
+    }, {
+      id: 4,
+      title: 'Envío de trabajo - Datos generales',
+      subtitle: 'Llena la información del trabajo',
+      body: () => `
+        <p>Para enviar un trabajo, completa el formulario con los datos de tu proyecto. <strong>Practica aquí:</strong></p>
+
+        <div class="interactive-area">
+          <span class="area-label">🧪 Formulario de envío</span>
+          <div style="margin-top:8px;">
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Título del trabajo *</label>
+              <input type="text" class="form-control form-control-sm" id="subTitle" placeholder="Ej: Estudio comparativo de métodos de remoción de contaminantes">
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label style="font-size:0.8rem;font-weight:600;">Semestre *</label>
+                <select class="form-select form-select-sm" id="subSemester">
+                  <option value="">Selecciona...</option>
+                  <option>4to Semestre</option>
+                  <option>5to Semestre</option>
+                  <option>6to Semestre</option>
+                  <option>7mo Semestre</option>
+                  <option>8vo Semestre</option>
+                  <option>9no Semestre</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label style="font-size:0.8rem;font-weight:600;">Grupo *</label>
+                <input type="text" class="form-control form-control-sm" id="subGroup" placeholder="Ej: 1301">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Profesor a cargo *</label>
+              <input type="text" class="form-control form-control-sm" id="subProfessor" placeholder="Nombre del profesor de la asignatura">
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Modalidad *</label>
+              <div style="display:flex;gap:16px;">
+                <label style="cursor:pointer;font-size:0.85rem;"><input type="radio" name="subModality" value="oral" onchange="updateModality()"> 🎤 Ponencia Oral</label>
+                <label style="cursor:pointer;font-size:0.85rem;"><input type="radio" name="subModality" value="cartel" onchange="updateModality()"> 📊 Cartel</label>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label style="font-size:0.8rem;font-weight:600;">Palabras clave</label>
+              <input type="text" class="form-control form-control-sm" id="subKeywords" placeholder="Ej: biosorbentes, metales pesados, tratamiento de aguas">
+              <small class="text-muted">Máximo 5 palabras clave separadas por comas</small>
+            </div>
+          </div>
+        </div>
+
+        <div id="modalityInfo" class="tip-box" style="display:none;">
+          <strong>ℹ️ Información:</strong>
+          <span id="modalityText">Has seleccionado una modalidad.</span>
+        </div>
+
+        <p class="mb-0 text-muted" style="font-size:0.85rem;">⬇️ En el siguiente paso agregarás integrantes y subirás el PDF.</p>
+      `
+    }, {
+      id: 5,
+      title: 'Integrantes y archivo PDF',
+      subtitle: 'Completa el equipo y sube tu trabajo',
+      body: () => `
+        <p>Agrega a los <strong>integrantes de tu equipo</strong> y selecciona el archivo PDF de tu trabajo.</p>
+
+        <div class="interactive-area">
+          <span class="area-label">🧪 Equipo y archivo</span>
+          <div style="margin-top:8px;">
+            <label style="font-size:0.8rem;font-weight:600;">Integrantes del equipo *</label>
+            <small class="d-block text-muted mb-1" style="font-size:0.75rem;">Agrega los nombres completos (hasta 10).</small>
+            <div class="input-group input-group-sm mb-2">
+              <input type="text" class="form-control" id="memberInput" placeholder="Nombre completo" onkeydown="if(event.key==='Enter')addMember()">
+              <button class="btn btn-outline-primary" onclick="addMember()">➕ Agregar</button>
+            </div>
+            <div id="membersList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+            <div id="membersError" style="display:none;font-size:0.75rem;color:var(--danger);margin-bottom:6px;">Debes agregar al menos un integrante.</div>
+
+            <hr style="margin:10px 0;">
+
+            <label style="font-size:0.8rem;font-weight:600;">Subir archivo PDF *</label>
+            <div id="fileDropArea" style="border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#fafafa;margin-top:4px;" onclick="document.getElementById('fileInput').click()">
+              <div style="font-size:2rem;">📎</div>
+              <div style="font-weight:600;font-size:0.85rem;" id="fileNameText">Haz clic para seleccionar archivo</div>
+              <small class="text-muted" style="font-size:0.75rem;">Solo PDF · Máx 10 MB</small>
+              <input type="file" class="d-none" id="fileInput" accept=".pdf" onchange="handleFileSelect(event)">
+            </div>
+            <div id="fileSelected" class="feedback-box success" style="display:none;font-size:0.85rem;margin-top:6px;">
+              ✅ Archivo seleccionado: <span id="fileName">archivo.pdf</span>
+            </div>
+
+            <button class="btn btn-tutorial-success btn-sm w-100 mt-2" onclick="simulateSubmit()">🚀 Simular envío del trabajo</button>
+            <div id="submitFeedback" class="feedback-box mt-2"></div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>📎 Requisitos del PDF:</strong> Formato de resumen oficial, máximo 10 MB, sin contraseña.
+          Revisa las <a href="index.html" target="_blank">plantillas oficiales</a> antes de subir.
+        </div>
+      `
+    }, {
+      id: 6,
+      title: 'Seguimiento y resultados',
+      subtitle: '¿Qué pasa después de enviar?',
+      body: () => `
+        <p>Una vez enviado tu trabajo, pasa por un proceso de evaluación. <strong>Interactúa con la línea de tiempo:</strong></p>
+
+        <div class="interactive-area">
+          <span class="area-label">Flujo del trabajo</span>
+          <div style="margin-top:8px;">
+            <div id="flowSteps" style="display:flex;flex-direction:column;gap:6px;">
+              <div class="flow-item" data-step="0" onclick="toggleFlowStep(0)" style="cursor:pointer;background:#d4edda;border-radius:10px;padding:10px 14px;border-left:4px solid var(--success);display:flex;align-items:center;gap:10px;">
+                <span style="font-size:1.2rem;">📤</span>
+                <div style="flex:1;"><strong>Envío</strong><br><small style="font-size:0.75rem;">Subes tu trabajo con todos los datos</small></div>
+                <span style="color:var(--success);font-size:1.2rem;">✓</span>
+              </div>
+              <div class="flow-item" data-step="1" onclick="toggleFlowStep(1)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 14px;border-left:4px solid var(--border);display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
+                <span style="font-size:1.2rem;">👀</span>
+                <div style="flex:1;"><strong>En revisión</strong><br><small style="font-size:0.75rem;">Tres evaluadores califican tu trabajo</small></div>
+                <span style="color:#ccc;font-size:1.2rem;">⬜</span>
+              </div>
+              <div class="flow-item" data-step="2" onclick="toggleFlowStep(2)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 14px;border-left:4px solid var(--border);display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
+                <span style="font-size:1.2rem;">⚖️</span>
+                <div style="flex:1;"><strong>Dictaminación</strong><br><small style="font-size:0.75rem;">Se asigna modalidad: oral, cartel o rechazo</small></div>
+                <span style="color:#ccc;font-size:1.2rem;">⬜</span>
+              </div>
+              <div class="flow-item" data-step="3" onclick="toggleFlowStep(3)" style="cursor:pointer;background:#fff;border-radius:10px;padding:10px 14px;border-left:4px solid var(--border);display:flex;align-items:center;gap:10px;border:1px solid var(--border);">
+                <span style="font-size:1.2rem;">🏆</span>
+                <div style="flex:1;"><strong>Resultado final</strong><br><small style="font-size:0.75rem;">Presentas en el evento y recibes certificado</small></div>
+                <span style="color:#ccc;font-size:1.2rem;">⬜</span>
+              </div>
+            </div>
+            <div id="flowInfo" class="feedback-box info mt-2" style="font-size:0.85rem;">
+              💡 Haz clic en cada etapa para ver más detalles.
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>🔍 Retroalimentación:</strong> Cuando los evaluadores califiquen tu trabajo,
+          podrás ver sus comentarios y puntuaciones desde tu panel de alumno.
+        </div>
+      `
+    }, {
+      id: 7,
+      title: 'Verifica lo aprendido',
+      subtitle: 'Mini-quiz de 3 preguntas',
+      body: () => `
+        <p>Responde estas preguntas para confirmar que entendiste el proceso.</p>
+
+        <div id="quizArea">
+          <div class="mb-3" id="q1">
+            <p style="font-weight:600;font-size:0.9rem;">1️⃣ ¿Qué necesitas para registrarte como estudiante?</p>
+            <div class="quiz-option" onclick="selectQuiz('q1',0)"><input type="radio" name="q1" value="0"> Solo un correo electrónico</div>
+            <div class="quiz-option" onclick="selectQuiz('q1',1)"><input type="radio" name="q1" value="1"> Correo institucional + contraseña</div>
+            <div class="quiz-option" onclick="selectQuiz('q1',2)"><input type="radio" name="q1" value="2"> Código de evaluador + correo</div>
+          </div>
+
+          <div class="mb-3" id="q2">
+            <p style="font-weight:600;font-size:0.9rem;">2️⃣ ¿Cuántos integrantes puede tener un equipo?</p>
+            <div class="quiz-option" onclick="selectQuiz('q2',0)"><input type="radio" name="q2" value="0"> Máximo 5 integrantes</div>
+            <div class="quiz-option" onclick="selectQuiz('q2',1)"><input type="radio" name="q2" value="1"> Máximo 10 integrantes</div>
+            <div class="quiz-option" onclick="selectQuiz('q2',2)"><input type="radio" name="q2" value="2"> Sin límite de integrantes</div>
+          </div>
+
+          <div class="mb-3" id="q3">
+            <p style="font-weight:600;font-size:0.9rem;">3️⃣ ¿Qué formato debe tener el archivo que subes?</p>
+            <div class="quiz-option" onclick="selectQuiz('q3',0)"><input type="radio" name="q3" value="0"> Word (.docx)</div>
+            <div class="quiz-option" onclick="selectQuiz('q3',1)"><input type="radio" name="q3" value="1"> PDF</div>
+            <div class="quiz-option" onclick="selectQuiz('q3',2)"><input type="radio" name="q3" value="2"> PowerPoint (.pptx)</div>
+          </div>
+
+          <div id="quizFeedback" class="feedback-box"></div>
+          <button class="btn btn-tutorial-primary btn-sm w-100 mt-1" onclick="checkQuiz()">✅ Verificar respuestas</button>
+        </div>
+      `
+    }, {
+      id: 8,
+      title: '¡Listo! Ya estás preparado',
+      subtitle: 'Resumen y pasos siguientes',
+      body: () => `
+        <div class="text-center mb-2"><span style="font-size:2.8rem;">🎉</span></div>
+        <p class="fw-bold" style="color:var(--primary);font-size:1.1rem;text-align:center;">
+          ¡Felicidades! Completaste la capacitación para estudiantes.
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;" id="finalChecklist">
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>📝</span>
+            <div style="font-size:0.8rem;font-weight:600;">Registrarme</div>
+            <span id="check1" style="display:block;font-size:0.7rem;margin-top:4px;color:var(--text-light);">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>📄</span>
+            <div style="font-size:0.8rem;font-weight:600;">Enviar trabajo</div>
+            <span id="check2" style="display:block;font-size:0.7rem;margin-top:4px;color:var(--text-light);">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>👥</span>
+            <div style="font-size:0.8rem;font-weight:600;">Agregar equipo</div>
+            <span id="check3" style="display:block;font-size:0.7rem;margin-top:4px;color:var(--text-light);">⬜ Pendiente</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:10px;padding:10px;text-align:center;">
+            <span>🧠</span>
+            <div style="font-size:0.8rem;font-weight:600;">Respondí el quiz</div>
+            <span id="check4" style="display:block;font-size:0.7rem;margin-top:4px;color:var(--text-light);">⬜ Pendiente</span>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>📌 Recordatorio final:</strong>
+          <ul class="mb-0 mt-1" style="font-size:0.85rem;">
+            <li>Usa tu <strong>correo institucional</strong> para registrarte</li>
+            <li>Descarga la <strong>plantilla oficial</strong> de resumen desde la página principal</li>
+            <li>Sube tu trabajo en formato <strong>PDF</strong> (máx. 10 MB)</li>
+            <li>Agrega a <strong>todos los integrantes</strong> del equipo</li>
+            <li>Revisa el <strong>estado</strong> de tu trabajo en el panel</li>
+          </ul>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;">
+          <a href="register.html" class="btn btn-tutorial-outline btn-tutorial">📝 Registrarme</a>
+          <a href="login.html" class="btn btn-tutorial-outline btn-tutorial">🔐 Iniciar sesión</a>
+          <a href="submit-work.html" class="btn btn-tutorial-primary btn-tutorial">📄 Enviar mi trabajo</a>
+        </div>
+      `
+    }];
+
+    let currentStep = 0;
+    let members = [];
+    let quizAnswered = [false, false, false];
+    let quizCorrect = [false, false, false];
+    const QUIZ_ANSWERS = [1, 1, 1];
+
+    function startTutorial() {
+      currentStep = 0;
+      document.getElementById('tutorialOverlay').classList.add('active');
+      renderStep(currentStep);
+      renderDots();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function finishTutorial() {
+      document.getElementById('tutorialOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function nextStep() {
+      if (currentStep < STEPS.length - 1) { currentStep++; renderStep(currentStep); renderDots(); }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) { currentStep--; renderStep(currentStep); renderDots(); }
+    }
+
+    function goToStep(index) {
+      currentStep = index; renderStep(currentStep); renderDots();
+    }
+
+    function renderDots() {
+      const c = document.getElementById('stepDots');
+      c.innerHTML = STEPS.map((_, i) => {
+        let cls = 'step-dot';
+        if (i === currentStep) cls += ' active';
+        else if (i < currentStep) cls += ' completed';
+        return `<button class="${cls}" onclick="goToStep(${i})" aria-label="Paso ${i+1}"></button>`;
+      }).join('');
+    }
+
+    function renderStep(index) {
+      const step = STEPS[index];
+      document.getElementById('stepBadge').textContent = `Paso ${index+1} de ${STEPS.length}`;
+      const pt = document.getElementById('progressTracker');
+      pt.innerHTML = STEPS.map((_, i) => {
+        let cls = 'pstep';
+        if (i < index) cls += ' done';
+        else if (i === index) cls += ' active';
+        return `<div class="${cls}"></div>`;
+      }).join('');
+      document.getElementById('stepTitle').textContent = step.title;
+      document.getElementById('stepSubtitle').textContent = step.subtitle;
+      document.getElementById('stepBody').innerHTML = step.body();
+
+      const bp = document.getElementById('btnPrev');
+      const bn = document.getElementById('btnNext');
+      const bf = document.getElementById('btnFinish');
+      bp.style.display = index === 0 ? 'none' : '';
+      bn.style.display = index === STEPS.length - 1 ? 'none' : '';
+      bf.classList.toggle('d-none', index !== STEPS.length - 1);
+
+      // Reset members list when entering step 5
+      if (index === 5) { members = []; renderMembers(); }
+    }
+
+    // ======== STEP 1: Registration ========
+    function updatePreview() {
+      const name = document.getElementById('tutName').value.trim();
+      const faculty = document.getElementById('tutFaculty').value;
+      const email = document.getElementById('tutEmail').value.trim();
+      const card = document.getElementById('previewCard');
+      if (name || faculty || email) {
+        card.style.display = 'block';
+        document.getElementById('previewName').textContent = name || '—';
+        document.getElementById('previewFaculty').textContent =
+          faculty ? document.getElementById('tutFaculty').options[document.getElementById('tutFaculty').selectedIndex].text : '—';
+        document.getElementById('previewEmail').textContent = email || '—';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    function simulateRegister() {
+      const name = document.getElementById('tutName').value.trim();
+      const faculty = document.getElementById('tutFaculty').value;
+      const email = document.getElementById('tutEmail').value.trim();
+      const pass = document.getElementById('tutPass').value;
+      const fb = document.getElementById('registerFeedback');
+      if (!name || !faculty || !email || !pass) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Todos los campos son obligatorios.';
+        return;
+      }
+      if (!email.includes('@')) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ El correo no tiene formato válido.';
+        return;
+      }
+      if (pass.length < 4) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ La contraseña debe tener al menos 4 caracteres.';
+        return;
+      }
+      fb.className = 'feedback-box success';
+      fb.textContent = '✅ ¡Registro simulado exitoso!';
+      document.getElementById('previewCard').style.display = 'block';
+      document.getElementById('check1').textContent = '✅ Completado';
+      document.getElementById('check1').style.color = 'var(--success)';
+    }
+
+    // ======== STEP 2: Login ========
+    function simulateLogin() {
+      const email = document.getElementById('tutLoginEmail').value.trim();
+      const pass = document.getElementById('tutLoginPass').value.trim();
+      const fb = document.getElementById('loginFeedback');
+      if (!email || !pass) { fb.className = 'feedback-box error'; fb.textContent = '❌ Ingresa correo y contraseña.'; return; }
+      if (!email.includes('@')) { fb.className = 'feedback-box error'; fb.textContent = '❌ El correo no tiene formato válido.'; return; }
+      fb.className = 'feedback-box success';
+      fb.textContent = '✅ ¡Inicio de sesión simulado correctamente!';
+    }
+
+    // ======== STEP 3: Dashboard ========
+    function showSubmitHint() {
+      const fb = document.getElementById('submitHint');
+      fb.className = 'feedback-box info';
+      fb.innerHTML = '💡 En el sistema real, este botón te lleva al formulario de <a href="submit-work.html" target="_blank"><strong>Enviar trabajo</strong></a>.';
+      fb.style.display = 'block';
+    }
+
+    function showMockFeedback(idx) {
+      const fb = document.getElementById('mockFeedbackArea');
+      const feedbacks = [
+        { status: 'En revisión', score: '—', comments: 'Tu trabajo está siendo evaluado por el comité. Los resultados se publicarán próximamente.' },
+        { status: 'Aceptado - Oral', score: '85/100', comments: 'Felicidades, tu trabajo fue seleccionado para presentación oral. Revisa la agenda para conocer tu horario y auditorio asignado.' }
+      ];
+      const f = feedbacks[idx];
+      fb.className = 'feedback-box success';
+      fb.innerHTML = `<strong>${f.status}</strong><br>Puntaje: ${f.score}<br>${f.comments}`;
+    }
+
+    // ======== STEP 4: Submit form ========
+    function updateModality() {
+      const sel = document.querySelector('input[name="subModality"]:checked');
+      const info = document.getElementById('modalityInfo');
+      const txt = document.getElementById('modalityText');
+      if (sel) {
+        info.style.display = 'block';
+        txt.textContent = sel.value === 'oral'
+          ? '🎤 Ponencia Oral — Prepara una presentación de 20 minutos con diapositivas.'
+          : '📊 Cartel — Diseña un cartel informativo para la sesión de exposición.';
+      }
+    }
+
+    // ======== STEP 5: Members + File ========
+    function addMember() {
+      const input = document.getElementById('memberInput');
+      const name = input.value.trim();
+      const err = document.getElementById('membersError');
+      if (!name) { err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      if (members.length >= 10) { alert('Máximo 10 integrantes.'); return; }
+      members.push(name);
+      input.value = '';
+      renderMembers();
+    }
+
+    function renderMembers() {
+      const list = document.getElementById('membersList');
+      list.innerHTML = members.map((m, i) =>
+        `<span style="background:var(--accent-bg);border:1px solid var(--accent);border-radius:20px;padding:4px 12px;font-size:0.8rem;display:flex;align-items:center;gap:6px;">
+          ${m}
+          <span onclick="removeMember(${i})" style="cursor:pointer;color:var(--danger);font-weight:700;">×</span>
+        </span>`
+      ).join('');
+      const counter = document.querySelector('#membersList');
+      // also update visual count
+      document.getElementById('membersError').style.display = members.length === 0 ? 'block' : 'none';
+      if (members.length > 0) {
+        document.getElementById('check3').textContent = '✅ Completado';
+        document.getElementById('check3').style.color = 'var(--success)';
+      }
+    }
+
+    function removeMember(idx) {
+      members.splice(idx, 1);
+      renderMembers();
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.type !== 'application/pdf') {
+        alert('Solo se aceptan archivos PDF.');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('El archivo es muy grande. Máximo 10 MB.');
+        return;
+      }
+      document.getElementById('fileSelected').style.display = 'block';
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileNameText').textContent = file.name;
+    }
+
+    function simulateSubmit() {
+      const title = document.getElementById('subTitle').value.trim();
+      const sem = document.getElementById('subSemester').value;
+      const group = document.getElementById('subGroup').value.trim();
+      const prof = document.getElementById('subProfessor').value.trim();
+      const modal = document.querySelector('input[name="subModality"]:checked');
+      const fb = document.getElementById('submitFeedback');
+      const fileSel = document.getElementById('fileSelected').style.display === 'block';
+
+      if (!title || !sem || !group || !prof || !modal) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Completa todos los campos obligatorios (título, semestre, grupo, profesor, modalidad).';
+        return;
+      }
+      if (members.length === 0) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Debes agregar al menos un integrante al equipo.';
+        return;
+      }
+      if (!fileSel) {
+        fb.className = 'feedback-box error';
+        fb.textContent = '❌ Debes seleccionar un archivo PDF.';
+        return;
+      }
+      fb.className = 'feedback-box success';
+      fb.textContent = `✅ ¡Envío simulado exitoso! Trabajo "${title}" (${members.length} integrantes) en modalidad ${modal.value}.`;
+      document.getElementById('check2').textContent = '✅ Completado';
+      document.getElementById('check2').style.color = 'var(--success)';
+    }
+
+    // ======== STEP 6: Flow ========
+    function toggleFlowStep(idx) {
+      const items = document.querySelectorAll('.flow-item');
+      const info = document.getElementById('flowInfo');
+      const descriptions = [
+        '📤 <strong>Envío:</strong> Completas el formulario con título, semestre, grupo, profesor, integrantes y subes tu PDF. ¡Asegúrate de que todo esté correcto!',
+        '👀 <strong>En revisión:</strong> Tres evaluadores asignados por el comité calificarán tu trabajo usando la rúbrica oficial (0-100 pts). Este proceso toma algunos días.',
+        '⚖️ <strong>Dictaminación:</strong> El administrador revisa los puntajes y asigna modalidad: <strong>Oral</strong> (mejores promedios), <strong>Cartel</strong> o <strong>Rechazo</strong> (&lt;60 pts).',
+        '🏆 <strong>Resultado final:</strong> Los aceptados presentan en el evento. Se generan certificados automáticos para todos los integrantes.'
+      ];
+
+      items.forEach((el, i) => {
+        if (i === idx) {
+          el.style.background = '#d4edda';
+          el.style.borderLeftColor = 'var(--success)';
+          el.querySelector('span:last-child').textContent = '▼';
+          el.querySelector('span:last-child').style.color = 'var(--success)';
+        } else {
+          el.style.background = '#fff';
+          el.style.borderLeftColor = 'var(--border)';
+          el.querySelector('span:last-child').textContent = '⬜';
+          el.querySelector('span:last-child').style.color = '#ccc';
+        }
+      });
+      info.className = 'feedback-box info';
+      info.innerHTML = descriptions[idx];
+    }
+
+    // ======== STEP 7: Quiz ========
+    function selectQuiz(q, opt) {
+      const container = document.getElementById(q);
+      container.querySelectorAll('.quiz-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === opt);
+        el.classList.remove('correct', 'wrong');
+      });
+      const radio = container.querySelectorAll('.quiz-option input')[opt];
+      if (radio) radio.checked = true;
+    }
+
+    function checkQuiz() {
+      const labels = ['q1', 'q2', 'q3'];
+      const results = [false, false, false];
+      labels.forEach((q, idx) => {
+        const container = document.getElementById(q);
+        const selected = container.querySelector('.quiz-option.selected');
+        if (!selected) return;
+        const val = parseInt(selected.querySelector('input').value);
+        const isCorrect = val === QUIZ_ANSWERS[idx];
+        results[idx] = isCorrect;
+        selected.classList.remove('selected');
+        selected.classList.add(isCorrect ? 'correct' : 'wrong');
+        quizAnswered[idx] = true;
+        quizCorrect[idx] = isCorrect;
+      });
+      const fb = document.getElementById('quizFeedback');
+      const allOk = results.every(r => r);
+      if (allOk) {
+        fb.className = 'feedback-box success';
+        fb.innerHTML = '🎉 <strong>¡Todas correctas!</strong> Has aprendido bien el proceso.';
+        document.getElementById('check4').textContent = '✅ Completado';
+        document.getElementById('check4').style.color = 'var(--success)';
+      } else {
+        const count = results.filter(r => r).length;
+        fb.className = 'feedback-box warning';
+        fb.innerHTML = `⚠️ <strong>${count}/3 correctas.</strong> Verde = correcto, rojo = incorrecto. Revisa e intenta de nuevo.`;
+      }
+    }
+
+    // Escape + click outside
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') finishTutorial(); });
+    document.getElementById('tutorialOverlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('tutorialOverlay')) finishTutorial();
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
