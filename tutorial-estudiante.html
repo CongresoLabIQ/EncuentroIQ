@@ -16,130 +16,336 @@
   <link rel="apple-touch-icon" href="favicon.ico">
   <style>
     .tutorial-overlay {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(0, 46, 85, 0.85);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 1050;
-      opacity: 0; pointer-events: none;
+      opacity: 0;
+      pointer-events: none;
       transition: opacity 0.4s;
     }
-    .tutorial-overlay.active { opacity: 1; pointer-events: all; }
-    .tutorial-card {
-      background: #fff; border-radius: 20px;
-      max-width: 780px; width: 92%;
-      max-height: 92vh; overflow-y: auto;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-      transform: scale(0.92) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+
+    .tutorial-overlay.active {
+      opacity: 1;
+      pointer-events: all;
     }
-    .tutorial-overlay.active .tutorial-card { transform: scale(1) translateY(0); }
+
+    .tutorial-card {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 780px;
+      width: 92%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .tutorial-overlay.active .tutorial-card {
+      transform: scale(1) translateY(0);
+    }
+
     .tutorial-card-header {
-      background: var(--primary); color: #fff;
+      background: var(--primary);
+      color: #fff;
       padding: 22px 32px 18px;
       border-radius: 20px 20px 0 0;
     }
+
     .tutorial-card-header .step-badge {
       display: inline-block;
-      background: var(--accent); color: var(--primary-dark);
-      font-weight: 800; font-size: 0.7rem;
-      padding: 3px 14px; border-radius: 20px;
-      letter-spacing: 0.5px; text-transform: uppercase;
+      background: var(--accent);
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 0.7rem;
+      padding: 3px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       margin-bottom: 6px;
     }
+
     .tutorial-card-header h3 {
-      color: #fff; font-family: var(--font-heading);
-      font-weight: 700; margin: 0; font-size: 1.35rem;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      margin: 0;
+      font-size: 1.35rem;
     }
+
     .tutorial-card-header p {
-      color: rgba(255,255,255,0.8); margin: 4px 0 0; font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 4px 0 0;
+      font-size: 0.9rem;
     }
-    .tutorial-card-body { padding: 24px 32px 16px; }
+
+    .tutorial-card-body {
+      padding: 24px 32px 16px;
+    }
+
     .tutorial-card-footer {
       padding: 12px 32px 20px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    .step-dots { display: flex; gap: 7px; align-items: center; }
+
+    .step-dots {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
     .step-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: #ccc; transition: all 0.3s;
-      border: none; padding: 0; cursor: pointer;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      transition: all 0.3s;
+      border: none;
+      padding: 0;
+      cursor: pointer;
     }
-    .step-dot.active { background: var(--primary); transform: scale(1.3); }
-    .step-dot.completed { background: var(--accent); }
+
+    .step-dot.active {
+      background: var(--primary);
+      transform: scale(1.3);
+    }
+
+    .step-dot.completed {
+      background: var(--accent);
+    }
 
     .interactive-area {
       background: var(--bg-light);
       border: 2px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 20px 22px; margin: 14px 0;
+      padding: 20px 22px;
+      margin: 14px 0;
       position: relative;
     }
+
     .interactive-area .area-label {
-      position: absolute; top: 0; left: 0;
-      background: var(--primary); color: #fff;
-      font-size: 0.6rem; font-weight: 700;
-      padding: 3px 12px; border-radius: 0 0 12px 0;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 0 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+
     .tip-box {
       background: var(--accent-bg);
       border-left: 4px solid var(--accent);
       padding: 10px 16px;
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      margin: 10px 0; font-size: 0.88rem;
+      margin: 10px 0;
+      font-size: 0.88rem;
     }
-    .tip-box strong { color: var(--primary-dark); }
+
+    .tip-box strong {
+      color: var(--primary-dark);
+    }
+
     .feedback-box {
-      padding: 10px 14px; border-radius: var(--radius-sm);
-      margin: 8px 0; font-size: 0.85rem; display: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      margin: 8px 0;
+      font-size: 0.85rem;
+      display: none;
     }
-    .feedback-box.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .feedback-box.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .feedback-box.info { display: block; background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-    .feedback-box.warning { display: block; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
-    .btn-tutorial { border-radius: 30px; padding: 8px 24px; font-weight: 600; }
-    .btn-tutorial-primary { background: var(--primary); color: #fff; border: none; }
-    .btn-tutorial-primary:hover { background: var(--primary-dark); color: #fff; }
-    .btn-tutorial-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
-    .btn-tutorial-outline:hover { background: var(--primary); color: #fff; }
-    .btn-tutorial-success { background: var(--success); color: #fff; border: none; }
-    .btn-tutorial-success:hover { background: #044a25; color: #fff; }
+    .feedback-box.success {
+      display: block;
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
 
-    .progress-tracker { display: flex; gap: 6px; margin-bottom: 10px; }
-    .progress-tracker .pstep { flex: 1; height: 4px; border-radius: 4px; background: #e0e0e0; transition: background 0.4s; }
-    .progress-tracker .pstep.done { background: var(--success); }
-    .progress-tracker .pstep.active { background: var(--primary); }
+    .feedback-box.error {
+      display: block;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .feedback-box.info {
+      display: block;
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .feedback-box.warning {
+      display: block;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .btn-tutorial {
+      border-radius: 30px;
+      padding: 8px 24px;
+      font-weight: 600;
+    }
+
+    .btn-tutorial-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-tutorial-primary:hover {
+      background: var(--primary-dark);
+      color: #fff;
+    }
+
+    .btn-tutorial-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-tutorial-outline:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-tutorial-success {
+      background: var(--success);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-tutorial-success:hover {
+      background: #044a25;
+      color: #fff;
+    }
+
+    .progress-tracker {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .progress-tracker .pstep {
+      flex: 1;
+      height: 4px;
+      border-radius: 4px;
+      background: #e0e0e0;
+      transition: background 0.4s;
+    }
+
+    .progress-tracker .pstep.done {
+      background: var(--success);
+    }
+
+    .progress-tracker .pstep.active {
+      background: var(--primary);
+    }
 
     .quiz-option {
-      display: block; padding: 10px 16px; margin-bottom: 8px;
-      border: 2px solid var(--border); border-radius: 12px;
-      cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+      display: block;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
     }
-    .quiz-option:hover { border-color: var(--primary); background: var(--accent-bg); }
-    .quiz-option input { display: none; }
-    .quiz-option.selected { border-color: var(--primary); background: var(--accent-bg); font-weight: 600; }
-    .quiz-option.correct { border-color: var(--success); background: #d4edda; }
-    .quiz-option.wrong { border-color: var(--danger); background: #f8d7da; }
+
+    .quiz-option:hover {
+      border-color: var(--primary);
+      background: var(--accent-bg);
+    }
+
+    .quiz-option input {
+      display: none;
+    }
+
+    .quiz-option.selected {
+      border-color: var(--primary);
+      background: var(--accent-bg);
+      font-weight: 600;
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: #d4edda;
+    }
+
+    .quiz-option.wrong {
+      border-color: var(--danger);
+      background: #f8d7da;
+    }
 
     .status-badge {
-      display: inline-block; padding: 4px 14px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 700;
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
     }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-review { background: #cce5ff; color: #004085; }
-    .status-accepted { background: #d4edda; color: #155724; }
-    .status-rejected { background: #f8d7da; color: #721c24; }
-    .status-presented { background: #d1ecf1; color: #0c5460; }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-review {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .status-accepted {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-presented {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
 
     @media (max-width: 576px) {
-      .tutorial-card-header { padding: 18px 18px 14px; }
-      .tutorial-card-body { padding: 16px 18px 10px; }
-      .tutorial-card-footer { padding: 10px 18px 16px; flex-direction: column; align-items: stretch; }
-      .tutorial-card-footer .d-flex { justify-content: center; }
+      .tutorial-card-header {
+        padding: 18px 18px 14px;
+      }
+
+      .tutorial-card-body {
+        padding: 16px 18px 10px;
+      }
+
+      .tutorial-card-footer {
+        padding: 10px 18px 16px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .tutorial-card-footer .d-flex {
+        justify-content: center;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div id="toastContainer"></div>
@@ -239,7 +445,8 @@
         <div class="d-flex gap-2">
           <button class="btn btn-tutorial-outline btn-tutorial" id="btnPrev" onclick="prevStep()">← Anterior</button>
           <button class="btn btn-tutorial-primary btn-tutorial" id="btnNext" onclick="nextStep()">Siguiente →</button>
-          <button class="btn btn-tutorial-success btn-tutorial d-none" id="btnFinish" onclick="finishTutorial()">✔ Finalizar</button>
+          <button class="btn btn-tutorial-success btn-tutorial d-none" id="btnFinish" onclick="finishTutorial()">✔
+            Finalizar</button>
         </div>
       </div>
 
@@ -255,9 +462,15 @@
         </div>
         <div class="col-md-4">
           <h6>Entidades participantes</h6>
-          <ul><li>Facultad de Estudios Superiores Cuautitlán</li></ul>
-          <ul><li>Facultad de Estudios Superiores Zaragoza</li></ul>
-          <ul><li>Facultad de Química</li></ul>
+          <ul>
+            <li>Facultad de Estudios Superiores Cuautitlán</li>
+          </ul>
+          <ul>
+            <li>Facultad de Estudios Superiores Zaragoza</li>
+          </ul>
+          <ul>
+            <li>Facultad de Química</li>
+          </ul>
         </div>
         <div class="col-md-4">
           <h6>Contacto</h6>
@@ -728,13 +941,13 @@
         let cls = 'step-dot';
         if (i === currentStep) cls += ' active';
         else if (i < currentStep) cls += ' completed';
-        return `<button class="${cls}" onclick="goToStep(${i})" aria-label="Paso ${i+1}"></button>`;
+        return `<button class="${cls}" onclick="goToStep(${i})" aria-label="Paso ${i + 1}"></button>`;
       }).join('');
     }
 
     function renderStep(index) {
       const step = STEPS[index];
-      document.getElementById('stepBadge').textContent = `Paso ${index+1} de ${STEPS.length}`;
+      document.getElementById('stepBadge').textContent = `Paso ${index + 1} de ${STEPS.length}`;
       const pt = document.getElementById('progressTracker');
       pt.innerHTML = STEPS.map((_, i) => {
         let cls = 'pstep';
@@ -817,7 +1030,7 @@
     function showSubmitHint() {
       const fb = document.getElementById('submitHint');
       fb.className = 'feedback-box info';
-      fb.innerHTML = '💡 En el sistema real, este botón te lleva al formulario de <a href="submit-work.html" target="_blank"><strong>Enviar trabajo</strong></a>.';
+      fb.innerHTML = '💡 En el sistema real, este botón te lleva al formulario de <strong>Enviar trabajo</strong></a>.';
       fb.style.display = 'block';
     }
 
@@ -933,7 +1146,7 @@
       const descriptions = [
         '📤 <strong>Envío:</strong> Completas el formulario con título, semestre, grupo, profesor, integrantes y subes tu PDF. ¡Asegúrate de que todo esté correcto!',
         '👀 <strong>En revisión:</strong> Tres evaluadores asignados por el comité calificarán tu trabajo usando la rúbrica oficial (0-100 pts). Este proceso toma algunos días.',
-        '⚖️ <strong>Dictaminación:</strong> El administrador revisa los puntajes y asigna modalidad: <strong>Oral</strong> (mejores promedios), <strong>Cartel</strong> o <strong>Rechazo</strong> (&lt;60 pts).',
+        '⚖️ <strong>Dictaminación:</strong> El administrador revisa los puntajes y asigna modalidad: <strong>Oral</strong> (mejores promedios), <strong>Cartel</strong> o <strong>Rechazo</strong>.',
         '🏆 <strong>Resultado final:</strong> Los aceptados presentan en el evento. Se generan certificados automáticos para todos los integrantes.'
       ];
 
@@ -1004,9 +1217,10 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').catch(() => {});
+        navigator.serviceWorker.register('service-worker.js').catch(() => { });
       });
     }
   </script>
 </body>
+
 </html>
