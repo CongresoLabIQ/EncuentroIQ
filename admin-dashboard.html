@@ -794,10 +794,6 @@
                 return completed >= 3; // ✅ Listo cuando 3 evaluadores completaron
             });
 
-            const badge = document.getElementById('readyBadge');
-            badge.textContent = readyWorksCache.length;
-            badge.classList.toggle('d-none', readyWorksCache.length === 0);
-
             const navBadge = document.getElementById('readyBadgeNav');
             if (navBadge) {
                 navBadge.textContent = readyWorksCache.length;
