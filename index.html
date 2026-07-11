@@ -39,25 +39,23 @@
         </div>
     </header>
 
-    <div class="banner-container">
-        <img src="banner%20eiq.png" alt="Banner Congreso" class="banner-img">
-    </div>
-
     <div class="container py-4">
-        <div class="hero-banner">
-            <div class="hero-banner-bg"></div>
-            <div class="hero-banner-content">
+        <div class="hero-section-landing">
+            <img src="banner%20eiq.png" alt="" class="hero-bg-img">
+            <div class="hero-bg-gradient"></div>
+            <div class="hero-content">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <span class="hero-banner-tag">9° Edición</span>
-                        <h1 class="hero-banner-title">Encuentro Estudiantil de Ingeniería Química</h1>
-                        <p class="hero-banner-sub">Facultad de Química · FES Cuautitlán · FES Zaragoza · UNAM</p>
+                        <span class="hero-tag">9° Edición</span>
+                        <h1 class="hero-title">Encuentro Estudiantil de Ingeniería Química</h1>
+                        <p class="hero-subtitle">Facultad de Química · FES Cuautitlán · FES Zaragoza · UNAM</p>
+                        <p class="hero-meta">Octubre 2026 · Ciudad de México</p>
                     </div>
                     <div class="col-md-4 text-center mt-3 mt-md-0">
-                        <div class="hero-banner-shield">
+                        <div class="hero-shield">
                             <span class="hero-shield-text">UNAM</span>
                         </div>
-                        <p class="hero-banner-lema"><em>Por mi raza hablará el espíritu</em></p>
+                        <p class="hero-motto"><em>Por mi raza hablará el espíritu</em></p>
                     </div>
                 </div>
             </div>
@@ -88,24 +86,33 @@
                             <div class="col-md-4">
                                 <div class="d-grid">
                                     <a href="https://docs.google.com/document/d/1--IWXc6P2_iY7P7mkA14RjOWzUqnT0wMEf5hmpE-YwA/export?format=docx"
-                                        class="btn btn-outline-unam fw-bold py-3">
-                                        📄 Formato de Resumen (.docx)
+                                        class="btn btn-unam resource-btn py-3">
+                                        <span class="resource-icon">📄</span>
+                                        <span class="resource-label">Formato de Resumen</span>
+                                        <span class="resource-desc">Plantilla oficial para estructurar tu trabajo</span>
+                                        <span class="resource-type">DOCX</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="d-grid">
                                     <a href="https://drive.google.com/uc?export=download&id=1F3VoWe3ZKIJHqFM2DmeCUUUZoxylNA_Y"
-                                        target="_blank" class="btn btn-outline-unam fw-bold py-3">
-                                        🖼️ Cintillo para Carteles
+                                        target="_blank" class="btn btn-outline-unam resource-btn py-3">
+                                        <span class="resource-icon">🖼️</span>
+                                        <span class="resource-label">Cintillo para Carteles</span>
+                                        <span class="resource-desc">Encabezado requerido para pósters</span>
+                                        <span class="resource-type">PNG</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="d-grid">
                                     <a href="https://drive.google.com/uc?export=download&id=1HHG2djDVrbfBiO7J9HDR6XWjFqYUc-Cq"
-                                        target="_blank" class="btn btn-outline-unam fw-bold py-3">
-                                        📊 Plantilla de Presentación
+                                        target="_blank" class="btn btn-outline-unam resource-btn py-3">
+                                        <span class="resource-icon">📊</span>
+                                        <span class="resource-label">Plantilla de Presentación</span>
+                                        <span class="resource-desc">Diapositivas para ponencia oral</span>
+                                        <span class="resource-type">PPTX</span>
                                     </a>
                                 </div>
                             </div>
@@ -116,13 +123,17 @@
                         <hr class="my-3">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <a href="tutorial-estudiante.html" class="btn btn-outline-unam fw-bold py-3 w-100">
-                                    🧑‍🏫 Soy estudiante — Ver tutorial
+                                <a href="tutorial-estudiante.html" class="btn btn-outline-unam resource-btn py-3 w-100">
+                                    <span class="resource-icon">🧑‍🏫</span>
+                                    <span class="resource-label">Soy estudiante</span>
+                                    <span class="resource-desc">Guía paso a paso para enviar tu trabajo</span>
                                 </a>
                             </div>
                             <div class="col-md-6">
-                                <a href="tutorial-evaluador.html" class="btn btn-outline-unam fw-bold py-3 w-100">
-                                    👨‍🏫 Soy evaluador — Capacitación
+                                <a href="tutorial-evaluador.html" class="btn btn-outline-unam resource-btn py-3 w-100">
+                                    <span class="resource-icon">👨‍🏫</span>
+                                    <span class="resource-label">Soy evaluador</span>
+                                    <span class="resource-desc">Capacitación para uso del sistema de rúbricas</span>
                                 </a>
                             </div>
                         </div>
@@ -133,35 +144,37 @@
 
         <hr class="my-5 w-50 mx-auto opacity-25">
 
-        <h3 class="text-center mb-4" style="color: var(--primary);">¿Cómo participar?</h3>
+        <h3 class="text-center mb-4 text-primary-theme">¿Cómo participar?</h3>
         <div class="row mb-4">
             <div class="col-md-3 mb-4">
-                <div class="step-card text-center p-3">
-                    <div style="font-size: 2.5rem;">📄</div>
-                    <h5 class="fw-bold mt-2">1. Envío</h5>
-                    <p class="small text-muted">Sube tu resumen del trabajo en PDF indicando tu semestre y grupo.</p>
+                <div class="step-card">
+                    <div class="step-connector"></div>
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold">Envío</h5>
+                    <p class="small">Sube tu resumen del trabajo en PDF indicando tu semestre y grupo.</p>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="step-card text-center p-3">
-                    <div style="font-size: 2.5rem;">⚖️</div>
-                    <h5 class="fw-bold mt-2">2. Evaluación</h5>
-                    <p class="small text-muted">Tres profesores revisarán tu trabajo usando rúbricas oficiales.</p>
+                <div class="step-card">
+                    <div class="step-connector"></div>
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold">Evaluación</h5>
+                    <p class="small">Tres profesores revisarán tu trabajo usando rúbricas oficiales.</p>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="step-card text-center p-3">
-                    <div style="font-size: 2.5rem;">🏆</div>
-                    <h5 class="fw-bold mt-2">3. Selección</h5>
-                    <p class="small text-muted">Los mejores promedios serán seleccionados para Ponencia Oral o Cartel.
-                    </p>
+                <div class="step-card">
+                    <div class="step-connector"></div>
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold">Selección</h5>
+                    <p class="small">Los mejores promedios serán seleccionados para Ponencia Oral o Cartel.</p>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="step-card text-center p-3">
-                    <div style="font-size: 2.5rem;">🎤</div>
-                    <h5 class="fw-bold mt-2">4. Evento</h5>
-                    <p class="small text-muted">¡Presenta tu proyecto en los auditorios o área de exposición!</p>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h5 class="fw-bold">Evento</h5>
+                    <p class="small">¡Presenta tu proyecto en los auditorios o área de exposición!</p>
                 </div>
             </div>
         </div>
@@ -178,11 +191,7 @@
                     <h6>Entidades participantes</h6>
                     <ul>
                         <li>Facultad de Estudios Superiores Cuautitlán</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Estudios Superiores Zaragoza</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Química</li>
                     </ul>
                 </div>
@@ -218,7 +227,7 @@
         const installBtn = document.createElement('button');
         installBtn.innerHTML = "📲 Instalar App del Congreso";
         installBtn.className = "btn btn-warning btn-sm mb-3 d-none mx-auto";
-        document.querySelector('.hero-section').prepend(installBtn);
+        document.querySelector('.hero-section-landing').prepend(installBtn);
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();

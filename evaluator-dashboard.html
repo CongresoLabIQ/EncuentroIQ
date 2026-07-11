@@ -79,9 +79,27 @@
                     Solo ves los trabajos que aún <strong>no has evaluado</strong>.
                 </div>
                 <div id="phase1List" class="row">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary"></div>
-                        <p class="mt-2 text-muted">Cargando tus asignaciones...</p>
+                    <div class="col-md-6 mb-3">
+                        <div class="skeleton-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                            </div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text w-75"></div>
+                            <div class="skeleton skeleton-text w-50"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="skeleton-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                            </div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text w-75"></div>
+                            <div class="skeleton skeleton-text w-50"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,9 +110,25 @@
                     <strong>Instrucciones:</strong> Evalúa al alumno durante su presentación oral/cartel.
                 </div>
                 <div id="phase2List" class="row">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary"></div>
-                        <p class="mt-2 text-muted">Cargando evaluaciones presenciales...</p>
+                    <div class="col-md-6 mb-3">
+                        <div class="skeleton-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                            </div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text w-75"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="skeleton-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                            </div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text w-75"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,7 +140,7 @@
     <div class="modal fade" id="evalModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--primary); color: white;">
+                <div class="modal-header bg-unam text-white">
                     <h5 class="modal-title">📋 Evaluación de Resumenes</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -336,12 +370,12 @@
     <div class="modal fade" id="liveModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--primary); color: white;">
+                <div class="modal-header bg-unam text-white">
                     <h5 class="modal-title">🎤 Evaluación de Presentación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h5 id="liveWorkTitle" class="mb-3" style="color: var(--primary);"></h5>
+                    <h5 id="liveWorkTitle" class="mb-3 text-primary-theme"></h5>
 
                     <div id="liveReadOnlyBanner" class="alert alert-success d-none text-center fw-bold mb-3">
                         ✅ Evaluación enviada — solo vista previa
@@ -1102,10 +1136,10 @@
         <div class="card work-card live h-100 shadow-sm ${isCompleted ? 'border-success opacity-75' : ''}">
           <div class="card-body">
             <div class="d-flex justify-content-between">
-              <span class="badge text-white mb-2" style="background:var(--primary);">${a.works?.short_id || ''}</span>
+              <span class="badge badge-oral">${a.works?.short_id || ''}</span>
               <small class="text-muted">${a.works?.auditorio || ''}</small>
             </div>
-            <h5 class="fw-bold mb-1" style="color: var(--primary);">${a.works?.title || 'Sin título'}</h5>
+            <h5 class="fw-bold mb-1 text-primary-theme">${a.works?.title || 'Sin título'}</h5>
             <p class="mb-1"><strong>Modalidad:</strong> ${modalityLabel}</p>
             <p class="mb-2"><strong>Equipo:</strong> ${a.works?.student_name || 'N/D'}</p>
             ${isCompleted
@@ -1119,7 +1153,7 @@
                             👁️ Ver
                           </button>
                         </div>`
-                        : `<button class="btn w-100 text-white fw-bold" style="background-color:var(--primary);"
+                        : `<button class="btn btn-unam w-100 fw-bold"
                   onclick="openLive('${a.id}', '${a.work_id}', \`${(a.works?.title || '').replace(/`/g, "'")}\`, '${modalityParam}')">
                   ⭐ Evaluar Presentación
                 </button>`
@@ -1130,12 +1164,12 @@
             }
 
             if (orales.length > 0) {
-                html += `<div class="col-12 mb-3"><h5 class="fw-bold" style="color:var(--primary);">🎤 Ponencia (${orales.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3"><h5 class="fw-bold text-primary-theme">🎤 Ponencia (${orales.length})</h5><hr></div>`;
                 html += orales.map(renderCard).join('');
             }
 
             if (carteles.length > 0) {
-                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold" style="color:var(--success);">📊 Cartel (${carteles.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold text-success">📊 Cartel (${carteles.length})</h5><hr></div>`;
                 html += carteles.map(renderCard).join('');
             }
 
@@ -1351,11 +1385,7 @@
                     <h6>Entidades participantes</h6>
                     <ul>
                         <li>Facultad de Estudios Superiores Cuautitlán</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Estudios Superiores Zaragoza</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Química</li>
                     </ul>
                 </div>

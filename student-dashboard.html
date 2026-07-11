@@ -45,15 +45,26 @@
 
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0" style="color: var(--primary); font-family: var(--font-heading);">Mis Trabajos
+            <h2 class="fw-bold mb-0 text-primary-theme" style="font-family: var(--font-heading);">Mis Trabajos
             </h2>
             <span class="btn btn-outline-unam fw-bold" style="cursor: not-allowed; opacity: 0.65;">🚫 La recepción de
                 trabajos terminó</span>
         </div>
 
         <div id="worksList">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary"></div>
+            <div class="skeleton-card">
+                <div class="skeleton-row">
+                    <div class="skeleton skeleton-badge"></div>
+                    <div class="skeleton skeleton-text w-75"></div>
+                </div>
+                <div class="skeleton-row">
+                    <div class="skeleton skeleton-badge"></div>
+                    <div class="skeleton skeleton-text w-50"></div>
+                </div>
+                <div class="skeleton-row">
+                    <div class="skeleton skeleton-badge"></div>
+                    <div class="skeleton skeleton-text w-33"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -61,7 +72,7 @@
     <div class="modal fade" id="feedbackModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--primary); color: white;">
+                <div class="modal-header bg-unam text-white">
                     <h5 class="modal-title">📝 Retroalimentación del Comité</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -83,11 +94,7 @@
                     <h6>Entidades participantes</h6>
                     <ul>
                         <li>Facultad de Estudios Superiores Cuautitlán</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Estudios Superiores Zaragoza</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Química</li>
                     </ul>
                 </div>
@@ -132,8 +139,8 @@
             <div class="content-card-body">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h5 class="fw-bold" style="color: var(--primary);">
-                            <span class="badge" style="background: var(--primary);">${w.short_id || 'S/N'}</span> 
+                        <h5 class="fw-bold text-primary-theme">
+                            <span class="badge badge-oral">${w.short_id || 'S/N'}</span> 
                             ${w.title}
                         </h5>
                         <p class="mb-1"><strong>Estado:</strong> ${statusData.badge}</p>
@@ -154,9 +161,9 @@
             const map = {
                 'pending': { badge: '<span class="badge bg-warning text-dark">Pendiente de revisión</span>' },
                 'under_review': { badge: '<span class="badge bg-info text-dark">En evaluación</span>' },
-                'accepted_oral': { badge: '<span class="badge" style="background: var(--primary);">✅ ACEPTADO PARA PONENCIA (ORAL)</span>' },
-                'accepted_poster': { badge: '<span class="badge" style="background: var(--accent); color: var(--primary);">✅ ACEPTADO PARA CARTEL (PÓSTER)</span>' },
-                'rejected': { badge: '<span class="badge bg-danger">❌ NO ACEPTADO</span>' }
+                'accepted_oral': { badge: '<span class="badge badge-accepted-oral">✅ ACEPTADO PARA PONENCIA (ORAL)</span>' },
+                'accepted_poster': { badge: '<span class="badge badge-accepted-poster">✅ ACEPTADO PARA CARTEL (PÓSTER)</span>' },
+                'rejected': { badge: '<span class="badge badge-rejected">❌ NO ACEPTADO</span>' }
             };
             return map[status] || { badge: '<span class="badge bg-secondary">Desconocido</span>' };
         }

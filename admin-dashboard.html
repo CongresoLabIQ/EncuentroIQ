@@ -7,10 +7,6 @@
     <title>Panel Admin | Encuentro IQ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#003D79">
@@ -209,7 +205,13 @@
                                     </thead>
                                     <tbody id="evalProgressBody">
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted py-4">Cargando datos...</td>
+                                            <td colspan="6">
+                                                <div class="p-2">
+                                                    <div class="skeleton-row"><div class="skeleton skeleton-text w-50"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-text w-33"></div></div>
+                                                    <div class="skeleton-row"><div class="skeleton skeleton-text w-75"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-text w-33"></div></div>
+                                                    <div class="skeleton-row"><div class="skeleton skeleton-text w-33"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-text w-50"></div></div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -307,7 +309,7 @@
                             <line x1="8" y1="2" x2="8" y2="6" />
                             <line x1="3" y1="10" x2="21" y2="10" />
                         </svg>
-                        <h2 class="mb-0" style="color: var(--primary);">Horario General de Ponencias</h2>
+                        <h2 class="mb-0 text-primary-theme">Horario General de Ponencias</h2>
                     </div>
 
                     <div class="d-flex gap-2 mb-3">
@@ -353,7 +355,7 @@
                             <circle cx="12" cy="8" r="6" />
                             <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
                         </svg>
-                        <h2 class="mb-0" style="color: var(--primary);">Fase 2: Evento Presencial</h2>
+                        <h2 class="mb-0 text-primary-theme">Fase 2: Evento Presencial</h2>
                     </div>
 
                     <div class="card mb-4 border-0 shadow-sm">
@@ -430,7 +432,7 @@
                         Enviar Agendas por Correo a todos los Jueces
                     </button>
 
-                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2" style="color: var(--primary);">
+                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2 text-primary-theme">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon
@@ -459,11 +461,7 @@
                     <h6>Entidades participantes</h6>
                     <ul>
                         <li>Facultad de Estudios Superiores Cuautitlán</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Estudios Superiores Zaragoza</li>
-                    </ul>
-                    <ul>
                         <li>Facultad de Química</li>
                     </ul>
                 </div>
@@ -661,21 +659,21 @@
 
                 const isOral = w.modality === 'Oral' || w.modality === 'Ponencia' || w.status === 'accepted_oral';
                 const typeBadge = isOral
-                    ? '<span class="badge" style="background: var(--primary); color: #fff; font-weight:600;">Oral</span>'
-                    : '<span class="badge" style="background: #1a5c2e; color: #fff; font-weight:600;">Cartel</span>';
+                    ? '<span class="badge badge-oral">Oral</span>'
+                    : '<span class="badge badge-poster">Cartel</span>';
 
                 let statusBadge = '';
                 if (w.status === 'pending') {
-                    statusBadge = '<span class="badge" style="background: #ffc107; color: #212529; font-weight:600;">Pendiente</span>';
+                    statusBadge = '<span class="badge badge-pending-status">Pendiente</span>';
                 } else if (w.status === 'under_review') {
-                    if (completed >= 3) statusBadge = '<span class="badge" style="background: #20c997; color: #fff; font-weight:600;">Listo para dictaminar</span>';
-                    else statusBadge = `<span class="badge" style="background: #0dcaf0; color: #212529; font-weight:600;">${completed}/3 completado</span>`;
+                    if (completed >= 3) statusBadge = '<span class="badge badge-ready-status">Listo para dictaminar</span>';
+                    else statusBadge = `<span class="badge badge-review-status">${completed}/3 completado</span>`;
                 } else if (w.status === 'accepted_oral') {
-                    statusBadge = '<span class="badge" style="background: var(--primary); color: #fff; font-weight:600;">Aceptado · Oral</span>';
+                    statusBadge = '<span class="badge badge-accepted-oral">Aceptado · Oral</span>';
                 } else if (w.status === 'accepted_poster') {
-                    statusBadge = '<span class="badge" style="background: #1a5c2e; color: #fff; font-weight:600;">Aceptado · Cartel</span>';
+                    statusBadge = '<span class="badge badge-accepted-poster">Aceptado · Cartel</span>';
                 } else if (w.status === 'rejected') {
-                    statusBadge = '<span class="badge" style="background: #dc3545; color: #fff; font-weight:600;">Rechazado</span>';
+                    statusBadge = '<span class="badge badge-rejected">Rechazado</span>';
                 }
 
                 let scoreDisplay = '<span class="text-muted small">—</span>';

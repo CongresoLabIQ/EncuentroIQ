@@ -17,14 +17,15 @@ Variables CSS definidas en `:root` dentro de `css/style.css`:
 | `--accent` | `#D59F0F` | Texto destacado, hover de enlaces, acentos |
 | `--accent-light` | `#E8B830` | Versión más clara del acento, badges |
 | `--accent-bg` | `rgba(213, 159, 15, 0.08)` | Fondos sutiles con tono dorado |
-| `--bg` | `#F5F7FA` | Fondo general de páginas |
-| `--card-bg` | `#FFFFFF` | Fondo de tarjetas y paneles |
-| `--text` | `#1A1A2E` | Texto principal |
-| `--text-light` | `#6B7280` | Texto secundario |
-| `--border` | `#E5E7EB` | Bordes de componentes |
-| `--success` | `#10B981` | Estados exitosos, aceptado |
-| `--warning` | `#F59E0B` | Advertencias, pendiente |
-| `--danger` | `#EF4444` | Errores, rechazado |
+| `--bg` | `#FFFFFF` | Fondo general de páginas |
+| `--bg-light` | `#F5F5F5` | Fondo de breadcrumb, encabezados de tabla |
+| `--bg-card` | `#EEEEEE` | Fondo de tarjetas secundarias |
+| `--border` | `#DDDDDD` | Bordes de componentes |
+| `--text` | `#444444` | Texto principal |
+| `--text-light` | `#666666` | Texto secundario |
+| `--success` | `#056835` | Estados exitosos, aceptado |
+| `--danger` | `#BC3A4C` | Errores, rechazado |
+| `--info` | `#2682A8` | Información |
 | `--shadow` | `0 2px 8px rgba(0,0,0,0.08)` | Sombra de tarjetas |
 
 ---
@@ -36,7 +37,7 @@ Variables CSS definidas en `:root` dentro de `css/style.css`:
 | Títulos | `'Roboto Slab', serif` (pesos: 400, 600, 700, 800) |
 | Cuerpo | `'Roboto', sans-serif` (pesos: 300, 400, 500, 600, 700) |
 | Tamaño base | `16px` |
-| Escala | `h1: 2.5rem`, `h2: 2rem`, `h3: 1.75rem`, `h4: 1.5rem` |
+| Radio de bordes | `30px` (tarjetas), `12px` (botones, inputs) |
 
 ---
 
@@ -62,15 +63,17 @@ Variables CSS definidas en `:root` dentro de `css/style.css`:
 │  ┌─────────┐                                        │
 │  │ Escudo  │  Encuentro Estudiantil de              │
 │  │  UNAM   │  Ingeniería Química                    │
-│  └─────────┘  8va Edición                           │
+│  └─────────┘  9° Edición                            │
+│              Octubre 2026 · Ciudad de México        │
 │                                                     │
 │  [Regístrate] [Más información]                     │
 └─────────────────────────────────────────────────────┘
 ```
 
-- Gradient de `--primary` a `--primary-dark`
-- Título en `--accent` (dorado)
-- Imagen de fondo opcional
+- Banner image con overlay de gradiente (`--primary` a `--primary-dark`)
+- Título en color blanco, tag de edición en `--accent`
+- Escudo UNAM con borde dorado y fondo semitransparente
+- Animación de entrada `fadeUp` al cargar
 
 ### Cards
 
