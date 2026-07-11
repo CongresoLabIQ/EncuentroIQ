@@ -145,6 +145,10 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div id="evalPdfPanel" class="eval-pdf-panel">
+                        <iframe id="evalPdfFrame" title="PDF del trabajo"></iframe>
+                    </div>
+                    <div class="eval-rubric-content">
                     <div class="row mb-3 align-items-center">
                         <div class="col-md-8">
                             <h5 id="evalWorkTitle" class="text-primary fw-bold mb-1"></h5>
@@ -353,6 +357,7 @@
                         <textarea class="form-control" id="evalComments" rows="4"
                             placeholder="Escribe aquí las observaciones para el alumno..."></textarea>
                     </div>
+                    </div> <!-- .eval-rubric-content -->
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -742,6 +747,15 @@
             if (!session) return window.location.href = 'login.html';
             loadPhase1();
             loadPhase2();
+
+            // Limpiar iframe del PDF al cerrar el modal
+            const evalModal = document.getElementById('evalModal');
+            if (evalModal) {
+                evalModal.addEventListener('hidden.bs.modal', () => {
+                    const frame = document.getElementById('evalPdfFrame');
+                    if (frame) frame.src = '';
+                });
+            }
         });
 
         // ============================================================
@@ -883,6 +897,19 @@
                     urlEl.style.display = 'inline-block';
                 } else {
                     urlEl.style.display = 'none';
+                }
+            }
+
+            // 2b. PDF iframe para split view en desktop
+            const pdfFrame = document.getElementById('evalPdfFrame');
+            const pdfPanel = document.getElementById('evalPdfPanel');
+            if (pdfFrame && pdfPanel) {
+                if (url && url !== '#' && url !== 'undefined' && url !== '') {
+                    pdfFrame.src = url;
+                    pdfPanel.style.display = '';
+                } else {
+                    pdfFrame.src = '';
+                    pdfPanel.style.display = 'none';
                 }
             }
 

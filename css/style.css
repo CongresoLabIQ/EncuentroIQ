@@ -1089,3 +1089,196 @@ h1, h2, h3, h4, h5, h6 {
   .unam-shield { width: 32px; height: 32px; }
   .shield-inner { font-size: 0.85rem; }
 }
+
+/* ============================================================
+   EVALUATOR SPLIT VIEW — PDF + Rubric side-by-side on desktop
+   ============================================================ */
+.eval-pdf-panel { display: none; }
+.eval-pdf-panel iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #f5f5f5;
+}
+.eval-rubric-content {
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+@media (min-width: 992px) {
+  #evalModal .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+    height: 100vh;
+  }
+  #evalModal .modal-content {
+    height: 100%;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #evalModal .modal-header {
+    border-radius: 0;
+    padding: 6px 16px;
+    flex-shrink: 0;
+  }
+  #evalModal .modal-body {
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+  .eval-pdf-panel {
+    display: flex;
+    flex: 0 0 50%;
+    border-right: 2px solid var(--border);
+    background: #e8e8e8;
+  }
+  .eval-rubric-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+  }
+  #evalModal .modal-footer {
+    border-radius: 0;
+    padding: 6px 16px;
+    flex-shrink: 0;
+  }
+  #evalModal .modal-body .row.mb-3 {
+    padding: 8px 0;
+  }
+}
+
+/* ============================================================
+   ADMIN BOTTOM NAVIGATION — replaces sidebar on mobile
+   ============================================================ */
+.admin-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--primary-dark);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 4px 0 env(safe-area-inset-bottom, 0);
+  z-index: 1040;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.admin-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-size: 0.58rem;
+  font-weight: 500;
+  padding: 5px 4px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.admin-nav-item:hover {
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.06);
+}
+.admin-nav-item.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+.admin-nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.admin-nav-item .nav-badge {
+  position: absolute;
+  top: -2px;
+  right: 50%;
+  transform: translateX(14px);
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 6px;
+  line-height: 1.2;
+  min-width: 14px;
+  text-align: center;
+}
+
+body.has-bottom-nav { padding-bottom: 64px; }
+
+/* Hide sidebar on mobile */
+@media (max-width: 991px) {
+  .sidebar-col { display: none !important; }
+  .col-lg-3.mb-4 { display: none !important; }
+}
+
+/* ============================================================
+   UPLOAD TOGGLE
+   ============================================================ */
+.upload-toggle {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+  vertical-align: middle;
+}
+.upload-toggle input { opacity: 0; width: 0; height: 0; }
+.upload-toggle .toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #ccc;
+  border-radius: 11px;
+  transition: background 0.3s;
+}
+.upload-toggle .toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.upload-toggle input:checked + .toggle-slider { background: var(--success); }
+.upload-toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+/* ============================================================
+   MOBILE PWA FEEL
+   ============================================================ */
+@supports (padding: env(safe-area-inset-top)) {
+  body { padding-top: env(safe-area-inset-top); }
+  .top-bar { padding-top: env(safe-area-inset-top); }
+}
+
+@media (display-mode: standalone) {
+  body { -webkit-user-select: none; user-select: none; }
+}
+
+@media (max-width: 576px) {
+  .work-card { margin-left: -4px; margin-right: -4px; }
+  .stat-item { transition: transform 0.15s; }
+  .stat-item:active { transform: scale(0.97); }
+  .btn:active { transform: scale(0.97); }
+  .tab-content .tab-pane { animation: fadeIn 0.2s ease-out; }
+}
+
+/* Page section transitions */
+.section-fade { animation: sectionFadeIn 0.25s ease-out; }
+@keyframes sectionFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
