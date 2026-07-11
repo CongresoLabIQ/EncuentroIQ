@@ -874,6 +874,27 @@
             return Math.round(total);
         }
 
+        // Convertir URLs de Google Drive a formato embeddable en iframe
+        function getEmbeddablePdfUrl(url) {
+            // Google Drive: /file/d/{ID}/view → /file/d/{ID}/preview
+            const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (fileMatch) {
+                return 'https://drive.google.com/file/d/' + fileMatch[1] + '/preview';
+            }
+            // Google Drive: /open?id={ID} → /file/d/{ID}/preview
+            const openMatch = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+            if (openMatch) {
+                return 'https://drive.google.com/file/d/' + openMatch[1] + '/preview';
+            }
+            // Google Drive: /uc?export=view&id={ID}
+            const ucMatch = url.match(/drive\.google\.com\/uc\?.*id=([a-zA-Z0-9_-]+)/);
+            if (ucMatch) {
+                return 'https://drive.google.com/uc?export=view&id=' + ucMatch[1];
+            }
+            // Para URLs que ya son directas (PDF, etc.)
+            return url;
+        }
+
         // --- Función para limpiar y abrir el modal ---
         function openEval(assignId, workId, title, url, semester) {
             currentAssignmentId = assignId;
@@ -905,7 +926,7 @@
             const pdfPanel = document.getElementById('evalPdfPanel');
             if (pdfFrame && pdfPanel) {
                 if (url && url !== '#' && url !== 'undefined' && url !== '') {
-                    pdfFrame.src = url;
+                    pdfFrame.src = getEmbeddablePdfUrl(url);
                     pdfPanel.style.display = '';
                 } else {
                     pdfFrame.src = '';
