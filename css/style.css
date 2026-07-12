@@ -218,6 +218,12 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1rem;
   border: none;
 }
+.login-card .card-header h1,
+.login-card .card-header h2,
+.login-card .card-header h3,
+.login-card .card-header h4,
+.login-card .card-header h5,
+.login-card .card-header h6 { color: #fff; }
 .login-card .card-body {
   background: var(--bg);
 }
