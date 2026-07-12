@@ -19,7 +19,7 @@
 <body>
     <div id="toastContainer"></div>
 
-    <!-- ==================== DESKTOP TOP BAR ==================== -->
+    <!-- ==================== TOP BAR (desktop only) ==================== -->
     <header class="top-bar d-none d-md-block">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
@@ -37,226 +37,65 @@
         </div>
     </header>
 
-    <div class="container py-4 d-none d-md-block">
-        <!-- ==================== DESKTOP HERO ==================== -->
-        <div class="hero-section-landing">
-            <img src="banner%20eiq.png" alt="" class="hero-bg-img">
-            <div class="hero-bg-gradient"></div>
-            <div class="hero-content">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <span class="hero-tag">9° Edición</span>
-                        <h1 class="hero-title">Encuentro Estudiantil de Ingeniería Química</h1>
-                        <p class="hero-subtitle">Facultad de Química · FES Cuautitlán · FES Zaragoza · UNAM</p>
-                        <p class="hero-meta">Octubre 2026 · Ciudad de México</p>
-                    </div>
-                    <div class="col-md-4 text-center mt-3 mt-md-0">
-                        <div class="hero-shield">
-                            <span class="hero-shield-text">UNAM</span>
-                        </div>
-                        <p class="hero-motto"><em>Por mi raza hablará el espíritu</em></p>
-                    </div>
+    <!-- ==================== HERO ==================== -->
+    <div class="ml-hero">
+        <div class="ml-hero-bg"></div>
+        <div class="ml-hero-gradient"></div>
+        <div class="ml-hero-content">
+            <div class="ml-hero-inner">
+                <div class="ml-hero-text">
+                    <span class="ml-tag">9° Edición</span>
+                    <h1 class="ml-title">Encuentro Estudiantil de Ingeniería Química</h1>
+                    <p class="ml-subtitle">Facultad de Química · FES Cuautitlán · FES Zaragoza · UNAM</p>
+                    <p class="ml-meta">Octubre 2026 · Ciudad de México</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- ==================== DESKTOP CTA ==================== -->
-        <div class="d-flex gap-3 justify-content-center mb-5 flex-wrap">
-            <a href="login.html" class="btn btn-unam btn-lg px-5 shadow">
-                Iniciar Sesión
-            </a>
-            <a href="register.html" class="btn btn-gold btn-lg px-5 shadow">
-                Registrarse
-            </a>
-        </div>
-
-        <!-- ==================== DESKTOP RESOURCES ==================== -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-10">
-                <div class="content-card p-0">
-                    <div class="content-card-header">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                        </svg>
-                        Recursos y Plantillas Oficiales
-                    </div>
-                    <div class="content-card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="d-grid">
-                                    <a href="https://docs.google.com/document/d/1--IWXc6P2_iY7P7mkA14RjOWzUqnT0wMEf5hmpE-YwA/export?format=docx"
-                                        class="btn btn-outline-unam resource-btn py-3">
-                                        <span class="resource-icon">📄</span>
-                                        <span class="resource-label">Formato de Resumen</span>
-                                        <span class="resource-desc">Plantilla oficial para estructurar tu trabajo</span>
-                                        <span class="resource-type">DOCX</span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-grid">
-                                    <a href="https://drive.google.com/uc?export=download&id=1F3VoWe3ZKIJHqFM2DmeCUUUZoxylNA_Y"
-                                        target="_blank" class="btn btn-outline-unam resource-btn py-3">
-                                        <span class="resource-icon">🖼️</span>
-                                        <span class="resource-label">Cintillo para Carteles</span>
-                                        <span class="resource-desc">Encabezado requerido para pósters</span>
-                                        <span class="resource-type">PNG</span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-grid">
-                                    <a href="https://drive.google.com/uc?export=download&id=1HHG2djDVrbfBiO7J9HDR6XWjFqYUc-Cq"
-                                        target="_blank" class="btn btn-outline-unam resource-btn py-3">
-                                        <span class="resource-icon">📊</span>
-                                        <span class="resource-label">Plantilla de Presentación</span>
-                                        <span class="resource-desc">Diapositivas para ponencia oral</span>
-                                        <span class="resource-type">PPTX</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-muted small mt-3 mb-0">
-                            Asegúrate de seguir los lineamientos de diseño establecidos en cada plantilla.
-                        </p>
-                        <hr class="my-3">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <a href="tutorial-estudiante.html" class="btn btn-outline-unam resource-btn py-3 w-100">
-                                    <span class="resource-icon">🧑‍🏫</span>
-                                    <span class="resource-label">Soy estudiante</span>
-                                    <span class="resource-desc">Guía paso a paso para enviar tu trabajo</span>
-                                </a>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="tutorial-evaluador.html" class="btn btn-outline-unam resource-btn py-3 w-100">
-                                    <span class="resource-icon">👨‍🏫</span>
-                                    <span class="resource-label">Soy evaluador</span>
-                                    <span class="resource-desc">Capacitación para uso del sistema de rúbricas</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr class="my-5 w-50 mx-auto opacity-25">
-
-        <!-- ==================== DESKTOP STEPS ==================== -->
-        <h3 class="text-center mb-4 text-primary-theme">¿Cómo participar?</h3>
-        <div class="row mb-4">
-            <div class="col-md-3 mb-4">
-                <div class="step-card">
-                    <div class="step-connector"></div>
-                    <div class="step-number">1</div>
-                    <h5 class="fw-bold">Envío</h5>
-                    <p class="small">Sube tu resumen del trabajo en PDF indicando tu semestre y grupo.</p>
-                </div>
-            </div>
-            <div class="col-md-3 mb-4">
-                <div class="step-card">
-                    <div class="step-connector"></div>
-                    <div class="step-number">2</div>
-                    <h5 class="fw-bold">Evaluación</h5>
-                    <p class="small">Tres profesores revisarán tu trabajo usando rúbricas oficiales.</p>
-                </div>
-            </div>
-            <div class="col-md-3 mb-4">
-                <div class="step-card">
-                    <div class="step-connector"></div>
-                    <div class="step-number">3</div>
-                    <h5 class="fw-bold">Selección</h5>
-                    <p class="small">Los mejores promedios serán seleccionados para Ponencia Oral o Cartel.</p>
-                </div>
-            </div>
-            <div class="col-md-3 mb-4">
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <h5 class="fw-bold">Evento</h5>
-                    <p class="small">¡Presenta tu proyecto en los auditorios o área de exposición!</p>
+                <div class="ml-hero-shield d-none d-md-flex">
+                    <span class="ml-hero-shield-text">UNAM</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== DESKTOP FOOTER ==================== -->
-    <footer class="footer-institutional d-none d-md-block">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="footer-shield">UNAM</div>
-                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
-                </div>
-                <div class="col-md-4">
-                    <h6>Entidades participantes</h6>
-                    <ul>
-                        <li>Facultad de Estudios Superiores Cuautitlán</li>
-                        <li>Facultad de Estudios Superiores Zaragoza</li>
-                        <li>Facultad de Química</li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h6>Contacto</h6>
-                    <ul>
-                        <li>sistema.congresolabiq@gmail.com</li>
-                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="footer-hr">
-            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
-        </div>
-    </footer>
-
-    <!-- ==================== MOBILE LANDING (Proposal 1) ==================== -->
-    <div class="mobile-landing d-md-none">
-        <!-- Hero -->
-        <div class="ml-hero">
-            <div class="ml-hero-bg"></div>
-            <div class="ml-hero-gradient"></div>
-            <div class="ml-hero-content">
-                <span class="ml-tag">9° Edición</span>
-                <h1 class="ml-title">Encuentro Estudiantil de Ingeniería Química</h1>
-                <p class="ml-subtitle">FQ · FES Cuautitlán · FES Zaragoza · UNAM</p>
-                <p class="ml-meta">Octubre 2026 · Ciudad de México</p>
-            </div>
-        </div>
-
-        <!-- Resources -->
+    <div class="container">
+        <!-- ==================== RESOURCES ==================== -->
         <div class="ml-section-title">Recursos y Plantillas</div>
         <div class="ml-resources">
             <a href="https://docs.google.com/document/d/1--IWXc6P2_iY7P7mkA14RjOWzUqnT0wMEf5hmpE-YwA/export?format=docx"
                 class="ml-pill">
                 <span class="ml-pill-icon">📄</span>
-                <span class="ml-pill-label">Resumen</span>
+                <span class="ml-pill-label">Formato de Resumen</span>
+                <span class="ml-pill-desc">Plantilla oficial para tu trabajo</span>
                 <span class="ml-pill-type">DOCX</span>
             </a>
             <a href="https://drive.google.com/uc?export=download&id=1F3VoWe3ZKIJHqFM2DmeCUUUZoxylNA_Y"
                 target="_blank" class="ml-pill">
                 <span class="ml-pill-icon">🖼️</span>
-                <span class="ml-pill-label">Cintillo</span>
+                <span class="ml-pill-label">Cintillo para Carteles</span>
+                <span class="ml-pill-desc">Encabezado requerido para pósters</span>
                 <span class="ml-pill-type">PNG</span>
             </a>
             <a href="https://drive.google.com/uc?export=download&id=1HHG2djDVrbfBiO7J9HDR6XWjFqYUc-Cq"
                 target="_blank" class="ml-pill">
                 <span class="ml-pill-icon">📊</span>
-                <span class="ml-pill-label">Presentación</span>
+                <span class="ml-pill-label">Plantilla de Presentación</span>
+                <span class="ml-pill-desc">Diapositivas para ponencia oral</span>
                 <span class="ml-pill-type">PPTX</span>
             </a>
-            <a href="tutorial-estudiante.html" class="ml-pill">
+            <a href="tutorial-estudiante.html" class="ml-pill ml-pill-tutorial">
                 <span class="ml-pill-icon">🧑‍🏫</span>
                 <span class="ml-pill-label">Guía Estudiante</span>
+                <span class="ml-pill-desc">Paso a paso para enviar tu trabajo</span>
             </a>
-            <a href="tutorial-evaluador.html" class="ml-pill">
+            <a href="tutorial-evaluador.html" class="ml-pill ml-pill-tutorial">
                 <span class="ml-pill-icon">👨‍🏫</span>
                 <span class="ml-pill-label">Guía Evaluador</span>
+                <span class="ml-pill-desc">Capacitación con rúbricas oficiales</span>
             </a>
         </div>
 
-        <!-- Steps -->
+        <hr class="my-4 my-md-5 w-50 mx-auto opacity-25 d-none d-md-block">
+
+        <!-- ==================== STEPS ==================== -->
         <div class="ml-section-title">¿Cómo participar?</div>
         <div class="ml-timeline">
             <div class="ml-step">
@@ -301,14 +140,49 @@
             </div>
         </div>
 
-        <div class="ml-bottom-spacer"></div>
+        <!-- ==================== CTA (desktop inline) ==================== -->
+        <div class="ml-cta-desktop d-none d-md-flex">
+            <a href="login.html" class="btn btn-unam btn-lg px-5 shadow">Iniciar Sesión</a>
+            <a href="register.html" class="btn btn-gold btn-lg px-5 shadow">Registrarse</a>
+        </div>
     </div>
 
-    <!-- Mobile sticky CTA bar -->
+    <div class="ml-bottom-spacer d-md-none"></div>
+
+    <!-- ==================== MOBILE STICKY CTA ==================== -->
     <div class="ml-sticky-bar d-md-none">
         <a href="login.html" class="ml-btn-login">Iniciar Sesión</a>
         <a href="register.html" class="ml-btn-register">Registrarse</a>
     </div>
+
+    <!-- ==================== FOOTER (desktop only) ==================== -->
+    <footer class="footer-institutional d-none d-md-block">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-shield">UNAM</div>
+                    <p class="footer-motto"><em>Por mi raza hablará el espíritu</em></p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Entidades participantes</h6>
+                    <ul>
+                        <li>Facultad de Estudios Superiores Cuautitlán</li>
+                        <li>Facultad de Estudios Superiores Zaragoza</li>
+                        <li>Facultad de Química</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <ul>
+                        <li>sistema.congresolabiq@gmail.com</li>
+                        <li>Batalla 5 de Mayo S/N, Ejercito de Oriente, Iztapalapa, CDMX</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-hr">
+            <p class="footer-copy">&copy; 2026 Universidad Nacional Autónoma de México</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -323,29 +197,12 @@
         }
     </script>
 
-    <!-- PWA install prompt (desktop only) -->
+    <!-- PWA install prompt -->
     <script>
         let deferredPrompt;
-        const installBtn = document.createElement('button');
-        installBtn.innerHTML = "📲 Instalar App del Congreso";
-        installBtn.className = "btn btn-warning btn-sm mb-3 d-none mx-auto d-none d-md-inline-block";
-        const heroDesktop = document.querySelector('.hero-section-landing');
-        if (heroDesktop) {
-            heroDesktop.prepend(installBtn);
-        }
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (installBtn) installBtn.classList.remove('d-none');
-
-            installBtn.addEventListener('click', () => {
-                installBtn.classList.add('d-none');
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            });
         });
     </script>
 </body>

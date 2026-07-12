@@ -1289,11 +1289,10 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 
 /* ============================================================
-   MOBILE LANDING (Proposal 1) — native app feel
+   LANDING — unified hero + resources + timeline
    ============================================================ */
-.mobile-landing { background: var(--bg); }
 
-/* Hero */
+/* Hero — base (mobile first) */
 .ml-hero {
   position: relative; height: 220px; overflow: hidden;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 70%);
@@ -1310,10 +1309,12 @@ body.has-bottom-nav { padding-bottom: 64px; }
   position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column;
   justify-content: flex-end; padding: 0 20px 18px; color: #fff;
 }
+.ml-hero-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.ml-hero-text { flex: 1; min-width: 0; }
 .ml-tag {
   display: inline-block; background: var(--accent); color: var(--primary-dark);
   font-weight: 800; font-size: 0.65rem; padding: 3px 10px; border-radius: 8px;
-  margin-bottom: 8px; align-self: flex-start; letter-spacing: 0.5px;
+  margin-bottom: 8px; letter-spacing: 0.5px;
 }
 .ml-title {
   font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800;
@@ -1321,16 +1322,24 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 .ml-subtitle { color: rgba(255,255,255,0.6); font-size: 0.7rem; margin: 0; }
 .ml-meta { color: var(--accent); font-weight: 600; font-size: 0.75rem; margin-top: 6px; }
+.ml-hero-shield {
+  width: 72px; height: 72px; border: 2.5px solid var(--accent); border-radius: 50%;
+  align-items: center; justify-content: center; flex-shrink: 0;
+  background: rgba(0,0,0,0.15);
+}
+.ml-hero-shield-text {
+  color: var(--accent); font-weight: 900; font-size: 1.1rem; font-family: Georgia, serif;
+}
 
 /* Section title */
 .ml-section-title {
   font-family: var(--font-heading); font-weight: 700; font-size: 0.85rem;
-  color: var(--primary); padding: 20px 20px 10px; margin: 0;
+  color: var(--primary); padding: 20px 0 10px; margin: 0;
 }
 
-/* Resources — horizontal scroll pills */
+/* Resources — horizontal scroll pills (mobile) */
 .ml-resources {
-  display: flex; gap: 10px; padding: 0 20px 18px; overflow-x: auto;
+  display: flex; gap: 10px; padding: 0 0 18px; overflow-x: auto;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
 .ml-resources::-webkit-scrollbar { display: none; }
@@ -1342,17 +1351,19 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 .ml-pill:active { transform: scale(0.96); }
 .ml-pill:hover { background: var(--primary); }
-.ml-pill:hover .ml-pill-label { color: #fff; }
+.ml-pill:hover .ml-pill-label,
+.ml-pill:hover .ml-pill-desc { color: #fff; }
 .ml-pill-icon { font-size: 1.3rem; }
 .ml-pill-label { font-size: 0.7rem; font-weight: 600; color: var(--primary); }
+.ml-pill-desc { font-size: 0.6rem; color: var(--text-light); text-align: center; line-height: 1.3; }
 .ml-pill-type {
   font-size: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
   padding: 1px 6px; border-radius: 4px; background: var(--primary); color: #fff;
 }
 .ml-pill:hover .ml-pill-type { background: var(--accent); color: var(--primary-dark); }
 
-/* Steps — vertical timeline */
-.ml-timeline { padding: 0 20px 20px; }
+/* Steps — vertical timeline (mobile) */
+.ml-timeline { padding: 0 0 20px; }
 .ml-step { display: flex; gap: 14px; padding-bottom: 16px; }
 .ml-step:last-child { padding-bottom: 0; }
 .ml-step-line {
@@ -1377,7 +1388,7 @@ body.has-bottom-nav { padding-bottom: 64px; }
 /* Bottom spacer for sticky bar */
 .ml-bottom-spacer { height: 72px; }
 
-/* Sticky CTA bar */
+/* Sticky CTA bar (mobile) */
 .ml-sticky-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 1040;
   background: #fff; border-top: 1px solid #eee;
@@ -1402,7 +1413,56 @@ body.has-bottom-nav { padding-bottom: 64px; }
 .ml-btn-register:active { transform: scale(0.96); }
 .ml-btn-register:hover { background: var(--primary); color: #fff; }
 
-/* Mobile PWA standalone: hide address bar space */
+/* Desktop CTA (inline buttons) */
+.ml-cta-desktop {
+  justify-content: center; gap: 16px; padding: 32px 0 40px;
+}
+
+/* ============================================================
+   DESKTOP (≥768px) — wider layout
+   ============================================================ */
+@media (min-width: 768px) {
+  .ml-hero {
+    height: 300px;
+    margin-bottom: 0;
+  }
+  .ml-hero-content { padding: 0 40px 28px; }
+  .ml-title { font-size: 1.75rem; }
+  .ml-subtitle { font-size: 0.9rem; }
+  .ml-meta { font-size: 0.85rem; }
+  .ml-tag { font-size: 0.75rem; padding: 4px 14px; }
+
+  .ml-section-title {
+    font-size: 1rem; padding: 28px 0 14px;
+  }
+
+  .ml-resources {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    overflow: visible;
+  }
+  .ml-pill {
+    min-width: 0; padding: 16px; flex-direction: column; gap: 6px;
+  }
+  .ml-pill-icon { font-size: 1.5rem; }
+  .ml-pill-label { font-size: 0.85rem; }
+  .ml-pill-desc { font-size: 0.7rem; }
+
+  .ml-pill-tutorial { grid-column: span 1; }
+
+  .ml-timeline {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 0 0 20px;
+  }
+  .ml-step { flex-direction: column; align-items: center; text-align: center; padding-bottom: 0; gap: 10px; }
+  .ml-step-line { width: auto; flex-direction: row; }
+  .ml-step-dot { width: 44px; height: 44px; font-size: 1rem; }
+  .ml-step-bar { display: none; }
+  .ml-step-text h5 { font-size: 0.95rem; }
+  .ml-step-text p { font-size: 0.8rem; }
+}
+
+/* ============================================================
+   MOBILE PWA standalone
+   ============================================================ */
 @media (display-mode: standalone) {
   .ml-sticky-bar { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0)); }
 }
