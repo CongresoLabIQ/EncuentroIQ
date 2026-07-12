@@ -139,16 +139,18 @@ Enviar un nuevo trabajo académico.
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"submitWork"` |
 | `student_id` | string | Sí | ID del estudiante |
-| `titulo` | string | Sí | Título del trabajo |
-| `semestre` | string | Sí | Semestre actual |
-| `grupo` | string | Sí | Grupo |
-| `modalidad` | string | Sí | `"oral"` o `"cartel"` |
-| `asesor` | string | Sí | Nombre del profesor asesor |
-| `resumen` | string | Sí | Resumen del trabajo (máx. 250 palabras) |
-| `file_base64` | string | Sí | PDF codificado en base64 |
+| `title` | string | Sí | Título del trabajo |
+| `abstract` | string | Sí | Palabras clave / keywords |
+| `semester` | string | Sí | Semestre actual |
+| `facultad` | string | Sí | Facultad: `"FES Cuautitlán"`, `"FES Zaragoza"` o `"Facultad de Química"` |
+| `professor_cargo` | string | Sí | Nombre del profesor a cargo (texto libre) |
+| `team_members` | string | Sí | Integrantes del equipo separados por comas |
+| `modality` | string | No | `"oral"` o `"cartel"` (default: `"Pendiente"`) |
+| `fileName` | string | Sí | Nombre del archivo PDF |
+| `fileBase64` | string | Sí | PDF codificado en base64 |
 
 ```json
-{ "action": "submitWork", "student_id": "user_abc123", "titulo": "Modelado de reactores", "semestre": "2025-2", "grupo": "2451", "modalidad": "oral", "asesor": "Dr. López", "resumen": "Este trabajo presenta...", "file_base64": "JVBERi0xLjQK..." }
+{ "action": "submitWork", "student_id": "user_abc123", "title": "Modelado de reactores", "abstract": "reactores, modelado, cinetica", "semester": "5to Semestre", "facultad": "FES Cuautitlán", "professor_cargo": "Leonardo Lomelí Vanegas", "team_members": "Juan Pérez, María López", "fileName": "trabajo.pdf", "fileBase64": "JVBERi0xLjQK..." }
 ```
 
 ---

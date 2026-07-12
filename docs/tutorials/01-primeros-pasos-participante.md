@@ -53,14 +53,15 @@
 
 Desde el panel de estudiante:
 
-1. Haz clic en **Enviar nuevo trabajo** o navega a `submit-work.html`.
+1. Haz clic en **Subir trabajo** en tu panel o navega a `submit-work.html`.
 2. Completa los campos:
    - **Título del trabajo:** Claro y descriptivo.
-   - **Semestre y grupo:** Según tu inscripción actual.
-   - **Modalidad:** Selecciona **Oral** o **Cartel**.
-   - **Asesor:** El nombre del profesor responsable.
-   - **Resumen:** Escribe o pega el resumen de tu trabajo (máximo 250 palabras).
-   - **Archivo PDF:** Arrastra tu archivo al área de carga o haz clic para seleccionarlo.
+   - **Semestre:** Según tu inscripción actual.
+   - **Facultad:** FES Cuautitlán, FES Zaragoza o Facultad de Química.
+   - **Profesor a cargo:** Escribe el nombre completo del profesor.
+   - **Integrantes del equipo:** Agrega los nombres de los autores.
+   - **Palabras clave:** Escribe las keywords de tu trabajo.
+   - **Archivo PDF:** Haz clic para seleccionarlo (solo PDF, máx. 10 MB).
 3. Revisa la información. Una vez enviado, **no podrás editarlo** sin contactar al administrador.
 4. Haz clic en **Enviar trabajo**.
 
@@ -98,7 +99,7 @@ En el **Panel de Estudiante** verás una tabla con todos tus trabajos enviados. 
 | Problema | Causa posible | Solución |
 |----------|--------------|----------|
 | No puedo registrarme | Correo ya existente | Usa otro correo o solicita recuperación de contraseña |
-| No veo el botón de enviar trabajo | Sesión no iniciada | Vuelve a iniciar sesión |
+| No veo el botón de subir trabajo | Subidas desactivadas por el administrador | El admin debe activar el toggle de subida en su panel |
 | El PDF no se carga | Archivo muy grande o formato incorrecto | Comprime el PDF o conviértelo a PDF |
 | Mi trabajo aparece como "Pendiente" | Aún no ha sido evaluado | Espera la notificación del comité |
 

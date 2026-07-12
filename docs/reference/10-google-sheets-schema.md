@@ -31,18 +31,19 @@ Trabajos académicos enviados por los estudiantes.
 | Columna | Tipo | Descripción |
 |---------|------|-------------|
 | `id` | string | Identificador único del trabajo |
+| `short_id` | string | ID corto para identificación visual |
 | `student_id` | string | ID del estudiante que envía |
-| `titulo` | string | Título del trabajo |
-| `semestre` | string | Semestre del estudiante |
-| `grupo` | string | Grupo |
-| `modalidad` | string | `oral` o `cartel` |
-| `asesor` | string | Nombre del profesor asesor |
-| `resumen` | string | Resumen del trabajo |
+| `title` | string | Título del trabajo |
+| `abstract` | string | Palabras clave / keywords |
+| `semester` | string | Semestre del estudiante |
+| `facultad` | string | Facultad de procedencia |
+| `profesor_cargo` | string | Nombre del profesor a cargo |
+| `team_members` | string | Integrantes del equipo |
+| `modality` | string | `oral`, `cartel` o `Pendiente` |
 | `file_url` | string | URL del PDF en Google Drive |
-| `status` | string | `pending`, `accepted`, `rejected`, `phase2`, `completed` |
-| `total_score` | number | Puntaje total ponderado |
-| `live_score` | number | Puntaje de evaluación en vivo |
-| `created_at` | date | Fecha de envío |
+| `file_id` | string | ID del archivo en Google Drive |
+| `status` | string | `pending`, `under_review`, `accepted_oral`, `accepted_poster`, `rejected` |
+| `submitted_at` | date | Fecha de envío |
 
 ---
 

@@ -66,8 +66,8 @@
 ### Panel del estudiante (`student-dashboard.html`)
 
 - Barra superior con datos del usuario
+- Botón "Subir trabajo" dinámico (controlado por toggle del admin en `localStorage.encuentroIQ_uploadsEnabled`)
 - Lista de trabajos enviados y su estado
-- Formulario de envío de trabajos
 - Acceso a encuesta de satisfacción
 
 ### Panel del evaluador (`evaluator-dashboard.html`)
@@ -105,7 +105,7 @@ Cliente HTTP que encapsula todas las llamadas al backend. Expone un objeto globa
 | `registerUser(email, password, name, userType, adminCode, facultad)` | Registrar usuario |
 | `getUserProfile(id)` | Obtener perfil local |
 | `checkAuth()` | Verificar sesión local |
-| `submitWork(workData, file, onProgress)` | Enviar trabajo con PDF |
+| `submitWork(workData, file, onProgress)` | Enviar trabajo con PDF (incluye upload progresivo) |
 | `getStudentWorks()` | Trabajos del estudiante |
 | `submitEvaluation(data)` | Enviar evaluación |
 | `getEvaluators()` | Lista de evaluadores |
