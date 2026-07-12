@@ -47,8 +47,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold mb-0 text-primary-theme" style="font-family: var(--font-heading);">Mis Trabajos
             </h2>
-            <span class="btn btn-outline-unam fw-bold" style="cursor: not-allowed; opacity: 0.65;">🚫 La recepción de
-                trabajos terminó</span>
+            <div id="uploadAction"></div>
         </div>
 
         <div id="worksList">
@@ -118,6 +117,14 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const session = await window.apiClient.checkAuth();
             if (!session) return window.location.href = 'login.html';
+
+            const uploadsEnabled = localStorage.getItem('encuentroIQ_uploadsEnabled');
+            const actionEl = document.getElementById('uploadAction');
+            if (uploadsEnabled !== '0') {
+                actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-accent fw-bold">📤 Subir trabajo</a>';
+            } else {
+                actionEl.innerHTML = '<span class="btn btn-outline-unam fw-bold" style="cursor:not-allowed;opacity:.65">🚫 La recepción de trabajos terminó</span>';
+            }
 
             const works = await window.apiClient.getStudentWorks(session.user.id);
             const container = document.getElementById('worksList');

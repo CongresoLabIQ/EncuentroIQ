@@ -187,6 +187,11 @@
     <script src="js/config.js"></script>
     <script src="js/api-client.js"></script>
     <script>
+        // Bloquear si la subida está desactivada
+        if (localStorage.getItem('encuentroIQ_uploadsEnabled') === '0') {
+            window.location.href = 'student-dashboard.html';
+        }
+
         // --- VARIABLES GLOBALES ---
         let members = [];
         const semesterSelect = document.getElementById('semester');
