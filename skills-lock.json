@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "93f53fd1c0352d3d7ec17b8f73d7351bf76f4821e55d123c9d2abc2c53ba48e4"
+    },
+    "progressive-web-app": {
+      "source": "secondsky/claude-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/progressive-web-app/skills/progressive-web-app/SKILL.md",
+      "computedHash": "36fdf85782ec1f4569cec2c9b47129a4adcb63bd20a6c017033f0bd917b77a05"
     }
   }
 }
