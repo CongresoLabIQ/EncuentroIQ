@@ -51,7 +51,7 @@ const apiClient = {
                 title: workData.title,
                 abstract: workData.abstract,
                 semester: workData.semester,
-                group: workData.group,
+                facultad: workData.facultad,
                 professor_cargo: workData.professor_cargo,
                 team_members: workData.team_members,
                 modality: "Pendiente",

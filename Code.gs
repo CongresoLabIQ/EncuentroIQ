@@ -243,13 +243,8 @@ function doPost(e) {
       row[h.indexOf('submitted_at')] = new Date();
       row[h.indexOf('semester')] = data.semester;
       row[h.indexOf('team_members')] = data.team_members;
-      if (h.indexOf('grupo') > -1) row[h.indexOf('grupo')] = data.group;
+      if (h.indexOf('facultad') > -1) row[h.indexOf('facultad')] = data.facultad || "";
       if (h.indexOf('profesor_cargo') > -1) row[h.indexOf('profesor_cargo')] = data.professor_cargo;
-      if (h.indexOf('facultad') > -1) {
-        const users = getSheetData(db, 'users');
-        const student = users.find(u => u.id === data.student_id);
-        row[h.indexOf('facultad')] = (student && student.facultad) || "";
-      }
       
       wSheet.appendRow(row);
       SpreadsheetApp.flush();
