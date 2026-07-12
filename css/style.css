@@ -1167,16 +1167,12 @@ body.has-bottom-nav { padding-bottom: 64px; }
   .top-bar { padding-top: env(safe-area-inset-top); }
 }
 
-/* Standalone (PWA) mode: hide chrome, native feel */
+/* Standalone (PWA) mode: native feel */
 @media (display-mode: standalone) {
   body {
     -webkit-user-select: none;
     user-select: none;
-    overflow: hidden;
-    position: fixed;
-    inset: 0;
   }
-  html { height: 100%; overflow: hidden; }
 }
 
 /* Mobile: full-screen app feel */
