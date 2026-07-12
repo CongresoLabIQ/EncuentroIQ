@@ -1,6 +1,6 @@
 {
-    "name": "Encuentro IQ - Sistema de Evaluación",
-    "short_name": "EncuentroIQ",
+    "name": "9no Encuentro Estudiantil de Ingeniería Química",
+    "short_name": "9no Encuentro Estudiantil de Ingeniería Química",
     "description": "Sistema de gestión y evaluación del Encuentro de Ingeniería Química",
     "start_url": "index.html",
     "display": "standalone",
