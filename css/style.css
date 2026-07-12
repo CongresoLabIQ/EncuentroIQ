@@ -137,6 +137,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
   display: flex;
+  justify-content: center;
   gap: 6px;
   font-size: 0.75rem;
 }
