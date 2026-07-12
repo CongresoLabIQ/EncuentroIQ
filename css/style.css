@@ -1292,9 +1292,9 @@ body.has-bottom-nav { padding-bottom: 64px; }
    LANDING — unified hero + resources + timeline
    ============================================================ */
 
-/* Hero — base (mobile first) */
+/* Hero — visual banner only (text is in container) */
 .ml-hero {
-  position: relative; height: 220px; overflow: hidden;
+  position: relative; height: 140px; overflow: hidden;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 70%);
 }
 .ml-hero-bg {
@@ -1305,12 +1305,9 @@ body.has-bottom-nav { padding-bottom: 64px; }
   position: absolute; inset: 0;
   background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.25) 100%);
 }
-.ml-hero-content {
-  position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column;
-  justify-content: flex-end; padding: 0 20px 18px; color: #fff;
-}
-.ml-hero-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
-.ml-hero-text { flex: 1; min-width: 0; }
+
+/* Hero text — sits inside container, same level as section titles */
+.ml-hero-text { padding: 16px 0 0; }
 .ml-tag {
   display: inline-block; background: var(--accent); color: var(--primary-dark);
   font-weight: 800; font-size: 0.65rem; padding: 3px 10px; border-radius: 8px;
@@ -1318,18 +1315,10 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 .ml-title {
   font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800;
-  color: #fff; margin: 0 0 4px; line-height: 1.2;
+  color: var(--primary); margin: 0 0 4px; line-height: 1.2;
 }
-.ml-subtitle { color: rgba(255,255,255,0.6); font-size: 0.7rem; margin: 0; }
+.ml-subtitle { color: var(--text-light); font-size: 0.7rem; margin: 0; }
 .ml-meta { color: var(--accent); font-weight: 600; font-size: 0.75rem; margin-top: 6px; }
-.ml-hero-shield {
-  width: 72px; height: 72px; border: 2.5px solid var(--accent); border-radius: 50%;
-  align-items: center; justify-content: center; flex-shrink: 0;
-  background: rgba(0,0,0,0.15);
-}
-.ml-hero-shield-text {
-  color: var(--accent); font-weight: 900; font-size: 1.1rem; font-family: Georgia, serif;
-}
 
 /* Section title */
 .ml-section-title {
@@ -1422,11 +1411,8 @@ body.has-bottom-nav { padding-bottom: 64px; }
    DESKTOP (≥768px) — wider layout
    ============================================================ */
 @media (min-width: 768px) {
-  .ml-hero {
-    height: 300px;
-    margin-bottom: 0;
-  }
-  .ml-hero-content { padding: 0 40px 28px; }
+  .ml-hero { height: 200px; }
+  .ml-hero-text { padding: 24px 0 0; }
   .ml-title { font-size: 1.75rem; }
   .ml-subtitle { font-size: 0.9rem; }
   .ml-meta { font-size: 0.85rem; }
