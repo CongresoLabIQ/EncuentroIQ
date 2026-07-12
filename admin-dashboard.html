@@ -199,41 +199,7 @@
                         <h2 class="mb-0 text-primary-theme">Horarios</h2>
                     </div>
 
-                    <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-primary" onclick="renderGeneralSchedule()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                                <polyline points="23 4 23 10 17 10" />
-                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                            </svg>
-                            Refrescar
-                        </button>
-                        <button class="btn btn-outline-dark" onclick="printSchedule()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                                <polyline points="6 9 6 2 18 2 18 9" />
-                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                                <rect x="6" y="14" width="12" height="8" />
-                            </svg>
-                            Imprimir
-                        </button>
-                    </div>
-
-                    <div class="table-responsive" id="schedulePrintable">
-                        <table class="table table-bordered align-middle text-center">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%;">Hora</th>
-                                    <th style="width: 42%;">Auditorio UMIEZ</th>
-                                    <th style="width: 42%;">Auditorio Principal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="scheduleBody">
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2 text-primary-theme">
+                    <h3 class="mb-3 d-flex align-items-center gap-2 text-primary-theme">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -315,6 +281,51 @@
                         </svg>
                         Enviar Agendas por Correo a todos los Jueces
                     </button>
+
+                    <h3 class="mb-3 mt-2 d-flex align-items-center gap-2 text-primary-theme">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        Horario General de Ponencias
+                    </h3>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" onclick="renderGeneralSchedule()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                            </svg>
+                            Refrescar
+                        </button>
+                        <button class="btn btn-outline-dark" onclick="printSchedule()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                                <polyline points="6 9 6 2 18 2 18 9" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            Imprimir
+                        </button>
+                    </div>
+
+                    <div class="table-responsive" id="schedulePrintable">
+                        <table class="table table-bordered align-middle text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Hora</th>
+                                    <th style="width: 42%;">Auditorio UMIEZ</th>
+                                    <th style="width: 42%;">Auditorio Principal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Sección Fase 2 -->
