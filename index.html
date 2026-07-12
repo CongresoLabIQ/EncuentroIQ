@@ -19,7 +19,8 @@
 <body>
     <div id="toastContainer"></div>
 
-    <header class="top-bar">
+    <!-- ==================== DESKTOP TOP BAR ==================== -->
+    <header class="top-bar d-none d-md-block">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <div class="unam-shield"><span class="shield-inner">U</span></div>
@@ -28,18 +29,16 @@
                     <div class="top-bar-event">Encuentro Estudiantil de Ingeniería Química</div>
                 </div>
             </div>
-            <nav class="top-bar-nav d-none d-lg-flex">
+            <nav class="top-bar-nav">
                 <a href="login.html" class="top-bar-link active">Inicio</a>
                 <a href="login.html" class="top-bar-link">Ingresar</a>
                 <a href="register.html" class="top-bar-link">Registro</a>
             </nav>
-            <div class="d-flex align-items-center gap-2 d-lg-none">
-                <a href="login.html" class="btn-top-auth">Ingresar</a>
-            </div>
         </div>
     </header>
 
-    <div class="container py-4">
+    <div class="container py-4 d-none d-md-block">
+        <!-- ==================== DESKTOP HERO ==================== -->
         <div class="hero-section-landing">
             <img src="banner%20eiq.png" alt="" class="hero-bg-img">
             <div class="hero-bg-gradient"></div>
@@ -61,6 +60,7 @@
             </div>
         </div>
 
+        <!-- ==================== DESKTOP CTA ==================== -->
         <div class="d-flex gap-3 justify-content-center mb-5 flex-wrap">
             <a href="login.html" class="btn btn-unam btn-lg px-5 shadow">
                 Iniciar Sesión
@@ -70,6 +70,7 @@
             </a>
         </div>
 
+        <!-- ==================== DESKTOP RESOURCES ==================== -->
         <div class="row justify-content-center mb-5">
             <div class="col-md-10">
                 <div class="content-card p-0">
@@ -144,6 +145,7 @@
 
         <hr class="my-5 w-50 mx-auto opacity-25">
 
+        <!-- ==================== DESKTOP STEPS ==================== -->
         <h3 class="text-center mb-4 text-primary-theme">¿Cómo participar?</h3>
         <div class="row mb-4">
             <div class="col-md-3 mb-4">
@@ -180,7 +182,8 @@
         </div>
     </div>
 
-    <footer class="footer-institutional">
+    <!-- ==================== DESKTOP FOOTER ==================== -->
+    <footer class="footer-institutional d-none d-md-block">
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-4">
@@ -208,9 +211,108 @@
         </div>
     </footer>
 
+    <!-- ==================== MOBILE LANDING (Proposal 1) ==================== -->
+    <div class="mobile-landing d-md-none">
+        <!-- Hero -->
+        <div class="ml-hero">
+            <div class="ml-hero-bg"></div>
+            <div class="ml-hero-gradient"></div>
+            <div class="ml-hero-content">
+                <span class="ml-tag">9° Edición</span>
+                <h1 class="ml-title">Encuentro Estudiantil de Ingeniería Química</h1>
+                <p class="ml-subtitle">FQ · FES Cuautitlán · FES Zaragoza · UNAM</p>
+                <p class="ml-meta">Octubre 2026 · Ciudad de México</p>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="ml-section-title">Recursos y Plantillas</div>
+        <div class="ml-resources">
+            <a href="https://docs.google.com/document/d/1--IWXc6P2_iY7P7mkA14RjOWzUqnT0wMEf5hmpE-YwA/export?format=docx"
+                class="ml-pill">
+                <span class="ml-pill-icon">📄</span>
+                <span class="ml-pill-label">Resumen</span>
+                <span class="ml-pill-type">DOCX</span>
+            </a>
+            <a href="https://drive.google.com/uc?export=download&id=1F3VoWe3ZKIJHqFM2DmeCUUUZoxylNA_Y"
+                target="_blank" class="ml-pill">
+                <span class="ml-pill-icon">🖼️</span>
+                <span class="ml-pill-label">Cintillo</span>
+                <span class="ml-pill-type">PNG</span>
+            </a>
+            <a href="https://drive.google.com/uc?export=download&id=1HHG2djDVrbfBiO7J9HDR6XWjFqYUc-Cq"
+                target="_blank" class="ml-pill">
+                <span class="ml-pill-icon">📊</span>
+                <span class="ml-pill-label">Presentación</span>
+                <span class="ml-pill-type">PPTX</span>
+            </a>
+            <a href="tutorial-estudiante.html" class="ml-pill">
+                <span class="ml-pill-icon">🧑‍🏫</span>
+                <span class="ml-pill-label">Guía Estudiante</span>
+            </a>
+            <a href="tutorial-evaluador.html" class="ml-pill">
+                <span class="ml-pill-icon">👨‍🏫</span>
+                <span class="ml-pill-label">Guía Evaluador</span>
+            </a>
+        </div>
+
+        <!-- Steps -->
+        <div class="ml-section-title">¿Cómo participar?</div>
+        <div class="ml-timeline">
+            <div class="ml-step">
+                <div class="ml-step-line">
+                    <div class="ml-step-dot">1</div>
+                    <div class="ml-step-bar"></div>
+                </div>
+                <div class="ml-step-text">
+                    <h5>Envío</h5>
+                    <p>Sube tu resumen del trabajo en PDF indicando tu semestre y grupo.</p>
+                </div>
+            </div>
+            <div class="ml-step">
+                <div class="ml-step-line">
+                    <div class="ml-step-dot">2</div>
+                    <div class="ml-step-bar"></div>
+                </div>
+                <div class="ml-step-text">
+                    <h5>Evaluación</h5>
+                    <p>Tres profesores revisarán tu trabajo usando rúbricas oficiales.</p>
+                </div>
+            </div>
+            <div class="ml-step">
+                <div class="ml-step-line">
+                    <div class="ml-step-dot">3</div>
+                    <div class="ml-step-bar"></div>
+                </div>
+                <div class="ml-step-text">
+                    <h5>Selección</h5>
+                    <p>Los mejores promedios serán seleccionados para Ponencia Oral o Cartel.</p>
+                </div>
+            </div>
+            <div class="ml-step">
+                <div class="ml-step-line">
+                    <div class="ml-step-dot">4</div>
+                    <div class="ml-step-bar"></div>
+                </div>
+                <div class="ml-step-text">
+                    <h5>Evento</h5>
+                    <p>¡Presenta tu proyecto en los auditorios o área de exposición!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ml-bottom-spacer"></div>
+    </div>
+
+    <!-- Mobile sticky CTA bar -->
+    <div class="ml-sticky-bar d-md-none">
+        <a href="login.html" class="ml-btn-login">Iniciar Sesión</a>
+        <a href="register.html" class="ml-btn-register">Registrarse</a>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Registro de Service Worker para PWA -->
+    <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -221,18 +323,21 @@
         }
     </script>
 
-    <!-- Lógica de botón de instalación PWA -->
+    <!-- PWA install prompt (desktop only) -->
     <script>
         let deferredPrompt;
         const installBtn = document.createElement('button');
         installBtn.innerHTML = "📲 Instalar App del Congreso";
-        installBtn.className = "btn btn-warning btn-sm mb-3 d-none mx-auto";
-        document.querySelector('.hero-section-landing').prepend(installBtn);
+        installBtn.className = "btn btn-warning btn-sm mb-3 d-none mx-auto d-none d-md-inline-block";
+        const heroDesktop = document.querySelector('.hero-section-landing');
+        if (heroDesktop) {
+            heroDesktop.prepend(installBtn);
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.classList.remove('d-none');
+            if (installBtn) installBtn.classList.remove('d-none');
 
             installBtn.addEventListener('click', () => {
                 installBtn.classList.add('d-none');
