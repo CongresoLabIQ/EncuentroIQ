@@ -72,30 +72,23 @@
                             <option value="9no Semestre">9no Semestre</option>
                         </select>
                     </div>
-                    <!-- Grupo -->
+                    <!-- Facultad -->
                     <div class="mb-4">
-                        <label for="group" class="form-label fw-bold">Grupo *</label>
-                        <input type="text" class="form-control form-control-lg" id="group" required
-                            placeholder="Ej: 1301 o 2152">
+                        <label for="facultad" class="form-label fw-bold">Facultad *</label>
+                        <select class="form-select form-select-lg" id="facultad" required>
+                            <option value="">Selecciona tu facultad...</option>
+                            <option value="FES Cuautitlán">FES Cuautitlán</option>
+                            <option value="FES Zaragoza">FES Zaragoza</option>
+                            <option value="Facultad de Química">Facultad de Química</option>
+                        </select>
                     </div>
 
                     <!-- Profesor a cargo -->
                     <div class="mb-4">
                         <label for="professorInCharge" class="form-label fw-bold">Profesor a cargo de la asignatura
                             *</label>
-                        <select class="form-select form-select-lg" id="professorInCharge" required disabled>
-                            <option value="">Primero selecciona un semestre...</option>
-                        </select>
-                    </div>
-
-                    <!-- Campo Manual (Se activa si elige "Otro") -->
-                    <div id="manualProfessorGroup" class="mb-4 d-none">
-                        <label for="manualProfessor" class="form-label fw-bold text-primary">Escribe el nombre completo
-                            del profesor *</label>
-                        <input type="text" class="form-control form-control-lg border-primary" id="manualProfessor"
-                            placeholder="Ej: Dr. Juan Pérez">
-                        <div class="form-text">Si tu profesor no aparece en la lista, escríbelo aquí respetando
-                            mayúsculas y minúsculas.</div>
+                        <input type="text" class="form-control form-control-lg" id="professorInCharge" required
+                            placeholder="Ej: Leonardo Lomelí Vanegas">
                     </div>
                     <div class="mb-4 p-3 bg-light rounded border">
                         <div class="d-flex justify-content-between align-items-center">
@@ -195,9 +188,8 @@
         // --- VARIABLES GLOBALES ---
         let members = [];
         const semesterSelect = document.getElementById('semester');
-        const professorSelect = document.getElementById('professorInCharge');
-        const manualGroup = document.getElementById('manualProfessorGroup');
-        const manualInput = document.getElementById('manualProfessor');
+        const facultadSelect = document.getElementById('facultad');
+        const professorInput = document.getElementById('professorInCharge');
         const fileInput = document.getElementById('fileInput');
 
         // --- 1. LÓGICA DE INTEGRANTES (MÁXIMO 10) ---
@@ -247,54 +239,7 @@
             if (members.length > 0) document.getElementById('membersError').classList.add('d-none');
         }
 
-        // --- 2. LÓGICA DE PROFESORES DINÁMICOS ---
-
-        // Detectar cambio de semestre para cargar lista de profesores
-        semesterSelect.addEventListener('change', async () => {
-            const selectedSemester = semesterSelect.value;
-            manualGroup.classList.add('d-none'); // Esconder campo manual al cambiar semestre
-
-            if (!selectedSemester) {
-                professorSelect.disabled = true;
-                professorSelect.innerHTML = '<option value="">Primero selecciona un semestre...</option>';
-                return;
-            }
-
-            professorSelect.disabled = true;
-            professorSelect.innerHTML = '<option value="">⏳ Cargando profesores...</option>';
-
-            try {
-                const response = await window.apiClient.getProfessorsBySemester(selectedSemester);
-                if (response.success && response.data.length > 0) {
-                    professorSelect.disabled = false;
-                    let options = '<option value="">-- Selecciona a tu profesor --</option>';
-                    response.data.forEach(p => options += `<option value="${p.name}">${p.name}</option>`);
-                    options += `<option value="Otro">Otro (No está en la lista)</option>`;
-                    professorSelect.innerHTML = options;
-                } else {
-                    professorSelect.disabled = false;
-                    professorSelect.innerHTML = '<option value="Otro">Otro (Escribir manualmente)</option>';
-                    manualGroup.classList.remove('d-none'); // Mostrar manual si no hay lista
-                }
-            } catch (e) {
-                showToast("Error al conectar con la base de datos de profesores.", 'error');
-            }
-        });
-
-        // Mostrar/Ocultar campo manual si eligen "Otro"
-        professorSelect.addEventListener('change', () => {
-            if (professorSelect.value === 'Otro') {
-                manualGroup.classList.remove('d-none');
-                manualInput.required = true;
-                manualInput.focus();
-            } else {
-                manualGroup.classList.add('d-none');
-                manualInput.required = false;
-                manualInput.value = '';
-            }
-        });
-
-        // --- 3. MANEJO DE ARCHIVOS (PDF) ---
+        // --- 2. MANEJO DE ARCHIVOS (PDF) ---
         const area = document.getElementById('fileUploadArea');
         area.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
@@ -310,7 +255,7 @@
             }
         });
 
-        // --- 4. ENVÍO DEL FORMULARIO ---
+        // --- 3. ENVÍO DEL FORMULARIO ---
         document.getElementById('submitWorkForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -322,11 +267,8 @@
             }
 
             // Validar nombre de profesor
-            let finalProfessorName = professorSelect.value;
-            if (finalProfessorName === 'Otro') {
-                finalProfessorName = manualInput.value.trim();
-            }
-            if (!finalProfessorName) return showToast("Selecciona o escribe el nombre del profesor.", 'warning');
+            const finalProfessorName = professorInput.value.trim();
+            if (!finalProfessorName) return showToast("Escribe el nombre del profesor.", 'warning');
 
             if (fileInput.files.length === 0) return showToast('Selecciona un archivo PDF', 'warning');
 
@@ -352,7 +294,7 @@
                     title: document.getElementById('title').value,
                     abstract: document.getElementById('abstract').value,
                     semester: semesterSelect.value,
-                    group: document.getElementById('group').value,
+                    facultad: facultadSelect.value,
                     professor_cargo: finalProfessorName,
                     team_members: membersString
                 };

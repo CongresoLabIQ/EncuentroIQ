@@ -121,7 +121,7 @@
             const uploadsEnabled = localStorage.getItem('encuentroIQ_uploadsEnabled');
             const actionEl = document.getElementById('uploadAction');
             if (uploadsEnabled !== '0') {
-                actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-accent fw-bold">📤 Subir trabajo</a>';
+                actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-outline-accent fw-bold">📤 Subir trabajo</a>';
             } else {
                 actionEl.innerHTML = '<span class="btn btn-outline-unam fw-bold" style="cursor:not-allowed;opacity:.65">🚫 La recepción de trabajos terminó</span>';
             }
