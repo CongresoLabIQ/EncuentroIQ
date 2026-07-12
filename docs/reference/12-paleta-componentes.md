@@ -163,6 +163,54 @@ Contenido científico
 - Filas alternadas (zebra striping)
 - Badges de estado con colores semánticos
 
+### Bottom nav (admin)
+
+```
+┌──────────┬──────────┬──────────┐
+│ Dashboard│ Horarios │  Fase 2  │
+│   [▣]    │   [📅]   │   [🏆]   │
+└──────────┴──────────┴──────────┘
+```
+
+- Fija en la parte inferior (`position: fixed; bottom: 0`)
+- Fondo blanco con sombra superior
+- 3 items: Dashboard, Horarios, Fase 2
+- Icono SVG + label de texto
+- Item activo con color `--primary`
+- Badge de notificación (ej. número de trabajos listos para dictaminar)
+- Solo visible en el panel del administrador
+
+### Upload toggle
+
+```
+Subida activa  [●───]
+```
+
+- Switch CSS personalizado (sin dependencias)
+- Persiste en `localStorage` con key `encuentroIQ_uploadsEnabled`
+- Label dinámico: "Subida activa" / "Subida desactivada"
+
+### Eval progress dots
+
+```
+✓ ✓ 2/3    │  ✓ - -  │  - - -
+```
+
+- Puntos circulares que indican progreso de evaluación
+- `done`: fondo verde, ✓ | `active`: fondo primario, número | `pending`: fondo gris claro, número
+- Acompañado de label `completed/total`
+
+### Avg score ring
+
+```
+┌───┐
+│85 │  (fondo verde si ≥80, amarillo si ≥60, rojo si <60)
+└───┘
+```
+
+- Badge circular con color semántico según puntaje
+- `high`: verde | `mid`: amarillo | `low`: rojo
+
 ---
 
 ## Responsive design
@@ -176,7 +224,24 @@ Contenido científico
 | > 1200px | Desktop grande |
 
 Comportamiento responsive:
-- Sidebar se colapsa a menú hamburguesa
 - Tablas se desplazan horizontalmente
 - Stats grid se apila verticalmente
 - Top bar simplifica navegación
+
+### Mobile PWA (≤767px)
+
+- **Top bar + breadcrumb ocultos** para vista inmersiva
+- **Footer oculto** para maximizar espacio
+- **Viewport:** `height: 100dvh` con `overflow: hidden`
+- **Standalone detection:** `window.matchMedia('(display-mode: standalone)')` aplica estilos adicionales
+  - `overflow: hidden`, `position: fixed`, `user-select: none`
+- **Touch feedback:** `:active` con `transform: scale(0.97)` en botones/cards
+- **Sección transitions:** Animación `fadeUp` al cambiar de pestaña
+- **Safe area insets:** `env(safe-area-inset-bottom)` para dispositivos con notch
+- **Overscroll:** `overscroll-behavior: contain` para prevenir pull-to-refresh
+
+### Split-view evaluador (≥992px)
+
+- Layout dividido: iframe PDF a la izquierda (50%) + rúbrica a la derecha (50%)
+- Modal de evaluación se expande a `90vw` y `90vh`
+- En móvil: mantiene modal tradicional

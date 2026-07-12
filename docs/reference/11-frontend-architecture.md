@@ -54,10 +54,38 @@
      │                │                  │
      ▼                ▼                  ▼
 ┌──────────┐   ┌──────────────┐   ┌─────────────┐
-│ submit-  │   │ Evaluación   │   │ Gestión     │
-│ work.html│   │ en vivo      │   │ completa    │
+│ submit-  │   │ Split-view   │   │ Bottom nav  │
+│ work.html│   │ PDF + Rúbrica│   │ 3 pestañas  │
 └──────────┘   └──────────────┘   └─────────────┘
 ```
+
+---
+
+## Paneles de usuario
+
+### Panel del estudiante (`student-dashboard.html`)
+
+- Barra superior con datos del usuario
+- Lista de trabajos enviados y su estado
+- Formulario de envío de trabajos
+- Acceso a encuesta de satisfacción
+
+### Panel del evaluador (`evaluator-dashboard.html`)
+
+- **Split-view en desktop (≥992px):** Panel dividido con iframe del PDF a la izquierda (50%) y rúbrica de evaluación a la derecha (50%).
+- **Modal en móvil:** Rúbrica en modal con fondo oscurecido.
+- El PDF se carga automáticamente al abrir el modal de evaluación.
+- Las URLs de Google Drive se convierten al formato `/preview` para embedding correcto.
+
+### Panel del administrador (`admin-dashboard.html`)
+
+Navegación por **bottom nav fija** con 3 pestañas:
+
+| Pestaña | Contenido |
+|---------|-----------|
+| **Dashboard** | Toggle subida activa · Botón Asignar Fase 1 · Botón Dictaminar (N) · Tabla de seguimiento de evaluaciones con filtros · Botón "Ver evaluadores" por trabajo · Sección "Listos para Dictaminar" |
+| **Horarios** | Asignar evaluadores Fase 2 · Caso de Emergencia · Enviar Agendas por correo · Tabla de horario general de ponencias |
+| **Fase 2** | Reconocimientos por ciclo académico (Top 3 Oral + Top 3 Cartel) · Generación de constancias |
 
 ---
 
@@ -115,11 +143,11 @@ Lógica específica para la asignación de evaluaciones:
 
 ## Estilos (CSS)
 
-El archivo `css/style.css` (~778 líneas) contiene:
+El archivo `css/style.css` contiene:
 
 - **Variables CSS:** Paleta de colores UNAM, tipografía, sombras
 - **Top bar:** Barra superior fija con logo institucional
-- **Sidebar:** Navegación lateral para paneles
+- **Bottom nav (admin):** Navegación inferior fija con iconos SVG + labels + badge. Solo 3 items en desktop.
 - **Hero banner:** Gradiente azul con texto dorado
 - **Cards:** Componentes de tarjeta reutilizables
 - **Stats grid:** Cuadrícula de indicadores numéricos
@@ -127,8 +155,13 @@ El archivo `css/style.css` (~778 líneas) contiene:
 - **Star ratings:** Estrellas interactivas para encuestas
 - **File upload:** Área drag-and-drop para PDFs
 - **Data tables:** Tablas responsivas
+- **Upload toggle:** Switch para activar/desactivar subida de trabajos
+- **Eval progress dots:** Puntos de progreso de evaluación (done/active/pending)
+- **Avg score ring:** Anillo de puntaje promedio con colores semánticos
+- **Split-view evaluador:** Layout dividido PDF+rúbrica en desktop
+- **Mobile PWA:** Estilos para viewport `100dvh`, standalone detection, touch feedback, sección transitions
 - **Formularios:** Inputs, botones, selects estilizados
-- **Responsive:** Media queries para móvil y tablet
+- **Responsive:** Media queries para móvil, tablet y desktop
 
 ---
 
