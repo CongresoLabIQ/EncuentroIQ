@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel del Alumno</title>
+    <meta name="description" content="Panel del alumno — consulta el estado de tus trabajos enviados al Encuentro de Ingeniería Química.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" as="style">
@@ -18,7 +19,9 @@
 </head>
 
 <body>
-    <div id="toastContainer"></div>
+    <a href="#mainContent" class="skip-link">Saltar al contenido principal</a>
+    <button id="themeToggle" class="theme-toggle" aria-label="Cambiar a modo oscuro"></button>
+    <div id="toastContainer" role="status" aria-live="polite"></div>
 
     <header class="top-bar">
         <div class="container d-flex align-items-center justify-content-between">
@@ -44,7 +47,7 @@
         </div>
     </nav>
 
-    <div class="container py-4">
+    <main id="mainContent" class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold mb-0 text-primary-theme" style="font-family: var(--font-heading);">Mis Trabajos
             </h2>
@@ -67,7 +70,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <div class="modal fade" id="feedbackModal" tabindex="-1">
         <div class="modal-dialog">
@@ -120,6 +123,29 @@
     <script src="js/config.js"></script>
     <script src="js/api-client.js"></script>
     <script>
+    // Dark mode init
+    (function() {
+      const saved = localStorage.getItem('encuentroIQ_theme');
+      if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      const btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      function updateIcon() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.innerHTML = isDark
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        btn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+      updateIcon();
+      btn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('encuentroIQ_theme', 'light'); }
+        else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('encuentroIQ_theme', 'dark'); }
+        updateIcon();
+      });
+    })();
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const session = await window.apiClient.checkAuth();
             if (!session) return window.location.href = 'login.html';
@@ -136,11 +162,11 @@
             const container = document.getElementById('worksList');
 
             if (works.length === 0) {
-                container.innerHTML = '<div class="alert alert-secondary text-center">No has enviado trabajos aún.</div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3 class="empty-state-title">Sin trabajos enviados</h3><p class="empty-state-desc">Aún no has enviado ningún trabajo al Encuentro. Sube tu resumen en PDF para participar.</p>' + (uploadsEnabled !== '0' ? '<a href="submit-work.html" class="btn btn-gold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Enviar mi primer trabajo</a>' : '') + '</div>';
                 return;
             }
 
-            container.innerHTML = works.map(w => {
+            container.innerHTML = works.map((w, i) => {
                 const statusData = getStatusDisplay(w.status);
                 const hasFeedback = w.feedback && w.feedback.length > 5;
                 const feedbackBtn = hasFeedback
@@ -148,7 +174,7 @@
                     : '';
 
                 return `
-        <div class="content-card mb-3">
+        <div class="content-card mb-3 animate-fadeUp animate-delay-${Math.min(i + 1, 4)}">
             <div class="content-card-body">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
