@@ -793,7 +793,7 @@
                     ${workUMIEZ ? `
                         <div class="p-2 border rounded bg-white shadow-sm">
                             <span class="badge bg-primary mb-1">${workUMIEZ.short_id}</span><br>
-                            <small class="fw-bold d-block text-truncate">${workUMIEZ.title}</small>
+                            <small class="fw-bold d-block schedule-title">${workUMIEZ.title}</small>
                             <small class="text-muted">${workUMIEZ.semester}</small>
                         </div>
                     ` : '<em class="text-muted small">Disponible</em>'}
@@ -802,7 +802,7 @@
                     ${workPrincipal ? `
                         <div class="p-2 border rounded bg-white shadow-sm">
                             <span class="badge bg-success mb-1">${workPrincipal.short_id}</span><br>
-                            <small class="fw-bold d-block text-truncate">${workPrincipal.title}</small>
+                            <small class="fw-bold d-block schedule-title">${workPrincipal.title}</small>
                             <small class="text-muted">${workPrincipal.semester}</small>
                         </div>
                     ` : '<em class="text-muted small">Disponible</em>'}
