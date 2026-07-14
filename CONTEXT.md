@@ -19,7 +19,7 @@ PWA para el **9no Encuentro Estudiantil de Ingeniería Química (UNAM)**. Permit
 - **Design system:** `--primary: #003D79`, `--accent: #D59F0F`, `--radius: 30px`, `--radius-sm: 12px`.
 - **Commits:** Formato `feat(design): descripción` con body en español con bullet points.
 - **Push:** Siempre a `main`. Repo: `https://github.com/CongresoLabIQ/EncuentroIQ.git`
-- **Skills instalados:** `progressive-web-app`, `design-taste-frontend` (en `.agents/skills/`). No push notifications.
+- **Skills instalados:** `progressive-web-app`, `design-taste-frontend`, `ui-ux-pro-max` (en `.agents/skills/`). No push notifications.
 - **PWA:** manifest.json + service-worker.js. Sin push notifications (descartado por el usuario).
 
 ---

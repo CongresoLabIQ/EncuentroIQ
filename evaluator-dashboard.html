@@ -7,6 +7,7 @@
     <title>Panel Evaluador - Congreso</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.ico">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" as="style">
     <link href="css/style.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#003D79">
@@ -44,7 +45,7 @@
     </nav>
 
     <div id="agendaNotice" class="alert alert-warning d-none animate__animated animate__bounceIn">
-        <strong>📌 Recordatorio:</strong> Tienes una evaluación en el
+        <strong><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Recordatorio:</strong> Tienes una evaluación en el
         <span id="nextRoom" class="fw-bold"></span> a las
         <span id="nextTime" class="fw-bold"></span>.
     </div>
@@ -56,12 +57,14 @@
             <li class="nav-item">
                 <button class="nav-link active" id="phase1-tab" data-bs-toggle="tab" data-bs-target="#phase1"
                     type="button">
-                    📄 Fase 1: Resumenes
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Fase 1: Resumenes
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="phase2-tab" data-bs-toggle="tab" data-bs-target="#phase2" type="button">
-                    🎤 Fase 2: Presentación oral/cartel
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    Fase 2: Presentación oral/cartel
                 </button>
             </li>
         </ul>
@@ -72,7 +75,7 @@
             <div class="tab-pane fade show active" id="phase1">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-secondary mb-0">Evaluación de Escritos</h4>
-                    <button class="btn btn-sm btn-outline-primary" onclick="loadPhase1()">🔄 Actualizar</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadPhase1()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Actualizar</button>
                 </div>
                 <div class="alert alert-info">
                     <strong>Instrucciones:</strong> Abre el PDF de cada trabajo, califícalo del 0 al 100.
@@ -141,8 +144,8 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-unam text-white">
-                    <h5 class="modal-title">📋 Evaluación de Resumenes</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Evaluación de Resumenes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <div id="evalPdfPanel" class="eval-pdf-panel">
@@ -156,7 +159,8 @@
                         </div>
                         <div class="col-md-4 text-end">
                             <a id="evalWorkUrl" href="#" target="_blank" class="btn btn-outline-primary fw-bold">
-                                📄 Leer Trabajo (PDF)
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Leer Trabajo (PDF)
                             </a>
                         </div>
                     </div>
@@ -169,7 +173,7 @@
                     <div class="alert alert-warning border-start border-4 border-warning mb-3"
                         id="cumpleExtensionSection">
                         <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <strong class="fs-6">📏 ¿Cumple con la extensión?</strong>
+                            <strong class="fs-6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> ¿Cumple con la extensión?</strong>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="cumpleExtension" id="cumpleSi"
                                     value="si" onchange="toggleCumpleExtension()">
@@ -182,7 +186,7 @@
                             </div>
                         </div>
                         <div id="cumpleWarning" class="d-none mt-2">
-                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", el trabajo será rechazado
+                            <small class="text-danger fw-bold">Al seleccionar "No", el trabajo será rechazado
                                 directamente. No es necesario evaluar la rúbrica.</small>
                         </div>
                     </div>
@@ -361,10 +365,10 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-primary" onclick="guardarBorrador()">💾 Guardar
-                        Borrador</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="guardarBorrador()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar Borrador</button>
                     <button type="button" class="btn btn-success btn-lg fw-bold" onclick="submitEval()">
-                        🚀 Guardar Evaluación
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Guardar Evaluación
                     </button>
                 </div>
             </div>
@@ -376,8 +380,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-unam text-white">
-                    <h5 class="modal-title">🎤 Evaluación de Presentación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Evaluación de Presentación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <h5 id="liveWorkTitle" class="mb-3 text-primary-theme"></h5>
@@ -389,7 +393,7 @@
                     <!-- ✅ ¿Se presentó el trabajo? -->
                     <div class="alert alert-warning border-start border-4 border-warning mb-3" id="sePresentoSection">
                         <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <strong class="fs-6">🎤 ¿Se presentó el trabajo?</strong>
+                            <strong class="fs-6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> ¿Se presentó el trabajo?</strong>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="sePresento" id="sePresentoSi"
                                     value="si" onchange="toggleSePresento()">
@@ -402,7 +406,7 @@
                             </div>
                         </div>
                         <div id="sePresentoWarning" class="d-none mt-2">
-                            <small class="text-danger fw-bold">⚠️ Al seleccionar "No", la calificación será 0
+                            <small class="text-danger fw-bold">Al seleccionar "No", la calificación será 0
                                 automáticamente.</small>
                         </div>
                     </div>
@@ -722,7 +726,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success fw-bold" onclick="submitLive()">
-                        ✅ Enviar Calificación
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>
+                        Enviar Calificación
                     </button>
                 </div>
             </div>
@@ -779,7 +784,7 @@
             let html = '';
 
             // SECCIÓN 1: PENDIENTES
-            html += `<div class="col-12 mb-3"><h5 class="text-danger fw-bold">⏳ Pendientes por Evaluar (${pending.length})</h5><hr></div>`;
+            html += `<div class="col-12 mb-3"><h5 class="text-danger fw-bold"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pendientes por Evaluar (${pending.length})</h5><hr></div>`;
 
             if (pending.length === 0) {
                 html += `<div class="col-12"><div class="alert alert-light text-center border">No tienes evaluaciones pendientes.</div></div>`;
@@ -789,7 +794,7 @@
 
             // SECCIÓN 2: EVALUADOS (HISTORIAL)
             if (completed.length > 0) {
-                html += `<div class="col-12 mb-3 mt-5"><h5 class="text-success fw-bold">✅ Evaluados / Historial (${completed.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3 mt-5"><h5 class="text-success fw-bold"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Evaluados / Historial (${completed.length})</h5><hr></div>`;
                 html += completed.map(a => renderWorkCard(a, true)).join('');
             }
 
@@ -813,19 +818,20 @@
                 ${isCompleted ? '<span class="badge bg-light text-success border border-success">Evaluado</span>' : ''}
             </div>
             <h5 class="text-dark fw-bold mb-1" style="font-size: 1.1rem;">${title}</h5>
-            <p class="mb-1 text-muted small">👤 Alumno: ${work.student_name || 'N/D'}</p>
-            <p class="mb-2 text-muted small">📅 Semestre: ${semester}</p>
+            <p class="mb-1 text-muted small"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Alumno: ${work.student_name || 'N/D'}</p>
+            <p class="mb-2 text-muted small"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Semestre: ${semester}</p>
             
             <div class="row g-2 mt-2">
                 <div class="col-6">
                     <a href="${pdfUrl}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 ${!pdfUrl ? 'disabled' : ''}">
-                        📄 Ver PDF
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Ver PDF
                     </a>
                 </div>
                 <div class="col-6">
                     <button class="btn ${isCompleted ? 'btn-success' : 'btn-primary'} btn-sm w-100"
                         onclick="openEval('${a.id}', '${a.work_id}', '${title}', '${pdfUrl}', '${semester}')">
-                        ${isCompleted ? '👁️ Ver' : '📝 Evaluar'}
+                        ${isCompleted ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ver' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Evaluar'}
                     </button>
                 </div>
             </div>
@@ -1096,7 +1102,7 @@
                     showToast('Error de conexión.', 'error');
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = '🚀 Guardar Evaluación';
+                    btn.innerHTML = 'Guardar Evaluación';
                 }
                 return;
             }
@@ -1145,7 +1151,7 @@
                 showToast('Error de conexión.', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚀 Guardar Evaluación';
+                btn.innerHTML = 'Guardar Evaluación';
             }
         }
         // ============================================================
@@ -1175,7 +1181,7 @@
             function renderCard(a) {
                 const isOral = (a.works?.status || '').includes('oral');
                 const isCompleted = a.status === 'completed';
-                const modalityLabel = isOral ? '🎤 Ponencia' : '📊 Cartel';
+                const modalityLabel = isOral ? 'Ponencia' : 'Cartel';
                 const modalityParam = isOral ? 'ponencia' : 'cartel';
                 const score = a.evaluation?.total_score;
 
@@ -1212,12 +1218,12 @@
             }
 
             if (orales.length > 0) {
-                html += `<div class="col-12 mb-3"><h5 class="fw-bold text-primary-theme">🎤 Ponencia (${orales.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3"><h5 class="fw-bold text-primary-theme"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Ponencia (${orales.length})</h5><hr></div>`;
                 html += orales.map(renderCard).join('');
             }
 
             if (carteles.length > 0) {
-                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold text-success">📊 Cartel (${carteles.length})</h5><hr></div>`;
+                html += `<div class="col-12 mb-3 mt-4"><h5 class="fw-bold text-success"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Cartel (${carteles.length})</h5><hr></div>`;
                 html += carteles.map(renderCard).join('');
             }
 
@@ -1352,7 +1358,7 @@
                 const res = await window.apiClient.submitLiveEvaluation(data);
 
                 btn.disabled = false;
-                btn.innerHTML = '✅ Enviar Calificación';
+                btn.innerHTML = 'Enviar Calificación';
 
                 if (res.success) {
                     bootstrap.Modal.getInstance(document.getElementById('liveModal')).hide();
@@ -1405,7 +1411,7 @@
             const res = await window.apiClient.submitLiveEvaluation(data);
 
             btn.disabled = false;
-            btn.innerHTML = '✅ Enviar Calificación';
+            btn.innerHTML = 'Enviar Calificación';
 
             if (res.success) {
                 bootstrap.Modal.getInstance(document.getElementById('liveModal')).hide();
@@ -1417,10 +1423,16 @@
         }
 
         async function logout() {
+            if (!confirm('¿Estás seguro de que deseas cerrar sesión?')) return;
             await window.apiClient.logoutUser();
             window.location.href = 'index.html';
         }
     </script>
+
+    <!-- Floating logout button -->
+    <button class="floating-logout" onclick="logout()" aria-label="Cerrar sesión">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
 
     <footer class="footer-institutional">
         <div class="container">
