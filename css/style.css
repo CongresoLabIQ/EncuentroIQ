@@ -707,6 +707,26 @@ h1, h2, h3, h4, h5, h6 {
   #scheduleSection { position: absolute; left: 0; top: 0; width: 100%; }
 }
 
+/* Schedule table — no horizontal scroll */
+#schedulePrintable table {
+  table-layout: fixed;
+  width: 100%;
+}
+#schedulePrintable table td,
+#schedulePrintable table th {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 0.8rem;
+  padding: 8px 6px;
+}
+@media (max-width: 576px) {
+  #schedulePrintable table td,
+  #schedulePrintable table th {
+    font-size: 0.7rem;
+    padding: 6px 4px;
+  }
+}
+
 /* Winners cards */
 #winnersByCycle .col-md-4.mb-3 .card .card-header.bg-primary { background: var(--primary) !important; }
 
