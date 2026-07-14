@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.3.0] — 2026-07-13
+
+### Added
+- **Dark mode completo:** Toggle fijo (sol/luna) en esquina superior derecha. Persiste en localStorage (`encuentroIQ_theme`). Sobreescribe variables CSS `--primary` a `#4d9de0` y `--accent` a `#f0b830` para contraste en fondo oscuro. Overrides para Bootstrap `.table`, `.btn-outline-*`, `.form-*`, `.modal`, `.alert`, `.nav-tabs`, `.badge`, `.dropdown`, `.card`, `.text-*` utilities.
+- **Página 404 personalizada:** `404.html` con icono SVG ilustrado, título, descripción y botón "Volver al Inicio".
+- **Skip link (accesibilidad):** Enlace "Saltar al contenido principal" en todas las páginas. Visible al hacer Tab. Apunta a `<main id="mainContent">`.
+- **Empty state mejorado (student-dashboard):** Icono SVG en círculo, título descriptivo, texto explicativo y botón CTA "Enviar mi primer trabajo" (solo si las subidas están activas).
+- **Animaciones de entrada:** Clases `.animate-fadeUp` + `.animate-delay-1..4` para tarjetas de trabajo con animación escalonada.
+- **Meta descriptions SEO:** `<meta name="description">` en las 13 páginas HTML del proyecto.
+- **Toast accesible:** `role="status"` + `aria-live="polite"` en el contenedor `#toastContainer`. Los toasts ahora son anunciados por lectores de pantalla.
+
+### Changed
+- **Skeleton loading:** Ya existía en los 3 dashboards (student, evaluator, admin) — verificado consistente.
+- **Manifest JSON:** Ya tenía iconos `icon-192.png` y `icon-512.png` correctos en `assets/` — sin cambios necesarios.
+- **Lazy loading de imágenes:** N/A — no hay tags `<img>` en el proyecto (el banner usa CSS `background-image`).
+
+### Fixed
+- **Contraste dark mode mejorado:** `--primary` se sobreescribe a `#4d9de0` en dark mode (antes `#003D79` se perdía en fondo oscuro). Colores `text-success/danger/warning/info/muted` con `!important` y valores bright.
+- **Tabla admin dashboard bordes blancos:** Overrides agresivos con `!important` en `--bs-table-bg`, `--bs-table-border-color`, `thead th`, `tbody tr/td`. El wrapper `.card.border-0` ahora tiene fondo dark.
+- **Botón "Subir trabajo" invisible en dark mode:** `btn-outline-accent` ahora tiene `color: var(--accent)` bright con borde visible.
+- **Toggle dark mode en index.html no funcionaba:** `index.html` ahora carga `app.js` que inicializa `initDarkMode()` (antes no lo cargaba, el botón estaba vacío sin funcionalidad).
+- **SVG icono del toggle no visible:** Añadido `.theme-toggle svg { display: block }` para asegurar rendering del icono.
+
 ## [1.2.0] — 2026-07-11
 
 ### Added
