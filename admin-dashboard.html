@@ -20,7 +20,6 @@
 
 <body>
     <a href="#mainContent" class="skip-link">Saltar al contenido principal</a>
-    <button id="themeToggle" class="theme-toggle" aria-label="Cambiar a modo oscuro"></button>
     <div id="toastContainer" role="status" aria-live="polite"></div>
 
     <header class="top-bar">
@@ -38,6 +37,7 @@
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
                     </svg> Administrador</span>
+                <button id="themeToggle" class="theme-toggle" aria-label="Cambiar a modo oscuro"></button>
                 <button class="top-bar-link" onclick="handleLogout()">Salir</button>
             </div>
         </div>
@@ -655,7 +655,7 @@
             const works = allWorks.filter(w => w.status.includes('accepted'));
             const judges = await window.apiClient.getEvaluators();
 
-            document.getElementById('emWork').innerHTML = works.map(w => `<option value="${w.id}">${w.title} (${w.grupo})</option>`).join('');
+            document.getElementById('emWork').innerHTML = works.map(w => `<option value="${w.id}">${w.title} (${w.facultad || 'Sin facultad'})</option>`).join('');
             document.getElementById('emJudge').innerHTML = judges.map(j => `<option value="${j.id}">${j.name}</option>`).join('');
 
             new bootstrap.Modal(document.getElementById('emergencyModal')).show();

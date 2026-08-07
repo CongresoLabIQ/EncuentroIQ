@@ -707,8 +707,13 @@
                 </select>
               </div>
               <div class="col-6">
-                <label style="font-size:0.8rem;font-weight:600;">Grupo *</label>
-                <input type="text" class="form-control form-control-sm" id="subGroup" placeholder="Ej: 1301">
+                <label style="font-size:0.8rem;font-weight:600;">Facultad *</label>
+                <select class="form-select form-select-sm" id="subFacultad">
+                  <option value="">Selecciona...</option>
+                  <option>FES Cuautitlán</option>
+                  <option>FES Zaragoza</option>
+                  <option>Facultad de Química</option>
+                </select>
               </div>
             </div>
             <div class="mb-2">
@@ -1115,15 +1120,15 @@
     function simulateSubmit() {
       const title = document.getElementById('subTitle').value.trim();
       const sem = document.getElementById('subSemester').value;
-      const group = document.getElementById('subGroup').value.trim();
+      const facultad = document.getElementById('subFacultad').value.trim();
       const prof = document.getElementById('subProfessor').value.trim();
       const modal = document.querySelector('input[name="subModality"]:checked');
       const fb = document.getElementById('submitFeedback');
       const fileSel = document.getElementById('fileSelected').style.display === 'block';
 
-      if (!title || !sem || !group || !prof || !modal) {
+      if (!title || !sem || !facultad || !prof || !modal) {
         fb.className = 'feedback-box error';
-        fb.textContent = '❌ Completa todos los campos obligatorios (título, semestre, grupo, profesor, modalidad).';
+        fb.textContent = '❌ Completa todos los campos obligatorios (título, semestre, facultad, profesor, modalidad).';
         return;
       }
       if (members.length === 0) {
@@ -1147,7 +1152,7 @@
       const items = document.querySelectorAll('.flow-item');
       const info = document.getElementById('flowInfo');
       const descriptions = [
-        '📤 <strong>Envío:</strong> Completas el formulario con título, semestre, grupo, profesor, integrantes y subes tu PDF. ¡Asegúrate de que todo esté correcto!',
+        '📤 <strong>Envío:</strong> Completas el formulario con título, semestre, facultad, profesor, integrantes y subes tu PDF. ¡Asegúrate de que todo esté correcto!',
         '👀 <strong>En revisión:</strong> Tres evaluadores asignados por el comité calificarán tu trabajo usando la rúbrica oficial (0-100 pts). Este proceso toma algunos días.',
         '⚖️ <strong>Dictaminación:</strong> El administrador revisa los puntajes y asigna modalidad: <strong>Oral</strong> (mejores promedios), <strong>Cartel</strong> o <strong>Rechazo</strong>.',
         '🏆 <strong>Resultado final:</strong> Los aceptados presentan en el evento. Se generan certificados automáticos para todos los integrantes.'

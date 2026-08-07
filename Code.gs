@@ -444,8 +444,46 @@ function doPost(e) {
       result = { success: true, count: count };
     }
 
+    else if (data.action === 'assignManualLive') {
+      const lSheet = db.getSheetByName('live_assignments');
+      const existing = getSheetData(db, 'live_assignments');
+      if (existing.some(a => a.work_id === data.work_id && a.evaluator_id === data.evaluator_id)) {
+        result = { success: false, error: 'Ese juez ya está asignado a ese trabajo.' };
+      } else {
+        lSheet.appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
+        result = { success: true };
+      }
+    }
+
     else if (data.action === 'submitLiveEvaluation') {
-      db.getSheetByName('live_evaluations').appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, data.total_score, data.s1, data.s2, data.s3, data.s4, data.s5, data.s6, data.comments, new Date()]);
+      const evSheet = db.getSheetByName('live_evaluations');
+      const headers = evSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
+      const fields = {
+        id: Utilities.getUuid(),
+        work_id: data.work_id,
+        evaluator_id: data.evaluator_id,
+        total_score: data.total_score,
+        s1: data.s1, s2: data.s2, s3: data.s3, s4: data.s4,
+        s5: data.s5, s6: data.s6, s7: data.s7, s8: data.s8,
+        c1: data.c1, c2: data.c2, c3: data.c3, c4: data.c4,
+        c5: data.c5, c6: data.c6, c7: data.c7, c8: data.c8,
+        c9: data.c9, c10: data.c10,
+        comments: data.comments,
+        timestamp: new Date()
+      };
+      const row = [];
+      Object.keys(fields).forEach(k => {
+        let idx = headers.indexOf(k);
+        if (idx === -1) {
+          evSheet.getRange(1, headers.length + 1).setValue(k);
+          headers.push(k);
+          idx = headers.length - 1;
+        }
+        row[idx] = fields[k];
+      });
+      for (let i = 0; i < headers.length; i++) if (row[i] === undefined) row[i] = "";
+      evSheet.appendRow(row);
+
       updateRow(db, 'live_assignments', 'id', data.assignment_id, { status: 'completed', completed_at: new Date() });
       const evs = getSheetData(db, 'live_evaluations').filter(e => e.work_id === data.work_id);
       const avg = (evs.reduce((s, c) => s + Number(c.total_score), 0) / evs.length).toFixed(2);
