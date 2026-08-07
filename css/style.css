@@ -1327,7 +1327,7 @@ body.has-bottom-nav { padding-bottom: 64px; }
 }
 .ml-hero-bg {
   position: absolute; inset: 0;
-  background: url('../banner%20eiq.png') center/cover no-repeat; opacity: 0.18;
+  background: url('../banner%20eiqm.png') center/cover no-repeat; opacity: 0.18;
 }
 .ml-hero-gradient {
   position: absolute; inset: 0;
@@ -1441,6 +1441,9 @@ body.has-bottom-nav { padding-bottom: 64px; }
    ============================================================ */
 @media (min-width: 768px) {
   .ml-hero { height: 300px; }
+  .ml-hero-bg {
+    background-image: url('../banner%20eiq.png');
+  }
   .ml-hero-content { padding-bottom: 28px; }
   .ml-title { font-size: 1.75rem; }
   .ml-subtitle { font-size: 0.9rem; }

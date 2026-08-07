@@ -123,7 +123,7 @@ function obtenerFechaEvento() {
       }
     }
   }
-  return '15-17 de julio de 2026';
+  return '23 de octubre de 2026';
 }
 
 function obtenerCodigoEvaluador() {
