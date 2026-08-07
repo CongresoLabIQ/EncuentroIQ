@@ -59,22 +59,6 @@
                             placeholder="Ej: Investigación sobre...">
                     </div>
 
-                    <!-- Semestre -->
-                    <div class="mb-4">
-                        <label for="semester" class="form-label fw-bold">Semestre Actual *</label>
-                        <select class="form-select form-select-lg" id="semester" required>
-                            <option value="">Selecciona tu semestre...</option>
-                            <option value="1er Semestre">1er Semestre</option>
-                            <option value="2do Semestre">2do Semestre</option>
-                            <option value="3er Semestre">3er Semestre</option>
-                            <option value="4to Semestre">4to Semestre</option>
-                            <option value="5to Semestre">5to Semestre</option>
-                            <option value="6to Semestre">6to Semestre</option>
-                            <option value="7mo Semestre">7mo Semestre</option>
-                            <option value="8vo Semestre">8vo Semestre</option>
-                            <option value="9no Semestre">9no Semestre</option>
-                        </select>
-                    </div>
                     <!-- Facultad -->
                     <div class="mb-4">
                         <label for="facultad" class="form-label fw-bold">Facultad *</label>
@@ -86,17 +70,74 @@
                         </select>
                     </div>
 
-                    <!-- Profesor a cargo -->
+                    <!-- Etapa académica -->
                     <div class="mb-4">
-                        <label for="professorInCharge" class="form-label fw-bold">Profesor a cargo de la asignatura
-                            *</label>
-                        <input type="text" class="form-control form-control-lg" id="professorInCharge" required
-                            placeholder="Ej: Leonardo Lomelí Vanegas">
+                        <label class="form-label fw-bold">Etapa académica *</label>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="etapa" id="etapaEscolar"
+                                    value="proyecto escolar (estudiantes)">
+                                <label class="form-check-label" for="etapaEscolar">Proyecto escolar (estudiantes)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="etapa" id="etapaServicio"
+                                    value="proyecto de servicio social">
+                                <label class="form-check-label" for="etapaServicio">Proyecto de servicio social</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="etapa" id="etapaTesis"
+                                    value="proyecto de tesis">
+                                <label class="form-check-label" for="etapaTesis">Proyecto de tesis</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="etapa" id="etapaInvestigacion"
+                                    value="proyecto de investigación">
+                                <label class="form-check-label" for="etapaInvestigacion">Proyecto de investigación</label>
+                            </div>
+                        </div>
+                        <div class="d-none mt-3 p-3 bg-light rounded border" id="semesterGroup">
+                            <label for="semester" class="form-label fw-bold">Semestre <small
+                                    class="text-muted fw-normal">(1er a 9no)</small></label>
+                            <select class="form-select form-select-lg" id="semester">
+                                <option value="">Selecciona tu semestre...</option>
+                                <option value="1er Semestre">1er Semestre</option>
+                                <option value="2do Semestre">2do Semestre</option>
+                                <option value="3er Semestre">3er Semestre</option>
+                                <option value="4to Semestre">4to Semestre</option>
+                                <option value="5to Semestre">5to Semestre</option>
+                                <option value="6to Semestre">6to Semestre</option>
+                                <option value="7mo Semestre">7mo Semestre</option>
+                                <option value="8vo Semestre">8vo Semestre</option>
+                                <option value="9no Semestre">9no Semestre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Asesor(es) -->
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold mb-0">Asesor o Asesores *</label>
+                            <span id="asesorCounter" class="badge bg-secondary">0 / 3</span>
+                        </div>
+                        <p class="small text-muted mb-2">Ingresa el nombre completo de cada asesor tal como quieres que
+                            aparezca en la constancia y presiona "Agregar".</p>
+
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="asesorInput"
+                                placeholder="Ej: Leonardo Lomelí Vanegas">
+                            <button class="btn btn-outline-primary" type="button" onclick="addAsesor()">➕
+                                Agregar</button>
+                        </div>
+
+                        <!-- Lista visual de asesores -->
+                        <div id="asesoresList" class="d-flex flex-wrap"></div>
+                        <div id="asesoresError" class="text-danger small mt-1 d-none">Debes agregar al menos un asesor.
+                        </div>
                     </div>
                     <div class="mb-4 p-3 bg-light rounded border">
                         <div class="d-flex justify-content-between align-items-center">
                             <label class="form-label fw-bold mb-0">Integrantes del Equipo (Autores) *</label>
-                            <span id="memberCounter" class="badge bg-secondary">0 / 10</span>
+                            <span id="memberCounter" class="badge bg-secondary">0 / 5</span>
                         </div>
                         <p class="small text-muted mb-2">Ingresa el nombre completo tal como quieres que aparezca en la
                             constancia y presiona "Agregar".</p>
@@ -213,19 +254,30 @@
 
         // --- VARIABLES GLOBALES ---
         let members = [];
+        let asesores = [];
         const semesterSelect = document.getElementById('semester');
         const facultadSelect = document.getElementById('facultad');
-        const professorInput = document.getElementById('professorInCharge');
+        const asesorInput = document.getElementById('asesorInput');
         const fileInput = document.getElementById('fileInput');
 
-        // --- 1. LÓGICA DE INTEGRANTES (MÁXIMO 10) ---
+        // --- 0. ETAPA ACADÉMICA (radio condicional) ---
+        document.querySelectorAll('input[name="etapa"]').forEach(r => {
+            r.addEventListener('change', () => {
+                const checked = document.querySelector('input[name="etapa"]:checked');
+                const showSemester = checked && checked.value === 'proyecto escolar (estudiantes)';
+                document.getElementById('semesterGroup').classList.toggle('d-none', !showSemester);
+                if (showSemester) semesterSelect.focus();
+            });
+        });
+
+        // --- 1. LÓGICA DE INTEGRANTES (MÁXIMO 5) ---
         function addMember() {
             const input = document.getElementById('memberInput');
             const name = input.value.trim().toUpperCase();
 
             if (!name) return;
-            if (members.length >= 10) {
-                showToast('Límite alcanzado: Solo se permiten máximo 10 integrantes.', 'warning');
+            if (members.length >= 5) {
+                showToast('Límite alcanzado: Solo se permiten máximo 5 integrantes.', 'warning');
                 return;
             }
             if (members.includes(name)) return showToast('Este integrante ya está en la lista.', 'warning');
@@ -253,16 +305,61 @@
         </span>
     `).join('');
 
-            counter.textContent = `${members.length} / 10`;
-            counter.className = members.length >= 10 ? "badge bg-danger" : "badge bg-secondary";
+            counter.textContent = `${members.length} / 5`;
+            counter.className = members.length >= 5 ? "badge bg-danger" : "badge bg-secondary";
 
-            // Bloquear si llega a 10
-            const isFull = members.length >= 10;
+            // Bloquear si llega a 5
+            const isFull = members.length >= 5;
             input.disabled = isFull;
             input.placeholder = isFull ? "Límite alcanzado" : "Ej: Juan Pérez García";
             btn.disabled = isFull;
 
             if (members.length > 0) document.getElementById('membersError').classList.add('d-none');
+        }
+
+        // --- 1b. LÓGICA DE ASESORES (MÁXIMO 3) ---
+        function addAsesor() {
+            const name = asesorInput.value.trim().toUpperCase();
+
+            if (!name) return;
+            if (asesores.length >= 3) {
+                showToast('Límite alcanzado: Solo se permiten máximo 3 asesores.', 'warning');
+                return;
+            }
+            if (asesores.includes(name)) return showToast('Este asesor ya está en la lista.', 'warning');
+
+            asesores.push(name);
+            asesorInput.value = '';
+            renderAsesores();
+        }
+
+        function removeAsesor(index) {
+            asesores.splice(index, 1);
+            renderAsesores();
+        }
+
+        function renderAsesores() {
+            const container = document.getElementById('asesoresList');
+            const counter = document.getElementById('asesorCounter');
+            const btn = document.querySelector('button[onclick="addAsesor()"]');
+
+            container.innerHTML = asesores.map((m, i) => `
+        <span class="badge bg-white text-dark border member-badge shadow-sm">
+            👤 ${m} 
+            <button type="button" class="btn-close btn-close-sm ms-2" onclick="removeAsesor(${i})" style="font-size: 0.5rem;"></button>
+        </span>
+    `).join('');
+
+            counter.textContent = `${asesores.length} / 3`;
+            counter.className = asesores.length >= 3 ? "badge bg-danger" : "badge bg-secondary";
+
+            // Bloquear si llega a 3
+            const isFull = asesores.length >= 3;
+            asesorInput.disabled = isFull;
+            asesorInput.placeholder = isFull ? "Límite alcanzado" : "Ej: Leonardo Lomelí Vanegas";
+            btn.disabled = isFull;
+
+            if (asesores.length > 0) document.getElementById('asesoresError').classList.add('d-none');
         }
 
         // --- 2. MANEJO DE ARCHIVOS (PDF) ---
@@ -292,9 +389,19 @@
                 return;
             }
 
-            // Validar nombre de profesor
-            const finalProfessorName = professorInput.value.trim();
-            if (!finalProfessorName) return showToast("Escribe el nombre del profesor.", 'warning');
+            // Validar asesores
+            if (asesores.length === 0) {
+                document.getElementById('asesoresError').classList.remove('d-none');
+                showToast('Agrega al menos un asesor.', 'warning');
+                return;
+            }
+
+            // Validar etapa académica y semestre condicional
+            const etapaEl = document.querySelector('input[name="etapa"]:checked');
+            if (!etapaEl) return showToast('Selecciona una etapa académica.', 'warning');
+            const etapa = etapaEl.value;
+            if (etapa === 'proyecto escolar (estudiantes)' && !semesterSelect.value)
+                return showToast('Selecciona tu semestre.', 'warning');
 
             if (fileInput.files.length === 0) return showToast('Selecciona un archivo PDF', 'warning');
 
@@ -314,14 +421,16 @@
             try {
                 const session = await window.apiClient.checkAuth();
                 const membersString = members.join(', ');
+                const asesoresString = asesores.join(', ');
+                const semester = etapa === 'proyecto escolar (estudiantes)' ? semesterSelect.value : etapa;
 
                 const workData = {
                     student_id: session.user.id,
                     title: document.getElementById('title').value,
                     abstract: document.getElementById('abstract').value,
-                    semester: semesterSelect.value,
+                    semester,
                     facultad: facultadSelect.value,
-                    professor_cargo: finalProfessorName,
+                    professor_cargo: asesoresString,
                     team_members: membersString
                 };
 

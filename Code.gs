@@ -255,7 +255,7 @@ function doPost(e) {
       const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
       const ev = getSheetData(db, 'users').find(u => u.id === data.evaluator_id);
       
-      const esAutoEval = (String(ev.name).trim().toUpperCase() === String(work.profesor_cargo).trim().toUpperCase());
+      const esAutoEval = String(work.profesor_cargo || '').split(',').some(n => String(n).trim().toUpperCase() === String(ev.name).trim().toUpperCase());
 
       if (tieneConflictoDeFacultad(work, ev) || esAutoEval) {
         result = { success: false, error: `Conflicto: El evaluador pertenece a la misma facultad que el autor del trabajo.` };
