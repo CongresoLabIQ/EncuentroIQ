@@ -1217,11 +1217,8 @@ body.has-bottom-nav { padding-bottom: 64px; }
 
 /* Mobile: full-screen app feel */
 @media (max-width: 767px) {
-  /* Hide top bar + breadcrumb on mobile — app doesn't need browser chrome.
-     The top bar moves off-screen (instead of display:none) so the dark-mode
-     toggle inside it can stay fixed and reachable. */
-  body { overflow-x: hidden; }
-  .top-bar { position: absolute; left: -9999px; width: 100%; }
+  /* Hide top bar + breadcrumb on mobile — app doesn't need browser chrome */
+  .top-bar { display: none; }
   .breadcrumb-bar { display: none; }
 
   /* Remove top padding since header is hidden */
@@ -1853,44 +1850,28 @@ body.has-bottom-nav .floating-logout {
 .theme-toggle svg { display: block; }
 .theme-toggle:hover { transform: scale(1.1); box-shadow: var(--shadow-hover); }
 
-/* Theme toggle inside the top bar (dashboards) — sits inline next to "Cerrar Sesión" */
-@media (min-width: 768px) {
-  .top-bar .theme-toggle {
-    position: static;
-    top: auto;
-    right: auto;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    border-color: rgba(255,255,255,0.35);
-    color: var(--accent);
-    box-shadow: none;
-  }
-  .top-bar .theme-toggle:hover {
-    transform: scale(1.05);
-    box-shadow: none;
-    background: rgba(255,255,255,0.12);
-  }
-}
-
-/* Mobile: keep the dark-mode toggle floating even though the top bar is hidden */
+/* Dashboards: dark-mode toggle floats next to the floating logout button */
 @media (max-width: 767px) {
-  .top-bar .theme-toggle {
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    left: auto;
-    width: 40px;
-    height: 40px;
-    background: var(--bg-card);
-    border-color: var(--border);
-    color: var(--accent);
-    box-shadow: var(--shadow);
+  body.has-floating-logout .theme-toggle {
+    top: auto;
+    right: 76px;
+    bottom: 80px;
+    width: 44px;
+    height: 44px;
   }
 }
 
 @media (min-width: 768px) {
   .theme-toggle { top: 16px; right: 16px; width: 44px; height: 44px; }
+  body.has-floating-logout .theme-toggle {
+    top: auto;
+    right: 80px;
+    bottom: 24px;
+  }
+  /* Admin: bottom nav keeps logout higher */
+  body.has-floating-logout.has-bottom-nav .theme-toggle {
+    bottom: 80px;
+  }
 }
 
 /* ============================================================
