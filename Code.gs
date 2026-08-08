@@ -99,6 +99,12 @@ function tieneConflictoDeFacultad(work, evaluator) {
   return wFac !== '' && eFac !== '' && wFac === eFac;
 }
 
+function esAutoEvaluacion(work, evaluator) {
+  if (!work || !evaluator) return false;
+  const nombreEv = String(evaluator.name).trim().toUpperCase();
+  return String(work.profesor_cargo || '').split(',').some(n => String(n).trim().toUpperCase() === nombreEv);
+}
+
 function generarShortId(db, semestre) {
   const prefijos = { "1er Semestre": "A", "2do Semestre": "B", "3er Semestre": "C", "4to Semestre": "D", "5to Semestre": "E", "6to Semestre": "F", "7mo Semestre": "G", "8vo Semestre": "H", "9no Semestre": "I" };
   const letra = prefijos[semestre] || "Z";
@@ -255,7 +261,7 @@ function doPost(e) {
       const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
       const ev = getSheetData(db, 'users').find(u => u.id === data.evaluator_id);
       
-      const esAutoEval = String(work.profesor_cargo || '').split(',').some(n => String(n).trim().toUpperCase() === String(ev.name).trim().toUpperCase());
+      const esAutoEval = esAutoEvaluacion(work, ev);
 
       if (tieneConflictoDeFacultad(work, ev) || esAutoEval) {
         result = { success: false, error: `Conflicto: El evaluador pertenece a la misma facultad que el autor del trabajo.` };
@@ -277,8 +283,7 @@ function doPost(e) {
       let count = 0;
       works.filter(w => w.status === 'pending').forEach(work => {
         let aptos = evaluators.filter(ev => {
-          const esMismoProf = (String(ev.name).trim().toUpperCase() === String(work.profesor_cargo).trim().toUpperCase());
-          return !tieneConflictoDeFacultad(work, ev) && !esMismoProf;
+          return !tieneConflictoDeFacultad(work, ev) && !esAutoEvaluacion(work, ev);
         });
 
         if (aptos.length < 2) return; 
@@ -328,7 +333,10 @@ function doPost(e) {
       const evals = getSheetData(db, 'evaluations');
       const users = getSheetData(db, 'users');
       const h = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
-      
+
+      const MAX_POR_FACULTAD = 17;
+      const ORALES_POR_FACULTAD = 2;
+
       let workPool = [];
 
       works.forEach((w, idx) => {
@@ -336,17 +344,10 @@ function doPost(e) {
         const wEvals = evals.filter(e => e.work_id === w.id);
         if (wEvals.length < 2) return;
 
-        const algunaNoCumple = wEvals.some(e => String(e.cumple_extension || '').toLowerCase() === 'no');
-        if (algunaNoCumple) {
-          workPool.push({ rowIndex: idx + 2, ...w, avgScore: 0, avgPertinencia: 0, ApprovedPert: false, feedback: wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n') });
-          return;
-        }
-
         const avgTotal = parseFloat((wEvals.reduce((s, c) => s + Number(c.total_score), 0) / wEvals.length).toFixed(1));
-        const avgPert = parseFloat((wEvals.reduce((s, c) => s + Number(c.score_pertinencia || 0), 0) / wEvals.length).toFixed(1));
         const fb = wEvals.map((e, i) => `Juez ${i + 1}: ${e.comentarios}`).join('\n\n');
-        
-        workPool.push({ rowIndex: idx + 2, ...w, avgScore: avgTotal, avgPertinencia: avgPert, ApprovedPert: (avgPert >= 6), feedback: fb });
+
+        workPool.push({ rowIndex: idx + 2, ...w, avgScore: avgTotal, feedback: fb });
       });
 
       let facultadPools = {};
@@ -356,29 +357,32 @@ function doPost(e) {
         facultadPools[fac].push(w);
       });
 
-      let salas = { "UMIEZ": [], "Auditorio Principal": [] };
-
+      // 1) Selección por facultad: top 17 aceptados, top 2 a ponencia, resto a cartel
+      let orales = [];
       Object.keys(facultadPools).forEach(fac => {
         let group = facultadPools[fac].sort((a, b) => b.avgScore - a.avgScore);
-        let oralCount = 0;
-        group.forEach(w => {
-          if (w.avgScore < 60 || !w.ApprovedPert) {
-            w.fStat = 'rejected'; w.fAud = ''; w.fHor = '';
-          } else if (oralCount < 3) {
-            w.fStat = 'accepted_oral'; w.fAud = 'Auditorio Principal';
-            salas["Auditorio Principal"].push(w); oralCount++;
-          } else if (oralCount < 6) {
-            w.fStat = 'accepted_oral'; w.fAud = 'UMIEZ';
-            salas["UMIEZ"].push(w); oralCount++;
+        group.forEach((w, i) => {
+          if (i < MAX_POR_FACULTAD) {
+            if (i < ORALES_POR_FACULTAD) {
+              w.fStat = 'accepted_oral';
+              orales.push(w);
+            } else {
+              w.fStat = 'accepted_poster'; w.fAud = ''; w.fHor = 'Sesión Carteles';
+            }
           } else {
-            w.fStat = 'accepted_poster'; w.fAud = ''; w.fHor = 'Sesión Carteles';
+            w.fStat = 'rejected'; w.fAud = ''; w.fHor = '';
           }
         });
       });
 
+      // 2) Distribuir las 6 ponencias en dos auditorios (3 y 3)
+      const salas = ["Auditorio Principal", "UMIEZ"];
+      orales.forEach((w, i) => { w.fAud = salas[i % salas.length]; });
+
+      // 3) Horarios de ponencias
       const hInicio = 10, mTurno = 20;
-      ["UMIEZ", "Auditorio Principal"].forEach(sala => {
-        shuffleArray(salas[sala]).forEach((work, idx) => {
+      salas.forEach(sala => {
+        shuffleArray(orales.filter(o => o.fAud === sala)).forEach((work, idx) => {
           let totalMins = idx * mTurno;
           work.fHor = (hInicio + Math.floor(totalMins/60)) + ":" + (totalMins % 60).toString().padStart(2,'0');
         });
@@ -431,8 +435,7 @@ function doPost(e) {
       let count = 0;
       function asignar(lista, w) {
         let aptos = lista.filter(ev => {
-           const esMismoProf = (String(ev.name).trim().toUpperCase() === String(w.profesor_cargo).trim().toUpperCase());
-           return !tieneConflictoDeFacultad(w, ev) && !esMismoProf;
+           return !tieneConflictoDeFacultad(w, ev) && !esAutoEvaluacion(w, ev);
         });
         aptos.sort((a,b) => workload[a.id] - workload[b.id]).slice(0,3).forEach(ev => {
           lSheet.appendRow([Utilities.getUuid(), w.id, ev.id, 'assigned', new Date(), '']);
@@ -450,8 +453,16 @@ function doPost(e) {
       if (existing.some(a => a.work_id === data.work_id && a.evaluator_id === data.evaluator_id)) {
         result = { success: false, error: 'Ese juez ya está asignado a ese trabajo.' };
       } else {
-        lSheet.appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
-        result = { success: true };
+        const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
+        const ev = getSheetData(db, 'users').find(u => u.id === data.evaluator_id);
+        if (!work || !ev) {
+          result = { success: false, error: 'Trabajo o evaluador no encontrado.' };
+        } else if (tieneConflictoDeFacultad(work, ev) || esAutoEvaluacion(work, ev)) {
+          result = { success: false, error: 'Conflicto: El evaluador pertenece a la misma facultad que el autor del trabajo.' };
+        } else {
+          lSheet.appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
+          result = { success: true };
+        }
       }
     }
 

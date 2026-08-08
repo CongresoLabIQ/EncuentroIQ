@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.4.0] — 2026-08-07
+
+### Added
+- **Nueva regla de dictamen:** Se aceptan los 17 mejores trabajos por facultad (sin umbral de calificación). Los 2 mejores de cada facultad van a ponencia y el resto a cartel (45 carteles + 6 ponencias en dos auditorios).
+- **Etapa académica en el formulario de envío:** Radio buttons con "Proyecto escolar (estudiantes)", "Proyecto de servicio social", "Proyecto de tesis" y "Proyecto de investigación". Si se elige proyecto escolar, aparece un desplegable de semestre (1er a 9no).
+- **Asesor o Asesores (máx 3):** El campo "Profesor a cargo" se convierte en una lista tipo chips de hasta 3 asesores.
+- **Toggle de modo oscuro flotante (dashboards):** En student, evaluator y admin flota junto al botón de cerrar sesión (mobile y desktop), en lugar de estar dentro de la top bar.
+- **Banners por dispositivo:** El hero usa `banner eiqm.png` en móvil y `banner eiq.png` en desktop.
+- **Backend `assignManualLive`:** Endpoint de asignación manual de emergencia Fase 2 (antes solo existía en el frontend).
+
+### Changed
+- **Regla de dictamen `batchFinalize`:** Se elimina el rechazo por promedio y el descalificante por `cumple_extension = no`; ahora la selección es por ranking (top 17 por facultad, top 2 a ponencia).
+- **Distribución de ponencias:** Las 6 ponencias se reparten 3 y 3 entre Auditorio Principal y UMIEZ (una por facultad en cada sala), con horarios de 20 min desde las 10:00.
+- **Fecha del evento:** 23 de octubre de 2026 en el hero y en el fallback del backend (`obtenerFechaEvento`).
+- **Orden de facultades en el hero:** FES Zaragoza primero (sede), luego Facultad de Química y FES Cuautitlán.
+- **Límite de integrantes:** De 10 a máximo 5 en el formulario de envío.
+- **Reorden del formulario de envío:** Título → Facultad → Etapa académica → Asesores.
+- **URL del Formato de Resumen:** Actualizada al nuevo documento de Google Drive (export directo a DOCX).
+- **Correo de contacto:** `contacto.encuentroestiq@gmail.com` en los 13 footers.
+- **Persistencia completa en Fase 2:** `submitLiveEvaluation` guarda los 8 sliders, los 10 checklist y el comentario en `live_evaluations`.
+
+### Fixed
+- **Body del admin sin `has-bottom-nav`:** La clase faltaba en el body real (solo existía en el string de la ventana de impresión); se agregó, corrigiendo el padding inferior y la posición del botón flotante sobre el bottom nav.
+- **Auto-evaluación con lista de asesores:** El chequeo "mismo profesor" ahora compara contra cada asesor separado por coma (helper `esAutoEvaluacion`) en asignaciones Fase 1 y Fase 2.
+- **Conflicto de facultad en `assignManualLive`:** La asignación manual de emergencia Fase 2 ahora también bloquea evaluadores de la misma facultad que el autor.
+- **`w.grupo` → `w.facultad`:** En el modal de caso de emergencia del admin.
+- **Hack off-screen de la top bar en móvil:** Se revierte a `display:none` (ya no se necesita con el toggle flotante).
+
 ## [1.3.0] — 2026-07-13
 
 ### Added

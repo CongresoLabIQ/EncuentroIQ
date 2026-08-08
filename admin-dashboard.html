@@ -850,7 +850,7 @@
 
         async function finalizeAllReadyWorks() {
             if (!readyWorksCache.length) return showToast('No hay trabajos con 3 evaluaciones completas.', 'warning');
-            if (!confirm(`¿Dictaminar ${readyWorksCache.length} trabajos?\n\nSe aplicará la regla Top 2 por semestre y se notificará a los alumnos por correo.`)) return;
+            if (!confirm(`¿Dictaminar ${readyWorksCache.length} trabajos?\n\nSe aceptarán los 17 mejores por facultad: los 2 primeros a ponencia y el resto a cartel. Se notificará a los alumnos por correo.`)) return;
 
             progressModal.show();
             document.getElementById('progressMessage').innerText = 'Dictaminando y enviando correos...';
