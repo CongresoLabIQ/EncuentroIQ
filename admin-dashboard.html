@@ -183,24 +183,9 @@
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                             </svg>
                             <h5 class="text-success mb-0">Listos para Dictaminar</h5>
-                            <span class="badge bg-success" id="readyCountBadgeLg">0</span>
-                        </div>
-                        <div id="readyWorksList"></div>
+                        <span class="badge bg-success" id="readyCountBadgeLg">0</span>
                     </div>
-
-                    <!-- Solicitudes de Ayuda -->
-                    <div class="mt-4" id="helpRequestsContainer">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                <h5 class="text-danger mb-0">Solicitudes de Ayuda</h5>
-                                <span class="badge bg-danger" id="helpCountBadge">0</span>
-                            </div>
-                            <span class="text-muted small">Actualización automática cada 20s</span>
-                        </div>
-                        <div id="helpRequestsList" class="card border-0 shadow-sm">
-                            <div class="card-body text-center text-muted py-4">Sin solicitudes pendientes.</div>
-                        </div>
+                        <div id="readyWorksList"></div>
                     </div>
 
                     <!-- Actividad de Evaluadores -->
@@ -383,22 +368,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2 text-primary-theme">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
-                        Mapa de Salones (Estado en Vivo)
-                    </h3>
-                    <div class="alert alert-info small py-2 d-flex align-items-center gap-2">
-                        <span class="badge bg-success">Completado</span>
-                        <span class="badge bg-warning text-dark">En curso</span>
-                        <span class="badge bg-secondary">Sin empezar</span>
-                        <span class="ms-1 text-muted">— se actualiza automáticamente cada 20s</span>
-                    </div>
-                    <div class="row" id="roomMapGrid"></div>
                 </div>
 
                 <!-- Sección Fase 2 -->
@@ -423,6 +392,43 @@
                     <div class="row mb-4" id="winnersByCycle">
                         <div class="col-12 text-center text-muted py-3">Cargando ganadores...</div>
                     </div>
+                </div>
+
+                <!-- Sección Solicitudes de Ayuda -->
+                <div id="helpSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--danger)"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        <h3 class="text-danger mb-0">Solicitudes de Ayuda</h3>
+                        <span class="badge bg-danger" id="helpCountBadge">0</span>
+                    </div>
+                    <div class="text-muted small mb-3">Actualización automática cada 20s</div>
+                    <div id="helpRequestsList" class="card border-0 shadow-sm">
+                        <div class="card-body text-center text-muted py-4">Sin solicitudes pendientes.</div>
+                    </div>
+                </div>
+
+                <!-- Sección Mapa de Salones -->
+                <div id="mapSection" class="d-none">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <h3 class="text-primary-theme mb-0">Mapa de Salones (Estado en Vivo)</h3>
+                    </div>
+                    <div class="alert alert-info small py-2 d-flex align-items-center gap-2">
+                        <span class="badge bg-success">Completado</span>
+                        <span class="badge bg-warning text-dark">En curso</span>
+                        <span class="badge bg-secondary">Sin empezar</span>
+                        <span class="ms-1 text-muted">— se actualiza automáticamente cada 20s</span>
+                    </div>
+                    <div class="row" id="roomMapGrid"></div>
                 </div>
 
     </main> <!-- .admin-app-content -->
@@ -575,6 +581,23 @@
             </svg>
             Horarios
         </button>
+        <button class="admin-nav-item" onclick="showSection('help')" data-section="help">
+            <span class="admin-nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span class="admin-nav-badge d-none" id="helpNavBadge">0</span>
+            </span>
+            Ayuda
+        </button>
+        <button class="admin-nav-item" onclick="showSection('map')" data-section="map">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Mapa
+        </button>
         <button class="admin-nav-item" onclick="showSection('event')" data-section="event">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="8" r="6"/>
@@ -602,7 +625,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
             checkAdminAuth();
+            initNavHideOnScroll();
         });
+
+        function initNavHideOnScroll() {
+            const nav = document.getElementById('adminBottomNav');
+            if (!nav) return;
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const y = window.scrollY;
+                    const delta = y - lastScrollY;
+                    if (y > 0 && delta > 4) {
+                        nav.classList.add('nav-hidden');
+                    } else if (delta < -4) {
+                        nav.classList.remove('nav-hidden');
+                    }
+                    lastScrollY = y;
+                    ticking = false;
+                });
+            }, { passive: true });
+        }
 
         function initLivePolling() {
             if (livePollTimer) clearInterval(livePollTimer);
@@ -621,8 +667,8 @@
                 liveData = data;
                 renderHelpRequests(data.helpRequests || []);
                 renderEvaluatorActivity(data.evaluators || []);
-                const sched = document.getElementById('scheduleSection');
-                if (sched && !sched.classList.contains('d-none')) renderRoomMap();
+                const map = document.getElementById('mapSection');
+                if (map && !map.classList.contains('d-none')) renderRoomMap();
             } catch (e) { /* poll silencioso; no molestar */ }
         }
 
@@ -647,16 +693,33 @@
             } catch (e) { /* sin audio */ }
         }
 
+        function vibrateAdmin() {
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate([280, 100, 280]);
+                } else if (window.Capacitor?.Plugins?.Haptics) {
+                    window.Capacitor.Plugins.Haptics.vibrate({ duration: 280 });
+                    setTimeout(() => window.Capacitor.Plugins.Haptics.vibrate({ duration: 280 }), 380);
+                }
+            } catch (e) { /* vibración no disponible */ }
+        }
+
         function renderHelpRequests(requests) {
             const list = document.getElementById('helpRequestsList');
             const badge = document.getElementById('helpCountBadge');
+            const navBadge = document.getElementById('helpNavBadge');
             const newIds = requests.map(r => r.id);
             const hasNew = newIds.some(id => !lastHelpIds.has(id)) && lastHelpIds.size > 0;
-            if (hasNew) playAlertSound();
+            if (hasNew) { playAlertSound(); vibrateAdmin(); }
 
             requests.forEach(r => lastHelpIds.add(r.id));
             badge.textContent = requests.length;
             knownHelpCount = requests.length;
+
+            if (navBadge) {
+                navBadge.textContent = requests.length;
+                navBadge.classList.toggle('d-none', requests.length === 0);
+            }
 
             if (!requests.length) {
                 list.innerHTML = '<div class="card-body text-center text-muted py-4">Sin solicitudes pendientes.</div>';
@@ -1428,7 +1491,7 @@
 
         function showSection(id) {
             if (winnersInterval) { clearInterval(winnersInterval); winnersInterval = null; }
-            ['dashboard', 'schedule', 'event'].forEach(s => {
+            ['dashboard', 'schedule', 'help', 'map', 'event'].forEach(s => {
                 const el = document.getElementById(s + 'Section');
                 if (el) el.classList.add('d-none');
             });
@@ -1442,11 +1505,12 @@
             if (target) {
                 target.classList.remove('d-none');
                 if (id === 'dashboard') renderDashboard();
+                if (id === 'map') renderRoomMap();
                 if (id === 'event') {
                     loadWinners();
                     winnersInterval = setInterval(loadWinners, 15000);
                 }
-                if (id === 'schedule') { renderGeneralSchedule(); renderRoomMap(); }
+                if (id === 'schedule') renderGeneralSchedule();
             }
         }
     </script>
