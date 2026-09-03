@@ -84,6 +84,60 @@ function doGet(e) {
       const poster = scoredWorks.filter(w => w.status === 'accepted_poster').sort((a, b) => b.live_score - a.live_score).slice(0, 3);
       result = { success: true, data: { oral, poster } };
     }
+    else if (action === 'getLiveAdminDashboard') {
+      assertAdmin(db, e.parameter.admin_user_id);
+      const works = getSheetData(db, 'works');
+      const users = getSheetData(db, 'users');
+      const assignments = getSheetData(db, 'assignments');
+      const liveAssignments = getSheetData(db, 'live_assignments');
+      const evaluations = getSheetData(db, 'evaluations');
+      const liveEvals = getSheetData(db, 'live_evaluations');
+      let statuses = [];
+      try { statuses = getSheetData(db, 'live_evaluator_status'); } catch (err) { statuses = []; }
+      let helpRequests = [];
+      try { helpRequests = getSheetData(db, 'help_requests'); } catch (err) { helpRequests = []; }
+
+      const now = Date.now();
+      const INACTIVO_MS = 5 * 60 * 1000;
+
+      const evaluators = users.filter(u => u.user_type === 'evaluator').map(u => {
+        const row = statuses.find(s => String(s.evaluator_id) === String(u.id)) || {};
+        const lastAct = row.last_activity ? new Date(row.last_activity).getTime() : 0;
+        const phase1Done = evaluations.filter(e => String(e.evaluator_id) === String(u.id)).length;
+        const phase2Done = liveEvals.filter(e => String(e.evaluator_id) === String(u.id)).length;
+        return {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          facultad: u.facultad || '',
+          status: row.status || EV_STATUS.AVAILABLE,
+          last_activity: row.last_activity || null,
+          lastActivityMs: lastAct || 0,
+          updated_at: row.updated_at || null,
+          activeRecently: !!lastAct && (now - lastAct < INACTIVO_MS),
+          phase1Done,
+          phase2Done,
+          totalDone: phase1Done + phase2Done,
+          assignedCount: assignments.filter(a => String(a.evaluator_id) === String(u.id)).length + liveAssignments.filter(a => String(a.evaluator_id) === String(u.id)).length
+        };
+      });
+
+      const worksWithNames = works.map(w => ({
+        ...w,
+        student_name: (users.find(u => u.id === w.student_id) || {}).name || 'Desconocido'
+      }));
+
+      result = {
+        success: true,
+        data: {
+          works: worksWithNames,
+          evaluators,
+          liveAssignments,
+          helpRequests: helpRequests.filter(h => h.status === 'pending'),
+          serverTime: now
+        }
+      };
+    }
   } catch (error) {
     result = { success: false, error: error.toString() };
   }
@@ -502,6 +556,117 @@ function doPost(e) {
       result = { success: true };
     }
 
+    else if (data.action === 'registerActivity') {
+      const evaluator = assertUser(db, data.user_id);
+      registerEvaluatorActivity(db, evaluator.id, data.status || EV_STATUS.AVAILABLE);
+      result = { success: true };
+    }
+
+    else if (data.action === 'setEvaluatorStatus') {
+      assertAdmin(db, data.admin_user_id);
+      if (!data.evaluator_id) throw new Error('Falta evaluator_id');
+      const valid = ['available', 'busy', 'absent', 'finished'];
+      if (!valid.includes(data.status)) throw new Error('Estado inválido');
+      setEvaluatorStatusInternal(db, data.evaluator_id, data.status);
+      result = { success: true };
+    }
+
+    else if (data.action === 'markEvaluatorAbsent') {
+      assertAdmin(db, data.admin_user_id);
+      if (!data.evaluator_id) throw new Error('Falta evaluator_id');
+      setEvaluatorStatusInternal(db, data.evaluator_id, EV_STATUS.ABSENT);
+      result = { success: true };
+    }
+
+    else if (data.action === 'reactivateEvaluator') {
+      assertAdmin(db, data.admin_user_id);
+      if (!data.evaluator_id) throw new Error('Falta evaluator_id');
+      setEvaluatorStatusInternal(db, data.evaluator_id, EV_STATUS.AVAILABLE);
+      result = { success: true };
+    }
+
+    else if (data.action === 'requestHelp') {
+      const evaluator = assertUser(db, data.user_id);
+      addHelpRequest(db, evaluator, (data.message || '').toString().substring(0, 500));
+      result = { success: true };
+    }
+
+    else if (data.action === 'resolveHelpRequest') {
+      assertAdmin(db, data.admin_user_id);
+      const sheet = getHelpSheet(db);
+      const dataRows = sheet.getDataRange().getValues();
+      const headers = dataRows[0];
+      const idIdx = headers.indexOf('id');
+      const stIdx = headers.indexOf('status');
+      const raIdx = headers.indexOf('resolved_at');
+      const rbIdx = headers.indexOf('resolved_by');
+      for (let i = 1; i < dataRows.length; i++) {
+        if (String(dataRows[i][idIdx]) === String(data.request_id)) {
+          const status = data.status === 'resolved' ? 'resolved' : 'acknowledged';
+          sheet.getRange(i + 1, stIdx + 1).setValue(status);
+          if (status === 'resolved' && raIdx > -1) sheet.getRange(i + 1, raIdx + 1).setValue(new Date());
+          if (rbIdx > -1) sheet.getRange(i + 1, rbIdx + 1).setValue(data.admin_user_id);
+          break;
+        }
+      }
+      result = { success: true };
+    }
+
+    else if (data.action === 'reassignLiveEvaluator') {
+      assertAdmin(db, data.admin_user_id);
+      const work_id = data.work_id;
+      const old_ev = data.old_evaluator_id;
+      const new_ev = data.new_evaluator_id;
+      if (!work_id || !old_ev || !new_ev) throw new Error('Faltan datos de reasignación');
+
+      const work = getSheetData(db, 'works').find(w => w.id === work_id);
+      const oldEvaluator = getSheetData(db, 'users').find(u => u.id === old_ev);
+      const newEvaluator = getSheetData(db, 'users').find(u => u.id === new_ev);
+      if (!work || !newEvaluator) throw new Error('Trabajo o evaluador nuevo no encontrado');
+
+      if (tieneConflictoDeFacultad(work, newEvaluator)) {
+        throw new Error('Conflicto: El nuevo evaluador pertenece a la misma facultad que el autor del trabajo.');
+      }
+      if (esAutoEvaluacion(work, newEvaluator)) {
+        throw new Error('Conflicto: El nuevo evaluador es el profesor del autor del trabajo.');
+      }
+
+      const lSheet = db.getSheetByName('live_assignments');
+      const lData = lSheet.getDataRange().getValues();
+      const lHeaders = lData[0];
+      const idIdx = lHeaders.indexOf('id');
+      const wIdx = lHeaders.indexOf('work_id');
+      const eIdx = lHeaders.indexOf('evaluator_id');
+
+      // Marcar la asignación del evaluador antiguo como reasignada/reemplazada
+      for (let i = 1; i < lData.length; i++) {
+        if (String(lData[i][wIdx]) === String(work_id) && String(lData[i][eIdx]) === String(old_ev)) {
+          lSheet.getRange(i + 1, eIdx + 1).setValue(new_ev);
+          break;
+        }
+      }
+
+      // Si el evaluador ausente era el único y no se encontró coincidencia, crear nueva asignación
+      const finalData = lSheet.getDataRange().getValues();
+      const exists = finalData.some(r => String(r[wIdx]) === String(work_id) && String(r[eIdx]) === String(new_ev));
+      if (!exists) {
+        lSheet.appendRow([Utilities.getUuid(), work_id, new_ev, 'assigned', new Date(), '']);
+      }
+
+      // Si el evaluador ausente está marcado absent, pasar a finished (tras ser sustituido)
+      const statusRow = getEvaluatorStatusSheet(db).getDataRange().getValues();
+      const sh = getEvaluatorStatusSheet(db).getDataRange();
+      for (let i = 1; i < statusRow.length; i++) {
+        if (String(statusRow[i][0]) === String(old_ev) && String(statusRow[i][1]) === EV_STATUS.ABSENT) {
+          sh.getSheet().getRange(i + 1, 2).setValue(EV_STATUS.FINISHED);
+          break;
+        }
+      }
+
+      logReassign(db, work_id, old_ev, new_ev, data.admin_user_id, data.reason || '');
+      result = { success: true };
+    }
+
     else if (data.action === 'generateCertificates') {
       const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
       const prof = work.profesor_cargo || "No asignado";
@@ -654,4 +819,124 @@ function updateRow(db, sheetName, idCol, idVal, updates) {
       break;
     }
   }
+}
+
+// ============================================================
+// VALIDACIÓN DE PERMISOS (SERVER-SIDE)
+// ============================================================
+
+function getUserById(db, userId) {
+  if (!userId) return null;
+  return getSheetData(db, 'users').find(x => String(x.id) === String(userId)) || null;
+}
+
+function assertAdmin(db, userId) {
+  const u = getUserById(db, userId);
+  if (!u) throw new Error('No autenticado: usuario no encontrado.');
+  if (u.user_type !== 'admin') throw new Error('Permiso denegado: se requiere rol de administrador.');
+  return u;
+}
+
+function assertUser(db, userId) {
+  const u = getUserById(db, userId);
+  if (!u) throw new Error('No autenticado: usuario no encontrado.');
+  return u;
+}
+
+// ============================================================
+// ACTIVIDAD DE EVALUADORES (live_evaluator_status)
+// ============================================================
+
+const EV_STATUS = { AVAILABLE: 'available', BUSY: 'busy', ABSENT: 'absent', FINISHED: 'finished' };
+// Estados "manuales" que NO deben sobreescribirse por automatismo
+const EV_MANUAL_STATES = [EV_STATUS.ABSENT, EV_STATUS.FINISHED];
+
+function getEvaluatorStatusSheet(db) {
+  let sheet = db.getSheetByName('live_evaluator_status');
+  if (!sheet) {
+    sheet = db.insertSheet('live_evaluator_status');
+    sheet.appendRow(['evaluator_id', 'status', 'last_activity', 'updated_at']);
+  }
+  return sheet;
+}
+
+// Upsert: si no existe el evaluador, lo crea; si existe, actualiza last_activity.
+// Nunca sobreescribe un estado manual (absent/finished) sin permiso explícito.
+function registerEvaluatorActivity(db, userId, forceStatus) {
+  const sheet = getEvaluatorStatusSheet(db);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const eIdx = headers.indexOf('evaluator_id');
+  const sIdx = headers.indexOf('status');
+  const laIdx = headers.indexOf('last_activity');
+  const uaIdx = headers.indexOf('updated_at');
+  const now = new Date();
+
+  if (eIdx === -1) throw new Error('live_evaluator_status no tiene la columna evaluator_id');
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][eIdx]) === String(userId)) {
+      const currentStatus = data[i][sIdx] || EV_STATUS.AVAILABLE;
+      const manual = EV_MANUAL_STATES.includes(currentStatus);
+      let newStatus = currentStatus;
+      if (forceStatus && !manual) newStatus = forceStatus;
+      sheet.getRange(i + 1, laIdx + 1).setValue(now);
+      sheet.getRange(i + 1, uaIdx + 1).setValue(now);
+      sheet.getRange(i + 1, sIdx + 1).setValue(newStatus);
+      return;
+    }
+  }
+  // No existe: crear
+  sheet.appendRow([userId, forceStatus || EV_STATUS.AVAILABLE, now, now]);
+}
+
+function setEvaluatorStatusInternal(db, evaluatorId, status) {
+  const sheet = getEvaluatorStatusSheet(db);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const eIdx = headers.indexOf('evaluator_id');
+  const sIdx = headers.indexOf('status');
+  const uaIdx = headers.indexOf('updated_at');
+  const now = new Date();
+  if (eIdx === -1) throw new Error('live_evaluator_status no tiene la columna evaluador');
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][eIdx]) === String(evaluatorId)) {
+      sheet.getRange(i + 1, sIdx + 1).setValue(status);
+      sheet.getRange(i + 1, uaIdx + 1).setValue(now);
+      return true;
+    }
+  }
+  sheet.appendRow([evaluatorId, status, '', now]);
+  return false;
+}
+
+// ============================================================
+// SOLICITUDES DE AYUDA (help_requests)
+// ============================================================
+
+function getHelpSheet(db) {
+  let sheet = db.getSheetByName('help_requests');
+  if (!sheet) {
+    sheet = db.insertSheet('help_requests');
+    sheet.appendRow(['id', 'evaluator_id', 'evaluator_name', 'message', 'status', 'created_at', 'resolved_at', 'resolved_by']);
+  }
+  return sheet;
+}
+
+function addHelpRequest(db, evaluator, message) {
+  const sheet = getHelpSheet(db);
+  sheet.appendRow([Utilities.getUuid(), evaluator.id, evaluator.name, message, 'pending', new Date(), '', '']);
+}
+
+// ============================================================
+// BITÁCORA DE REASIGNACIÓN (reassign_log)
+// ============================================================
+
+function logReassign(db, workId, oldEv, newEv, adminId, reason) {
+  let sheet = db.getSheetByName('reassign_log');
+  if (!sheet) {
+    sheet = db.insertSheet('reassign_log');
+    sheet.appendRow(['id', 'work_id', 'old_evaluator_id', 'new_evaluator_id', 'by_admin_id', 'reason', 'timestamp']);
+  }
+  sheet.appendRow([Utilities.getUuid(), workId, oldEv, newEv, adminId, reason, new Date()]);
 }

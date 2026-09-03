@@ -1,4 +1,4 @@
-const CACHE_NAME = 'labiq-v2';
+const CACHE_NAME = 'encuentroiq-v3';
 const ASSETS = [
     '/',
     'index.html',
@@ -10,6 +10,11 @@ const ASSETS = [
     'submit-work.html',
     'encuesta-satisfaccion.html',
     'download.html',
+    'reset-password.html',
+    'set-new-password.html',
+    'tutorial-estudiante.html',
+    'tutorial-evaluador.html',
+    '404.html',
     'css/style.css',
     'js/config.js',
     'js/api-client.js',
@@ -18,8 +23,10 @@ const ASSETS = [
     'manifest.json',
     'favicon.ico',
     'favicon.jpg',
+    'favicon.png',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+    'https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap'
 ];
 
 self.addEventListener('install', (e) => {

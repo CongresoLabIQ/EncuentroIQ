@@ -186,6 +186,58 @@
                         </div>
                         <div id="readyWorksList"></div>
                     </div>
+
+                    <!-- Solicitudes de Ayuda -->
+                    <div class="mt-4" id="helpRequestsContainer">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <h5 class="text-danger mb-0">Solicitudes de Ayuda</h5>
+                                <span class="badge bg-danger" id="helpCountBadge">0</span>
+                            </div>
+                            <span class="text-muted small">Actualización automática cada 20s</span>
+                        </div>
+                        <div id="helpRequestsList" class="card border-0 shadow-sm">
+                            <div class="card-body text-center text-muted py-4">Sin solicitudes pendientes.</div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad de Evaluadores -->
+                    <div class="mt-4" id="evaluatorActivityContainer">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <h5 class="text-primary-theme mb-0">Actividad de Evaluadores</h5>
+                                <span class="small text-muted">Inactividad &gt; 5 min</span>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <span class="badge bg-success">Activo</span>
+                            <span class="badge bg-warning text-dark">Evaluando</span>
+                            <span class="badge bg-danger">Ausente</span>
+                            <span class="badge bg-secondary">Sin actividad</span>
+                            <span class="badge bg-info text-white">Terminó</span>
+                        </div>
+                        <div class="card border-0 shadow-sm">
+                            <div class="table-responsive">
+                                <table class="table data-table table-hover align-middle mb-0" id="evaluatorActivityTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Evaluador</th>
+                                            <th>Facultad</th>
+                                            <th>Estado</th>
+                                            <th>Última actividad</th>
+                                            <th>Eval. hechas</th>
+                                            <th style="width:130px;">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="evaluatorActivityBody">
+                                        <tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -330,6 +382,22 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <h3 class="mb-3 mt-4 d-flex align-items-center gap-2 text-primary-theme">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Mapa de Salones (Estado en Vivo)
+                    </h3>
+                    <div class="alert alert-info small py-2 d-flex align-items-center gap-2">
+                        <span class="badge bg-success">Completado</span>
+                        <span class="badge bg-warning text-dark">En curso</span>
+                        <span class="badge bg-secondary">Sin empezar</span>
+                        <span class="ms-1 text-muted">— se actualiza automáticamente cada 20s</span>
+                    </div>
+                    <div class="row" id="roomMapGrid"></div>
                 </div>
 
                 <!-- Sección Fase 2 -->
@@ -459,6 +527,36 @@
         </div>
     </div>
 
+    <!-- Modal Sustituir Evaluador Ausente -->
+    <div class="modal fade" id="reassignModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title fw-bold">Sustituir Evaluador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">Sustituyendo al evaluador <strong id="reassignEvalName"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Trabajo a reasignar</label>
+                        <select id="reassignWork" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Evaluador sustituto</label>
+                        <select id="reassignJudge" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Motivo (opcional)</label>
+                        <input type="text" id="reassignReason" class="form-control" placeholder="Ej. No asistió al evento">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-primary fw-bold px-4" onclick="submitReassign()">Confirmar sustitución</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Bottom Navigation -->
     <nav class="admin-bottom-nav" id="adminBottomNav">
         <button class="admin-nav-item active" onclick="showSection('dashboard')" data-section="dashboard">
@@ -495,13 +593,165 @@
         let evalFilter = { status: 'all', modality: 'all', sortBy: 'default' };
         let assignmentSystem = new EvaluationAssignment();
         let progressModal = null;
+        let liveData = null;
+        let livePollTimer = null;
+        let lastHelpIds = new Set();
+        let knownHelpCount = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
             checkAdminAuth();
         });
 
+        function initLivePolling() {
+            if (livePollTimer) clearInterval(livePollTimer);
+            pollLiveDashboard();
+            livePollTimer = setInterval(pollLiveDashboard, 20000);
+        }
+
+        function stopLivePolling() {
+            if (livePollTimer) { clearInterval(livePollTimer); livePollTimer = null; }
+        }
+
+        async function pollLiveDashboard() {
+            try {
+                const data = await window.apiClient.getLiveAdminDashboard();
+                if (!data) return;
+                liveData = data;
+                renderHelpRequests(data.helpRequests || []);
+                renderEvaluatorActivity(data.evaluators || []);
+                const sched = document.getElementById('scheduleSection');
+                if (sched && !sched.classList.contains('d-none')) renderRoomMap();
+            } catch (e) { /* poll silencioso; no molestar */ }
+        }
+
+        function playAlertSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const seq = [880, 1175, 880, 1175];
+                let t = ctx.currentTime;
+                seq.forEach((f, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = f;
+                    gain.gain.setValueAtTime(0.35, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.25);
+                    t += 0.28;
+                });
+            } catch (e) { /* sin audio */ }
+        }
+
+        function renderHelpRequests(requests) {
+            const list = document.getElementById('helpRequestsList');
+            const badge = document.getElementById('helpCountBadge');
+            const newIds = requests.map(r => r.id);
+            const hasNew = newIds.some(id => !lastHelpIds.has(id)) && lastHelpIds.size > 0;
+            if (hasNew) playAlertSound();
+
+            requests.forEach(r => lastHelpIds.add(r.id));
+            badge.textContent = requests.length;
+            knownHelpCount = requests.length;
+
+            if (!requests.length) {
+                list.innerHTML = '<div class="card-body text-center text-muted py-4">Sin solicitudes pendientes.</div>';
+                return;
+            }
+            list.innerHTML = requests.map((r, i) => `
+                <div class="d-flex justify-content-between align-items-center px-3 py-2 ${i % 2 ? 'bg-light' : ''}" style="border-top:1px solid #f0f0f0">
+                    <div class="me-2">
+                        <div class="fw-semibold small">
+                            ${r.evaluator_name || 'Evaluador'}
+                            <span class="text-muted fw-normal">· ${r.created_at ? new Date(r.created_at).toLocaleTimeString() : ''}</span>
+                        </div>
+                        <div class="text-muted small">${r.message || 'Sin detalle'}</div>
+                    </div>
+                    <div class="d-flex gap-1 flex-shrink-0">
+                        <button class="btn btn-sm btn-outline-success" onclick="resolveHelp('${r.id}','resolved')">Atendida</button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="resolveHelp('${r.id}','acknowledged')">En camino</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function resolveHelp(requestId, status) {
+            const res = await window.apiClient.resolveHelpRequest(requestId, status);
+            if (res.success) {
+                showToast('Solicitud actualizada.', 'success');
+                pollLiveDashboard();
+            } else { showToast(res.error, 'error'); }
+        }
+
+        function evaluatorBadge(ev) {
+            const st = ev.status;
+            const active = ev.activeRecently;
+            if (st === 'absent') return '<span class="badge bg-danger">Ausente</span>';
+            if (st === 'finished') return '<span class="badge bg-info text-white">Terminó</span>';
+            if (st === 'busy') return '<span class="badge bg-warning text-dark">Evaluando</span>';
+            if (active) return '<span class="badge bg-success">Activo</span>';
+            return '<span class="badge bg-secondary">Sin actividad</span>';
+        }
+
+        function renderEvaluatorActivity(evaluators) {
+            const body = document.getElementById('evaluatorActivityBody');
+            if (!evaluators.length) {
+                body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay evaluadores registrados aún.</td></tr>';
+                return;
+            }
+            const now = Date.now();
+            body.innerHTML = evaluators.map(ev => {
+                const lastLabel = ev.lastActivityMs
+                    ? (now - ev.lastActivityMs < 60000
+                        ? 'Hace ' + Math.max(1, Math.round((now - ev.lastActivityMs) / 1000)) + 's'
+                        : 'Hace ' + Math.max(1, Math.round((now - ev.lastActivityMs) / 60000)) + ' min')
+                    : 'Nunca';
+                const manualAbsent = ev.status === 'absent';
+                const reactivating = manualAbsent;
+                return `<tr>
+                    <td>
+                        <div class="fw-semibold small">${ev.name}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">${ev.email || ''}</div>
+                    </td>
+                    <td class="small">${ev.facultad || '—'}</td>
+                    <td>${evaluatorBadge(ev)}</td>
+                    <td class="small">${lastLabel}</td>
+                    <td class="small text-center">${ev.totalDone}</td>
+                    <td>${reactivating
+                        ? `<div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="reactivateEvaluator('${ev.id}')">Reactivar</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openReassignModal('${ev.id}','${(ev.name||'').replace(/'/g,"\\'")}')">Sustituir</button>
+                          </div>`
+                        : `<button class="btn btn-sm btn-outline-danger" onclick="confirmAbsent('${ev.id}','${(ev.name||'').replace(/'/g,"\\'")}')">Marcar ausente</button>`}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function confirmAbsent(id, name) {
+            if (confirm(`¿Marcar a "${name}" como AUSENTE?\n\nEsto indica al dashboard que no está disponible. Sus trabajos podrán reasignarse.`)) {
+                markAbsent(id);
+            }
+        }
+
+        async function markAbsent(id) {
+            const res = await window.apiClient.markEvaluatorAbsent(id);
+            if (res.success) { showToast('Evaluador marcado como ausente.', 'success'); pollLiveDashboard(); }
+            else showToast(res.error, 'error');
+        }
+
+        async function reactivateEvaluator(id) {
+            if (!confirm('¿Reactivar a este evaluador (volverá a estado "disponible")?')) return;
+            const res = await window.apiClient.reactivateEvaluator(id);
+            if (res.success) { showToast('Evaluador reactivado.', 'success'); pollLiveDashboard(); }
+            else showToast(res.error, 'error');
+        }
+
         async function handleLogout() {
+            stopLivePolling();
             if (confirm('¿Cerrar sesión?')) {
                 await window.apiClient.logoutUser();
                 window.location.href = 'index.html';
@@ -514,6 +764,7 @@
             const profile = await window.apiClient.getUserProfile(session.user.id);
             if (profile?.user_type !== 'admin') return window.location.href = 'student-dashboard.html';
             loadAdminDashboard();
+            initLivePolling();
         }
 
         async function loadAdminDashboard() {
@@ -772,8 +1023,77 @@
         }
 
 
-        function renderGeneralSchedule() {
-            const body = document.getElementById('scheduleBody');
+        function renderRoomMap() {
+            const grid = document.getElementById('roomMapGrid');
+            if (!grid) return;
+            if (!liveData || !liveData.liveAssignments || !liveData.works) {
+                grid.innerHTML = '<div class="col-12 text-center text-muted py-4">Cargando mapa de salones...</div>';
+                return;
+            }
+            const { liveAssignments, works, evaluators } = liveData;
+            const evById = {};
+            (evaluators || []).forEach(e => evById[e.id] = e);
+            const evalsByWork = {};
+            (liveAssignments || []).forEach(a => {
+                if (!evalsByWork[a.work_id]) evalsByWork[a.work_id] = [];
+                const isCompleted = a.status === 'completed';
+                evalsByWork[a.work_id].push({ id: a.evaluator_id, completed: isCompleted, status: a.status });
+            });
+
+            const oralWorks = works.filter(w => w.status === 'accepted_oral');
+            if (!oralWorks.length) {
+                grid.innerHTML = '<div class="col-12 text-center text-muted py-4">No hay ponencias dictaminadas para el mapa.</div>';
+                return;
+            }
+
+            const byRoom = { 'UMIEZ': [], 'Auditorio Principal': [] };
+            oralWorks.forEach(w => {
+                const room = (w.auditorio || 'UMIEZ').trim();
+                (byRoom[room] || (byRoom['Auditorio Principal'] = byRoom['Auditorio Principal'] || [])).push(w);
+            });
+
+            function workStatus(w) {
+                const evals = evalsByWork[w.id] || [];
+                if (!evals.length) return { color: 'secondary', label: 'Sin evaluadores', cls: 'border-secondary' };
+                const completed = evals.filter(e => e.completed).length;
+                if (completed === evals.length) return { color: 'success', label: `Completado ${completed}/${evals.length}`, cls: 'border-success' };
+                if (completed > 0) return { color: 'warning', label: `En curso ${completed}/${evals.length}`, cls: 'border-warning' };
+                return { color: 'secondary', label: `Sin empezar ${completed}/${evals.length}`, cls: 'border-secondary' };
+            }
+
+            grid.innerHTML = Object.keys(byRoom).map(room => `
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 h-100 shadow-sm">
+                        <div class="card-header bg-primary text-white text-center fw-bold">${room}</div>
+                        <div class="card-body">
+                            ${byRoom[room].sort((a,b) => (a.horario||'').localeCompare(b.horario||'')).map(w => {
+                                const st = workStatus(w);
+                                const evals = evalsByWork[w.id] || [];
+                                const evHtml = evals.length
+                                    ? evals.map(e => {
+                                        const ev = evById[e.id];
+                                        const name = ev ? ev.name : 'Evaluador';
+                                        const label = ev ? (ev.status === 'absent' ? ' (ausente)' : ev.activeRecently ? '' : ' (sin actividad)') : '';
+                                        return `<span class="badge ${e.completed ? 'bg-success' : 'bg-light text-dark border'} me-1 mb-1">${name}${label}</span>`;
+                                    }).join('')
+                                    : '<span class="text-muted small">Sin asignaciones</span>';
+                                return `
+                                <div class="border rounded p-2 mb-2 ${st.cls}" style="border-left-width:4px !important;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="fw-bold">${w.horario || '—'}</small>
+                                        <span class="badge bg-${st.color} ${st.color==='warning'||st.color==='light'?'text-dark':''}">${st.label}</span>
+                                    </div>
+                                    <div class="fw-semibold small">${w.short_id || ''} — ${w.title}</div>
+                                    <div class="text-muted small">${w.student_name || ''} · ${w.semester || ''}</div>
+                                    <div class="mt-1">${evHtml}</div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderGeneralSchedule() {            const body = document.getElementById('scheduleBody');
             const oralWorks = allWorks.filter(w => w.status === 'accepted_oral');
 
             if (oralWorks.length === 0) {
@@ -1065,6 +1385,46 @@
 
         let winnersInterval;
 
+        let reassignState = { evaluatorId: null };
+
+        function openReassignModal(evaluatorId, name) {
+            reassignState.evaluatorId = evaluatorId;
+            document.getElementById('reassignEvalName').textContent = name || 'Evaluador';
+
+            const works = (allWorks || []).filter(w => (w.status || '').includes('accepted'));
+            document.getElementById('reassignWork').innerHTML = works.map(w =>
+                `<option value="${w.id}">${w.short_id || w.id} — ${w.title} (${w.facultad || 'Sin facultad'}) (${w.status})</option>`
+            ).join('') || '<option value="">Sin trabajos aceptados</option>';
+
+            const judges = liveData && liveData.evaluators ? liveData.evaluators.filter(e =>
+                e.id !== evaluatorId && e.status !== 'absent'
+            ) : [];
+            document.getElementById('reassignJudge').innerHTML = judges.map(j =>
+                `<option value="${j.id}">${j.name} (${j.facultad || 'Sin facultad'})</option>`
+            ).join('') || '<option value="">Sin sustitutos disponibles</option>';
+
+            document.getElementById('reassignReason').value = '';
+            new bootstrap.Modal(document.getElementById('reassignModal')).show();
+        }
+
+        async function submitReassign() {
+            const workId = document.getElementById('reassignWork').value;
+            const newJudgeId = document.getElementById('reassignJudge').value;
+            const reason = document.getElementById('reassignReason').value;
+            if (!workId || !newJudgeId) { showToast('Selecciona trabajo y sustituto.', 'warning'); return; }
+            if (!confirm('¿Confirmar la sustitución del evaluador en este trabajo?')) return;
+
+            const res = await window.apiClient.reassignLiveEvaluator(workId, reassignState.evaluatorId, newJudgeId, reason);
+            if (res.success) {
+                bootstrap.Modal.getInstance(document.getElementById('reassignModal')).hide();
+                showToast('Evaluador sustituido correctamente.', 'success');
+                loadAdminDashboard();
+                pollLiveDashboard();
+            } else {
+                showToast(res.error, 'error');
+            }
+        }
+
         function showSection(id) {
             if (winnersInterval) { clearInterval(winnersInterval); winnersInterval = null; }
             ['dashboard', 'schedule', 'event'].forEach(s => {
@@ -1085,7 +1445,7 @@
                     loadWinners();
                     winnersInterval = setInterval(loadWinners, 15000);
                 }
-                if (id === 'schedule') renderGeneralSchedule();
+                if (id === 'schedule') { renderGeneralSchedule(); renderRoomMap(); }
             }
         }
     </script>

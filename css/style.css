@@ -1571,6 +1571,47 @@ body.has-bottom-nav .floating-logout {
   bottom: 80px;
 }
 
+/* Floating help button (lower-left) */
+.floating-help {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 40px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(213, 159, 15, 0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.floating-help:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(213, 159, 15, 0.55);
+}
+
+.floating-help:active {
+  transform: scale(0.96);
+}
+
+@media (min-width: 768px) {
+  .floating-help {
+    bottom: 24px;
+    left: 24px;
+  }
+}
+
+body.has-bottom-nav .floating-help {
+  bottom: 80px;
+}
+
 /* ============================================================
    PREFERS REDUCED MOTION
    ============================================================ */

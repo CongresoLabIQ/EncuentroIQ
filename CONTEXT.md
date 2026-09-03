@@ -1,6 +1,6 @@
 # Contexto del Proyecto — EncuentroIQ
 
-> Archivo de contexto para sesiones de desarrollo. Última actualización: 2026-07-11.
+> Archivo de contexto para sesiones de desarrollo. Última actualización: 2026-09-03.
 
 ---
 
@@ -121,6 +121,12 @@ Funciones JS clave:
 | `checkAuth` | Verificar sesión |
 | `register` | Registrar usuario |
 | `getProfessorsBySemester` | Catálogo de profesores (aún existe pero no se usa en submit) |
+| `getLiveAdminDashboard` | Dashboard admin en vivo (evaluadores + solicitudes ayuda + mapa) |
+| `registerActivity` | Registrar actividad del evaluador (available/busy) |
+| `setEvaluatorStatus` / `markEvaluatorAbsent` / `reactivateEvaluator` | Control de estado de evaluador (admin) |
+| `requestHelp` | Evaluador pide ayuda |
+| `resolveHelpRequest` | Admin atiende solicitud de ayuda |
+| `reassignLiveEvaluator` | Sustituir evaluador ausente en Fase 2 |
 
 **Cambio reciente:** `submitWork` ahora recibe `facultad` directamente del formulario (antes hacía lookup desde la hoja `users`). El campo `grupo` ya no se envía.
 
@@ -140,6 +146,17 @@ Funciones JS clave:
 ### Hoja `config`
 `event_date`, `evaluator_code`
 
+### Hoja `live_evaluator_status` (fase 2 — actividad en vivo)
+`evaluator_id`, `status`, `last_activity`, `updated_at`
+Estados: `available | busy | absent | finished` (semibackend: `busy`/`available` automáticos, `absent`/`finished` manuales)
+
+### Hoja `help_requests` (botón de ayuda del evaluador)
+`id`, `evaluator_id`, `evaluator_name`, `message`, `status`, `created_at`, `resolved_at`, `resolved_by`
+Estados: `pending | acknowledged | resolved`
+
+### Hoja `reassign_log` (sustitución de evaluador ausente)
+`id`, `work_id`, `old_evaluator_id`, `new_evaluator_id`, `by_admin_id`, `reason`, `timestamp`
+
 ---
 
 ## 9. Errores conocidos / areas de mejora
@@ -150,6 +167,28 @@ Funciones JS clave:
 
 ---
 
+## 9b. Seguridad — validación server-side (NUEVO)
+
+- `assertAdmin(db, userId)` y `assertUser(db, userId)` en `Code.gs` validan contra la hoja `users` (NUNCA confiar en localStorage para roles).
+- Los endpoints sensibles reciben `admin_user_id` y deben llamar `assertAdmin`:
+  - `getLiveAdminDashboard`, `setEvaluatorStatus`, `markEvaluatorAbsent`, `reactivateEvaluator`, `resolveHelpRequest`, `reassignLiveEvaluator`
+- El evaluador envía `user_id` y se valida con `assertUser` en: `registerActivity`, `requestHelp`.
+- `js/api-client.js` expone `_sessionId()` para enviar el id desde la sesión local en cada request.
+
+## 9c. Generación de APK (Capacitor)
+
+Requiere Node.js + Android Studio. Scripts en `package.json`:
+- `npm run build:www` → copia el sitio estático a `www/`
+- `npm run sync` → build + `npx cap sync android`
+- `npm run open` → `npx cap open android` (compila APK en Android Studio)
+
+Config: `capacitor.config.ts` (`appId: mx.unam.encuentroiq`, `webDir: www`).
+`www/` y `node_modules/` NO se versionan (ignorados en `.gitignore`). `android/` SÍ se versiona.
+
+Nota: en paths de Windows con espacios y en "Mi unidad" el `npm install` a veces falla con `EBADF`/`EPERM` por antivirus — si pasa, probar en terminal no administrador o con Defender desactivado temporalmente.
+
+---
+
 ## 10. Cómo probar localmente
 
 1. Abrir `index.html` en navegador (sin servidor, funciona directo).
@@ -157,3 +196,5 @@ Funciones JS clave:
 3. Admin: `admin-dashboard.html` (requiere `user_type: 'admin'`).
 4. Toggle de subidas: activar/desactivar en admin → recargar student-dashboard para ver efecto.
 5. Mobile: probar en dispositivo real, no solo Chrome DevTools (diferencias reales en viewport).
+6. **Fase 2 en vivo (admin):** el tab Dashboard hace polling cada 20s (`pollLiveDashboard`) → solicitudes de ayuda, actividad de evaluadores, mapa de salones.
+7. **Actividad de evaluador:** se registra al abrir Fase 2 (`available`), abrir presentación (`busy`), enviar (`available`). "Sin actividad" = >5 min sin `last_activity`, distinto de "Ausente" (manual).

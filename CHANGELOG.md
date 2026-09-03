@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.5.0] — 2026-09-03
+
+### Added
+- **Dashboard admin en vivo:** `getLiveAdminDashboard` retorna en tiempo real la actividad de evaluadores, solicitudes de ayuda pendientes y mapa de salones. El tab Dashboard hace polling cada 20s.
+- **Solicitudes de ayuda:** Botón flotante "Ayuda" en el evaluador con modal para enviar mensajes al admin. Sección dedicada en el admin con badge de pendientes, botones "Atendida"/"En camino" y sonido de alerta al recibir nuevas solicitudes.
+- **Actividad de evaluadores:** Tabla con badges semánticos (Activo / Evaluando / Ausente / Sin actividad / Terminó), tiempo relativo de última actividad y acciones contextuales (Marcar ausente / Reactivar / Sustituir).
+- **Mapa de salones en vivo:** Grid de salones (Auditorio Principal + UMIEZ) con tarjetas de ponencias, estado de evaluación y nombre de evaluadores asignados.
+- **Sustitución de evaluador ausente:** Modal de reasignación con selección de trabajo y evaluador sustituto. Validación de conflicto de facultad y auto-evaluación en el backend.
+- **Validación server-side de permisos:** `assertAdmin()` y `assertUser()` en `Code.gs` validan contra la hoja `users` en cada endpoint sensible (nunca confiar en localStorage).
+- **Registro de actividad del evaluador:** `registerActivity` actualiza `live_evaluator_status` con `last_activity`. Estados manuales (`absent`/`finished`) no se sobreescriben por automatismo.
+- **Bitácora de reasignación:** Hoja `reassign_log` registra cada sustitución con motivo y timestamp.
+- **Generación de APK (Capacitor):** Configuración de Capacitor (`capacitor.config.ts`), `package.json` con scripts `build:www`/`sync`/`open` y script de build que copia el sitio estático a `www/`.
+
+### Changed
+- **Service worker:** Nombre de caché actualizado de `labiq-v2` a `encuentroiq-v3`. Assets expandidos con páginas faltantes (`reset-password.html`, `set-new-password.html`, `tutorial-estudiante.html`, `tutorial-evaluador.html`, `404.html`), `favicon.png` y Google Fonts.
+- **Manifest PWA mejorado:** `short_name` a "EncuentroIQ", `orientation` a "any", categorías `education`/`productivity`, `lang: "es"`, `scope: "./"` y shortcuts a Panel Admin y Panel Evaluador.
+
+### Fixed
+- **Logout del admin no detenía el polling:** `handleLogout()` ahora llama `stopLivePolling()` para evitar requests al cerrar sesión.
+
 ## [1.4.0] — 2026-08-07
 
 ### Added

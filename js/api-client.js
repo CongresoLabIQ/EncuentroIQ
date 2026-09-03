@@ -155,6 +155,81 @@ const apiClient = {
         } catch (e) { return { success: false, data: [] }; }
     },
 
+    // ✅ NUEVO: Dashboard admin en vivo (requiere permiso de admin en backend)
+    _sessionId() {
+        const s = getSession();
+        return s && s.id ? s.id : null;
+    },
+
+    async getLiveAdminDashboard() {
+        const userId = this._sessionId();
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getLiveAdminDashboard&admin_user_id=${encodeURIComponent(userId || '')}`);
+        const json = await res.json();
+        return json.success ? json.data : null;
+    },
+
+    // Actividad del evaluador (semibackend: registra actividad)
+    async registerActivity(status = 'available') {
+        return await postData({
+            action: 'registerActivity',
+            user_id: this._sessionId(),
+            status
+        });
+    },
+
+    async setEvaluatorStatus(evaluatorId, status) {
+        return await postData({
+            action: 'setEvaluatorStatus',
+            admin_user_id: this._sessionId(),
+            evaluator_id: evaluatorId,
+            status
+        });
+    },
+
+    async markEvaluatorAbsent(evaluatorId) {
+        return await postData({
+            action: 'markEvaluatorAbsent',
+            admin_user_id: this._sessionId(),
+            evaluator_id: evaluatorId
+        });
+    },
+
+    async reactivateEvaluator(evaluatorId) {
+        return await postData({
+            action: 'reactivateEvaluator',
+            admin_user_id: this._sessionId(),
+            evaluator_id: evaluatorId
+        });
+    },
+
+    async requestHelp(message) {
+        return await postData({
+            action: 'requestHelp',
+            user_id: this._sessionId(),
+            message
+        });
+    },
+
+    async resolveHelpRequest(requestId, status = 'resolved') {
+        return await postData({
+            action: 'resolveHelpRequest',
+            admin_user_id: this._sessionId(),
+            request_id: requestId,
+            status
+        });
+    },
+
+    async reassignLiveEvaluator(workId, oldEvaluatorId, newEvaluatorId, reason = '') {
+        return await postData({
+            action: 'reassignLiveEvaluator',
+            admin_user_id: this._sessionId(),
+            work_id: workId,
+            old_evaluator_id: oldEvaluatorId,
+            new_evaluator_id: newEvaluatorId,
+            reason
+        });
+    },
+
     // Recuperación de contraseña
     async forgotPassword(email) {
         return await postData({
