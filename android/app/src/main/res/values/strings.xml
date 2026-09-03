@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EncuentroIQ</string>
+    <string name="title_activity_main">EncuentroIQ</string>
+    <string name="package_name">mx.unam.encuentroiq</string>
+    <string name="custom_url_scheme">mx.unam.encuentroiq</string>
+</resources>

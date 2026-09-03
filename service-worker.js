@@ -54,27 +54,36 @@ self.addEventListener('fetch', (e) => {
     if (url.origin === 'https://script.google.com' && e.request.method === 'GET') {
         e.respondWith(
             caches.match(e.request).then(cached => {
-                const fetchPromise = fetch(e.request).then(res => {
-                    const clone = res.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                return fetch(e.request).then(res => {
+                    if (res && res.ok) {
+                        const clone = res.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                        return res;
+                    }
                     return res;
                 }).catch(() => cached);
-                return fetchPromise;
             })
         );
         return;
     }
 
-    // Navigation: stale-while-revalidate
+    // Navigation: stale-while-revalidate with safe index.html fallback
     if (e.request.mode === 'navigate') {
         e.respondWith(
             caches.match(e.request).then(cached => {
                 const fetchPromise = fetch(e.request).then(res => {
-                    const clone = res.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                    if (res && res.ok) {
+                        const clone = res.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                        return res;
+                    }
                     return res;
-                }).catch(() => cached);
-                return fetchPromise || caches.match('index.html');
+                }).catch(() => null);
+                // never resolve undefined: fallback to index.html deterministically
+                return fetchPromise.then(res => {
+                    if (res) return res;
+                    return caches.match('index.html');
+                });
             })
         );
         return;
@@ -89,7 +98,7 @@ self.addEventListener('fetch', (e) => {
                     caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
                 }
                 return res;
-            });
-        })
+            }).catch(() => caches.match('index.html'));
+        }).then(res => res || Response.error())
     );
 });

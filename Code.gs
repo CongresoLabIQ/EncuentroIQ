@@ -159,12 +159,22 @@ function esAutoEvaluacion(work, evaluator) {
   return String(work.profesor_cargo || '').split(',').some(n => String(n).trim().toUpperCase() === nombreEv);
 }
 
-function generarShortId(db, semestre) {
-  const prefijos = { "1er Semestre": "A", "2do Semestre": "B", "3er Semestre": "C", "4to Semestre": "D", "5to Semestre": "E", "6to Semestre": "F", "7mo Semestre": "G", "8vo Semestre": "H", "9no Semestre": "I" };
-  const letra = prefijos[semestre] || "Z";
+function generarShortId(db, facultad) {
+  const fac = String(facultad || '').trim().toLowerCase();
+  let prefijo;
+  if (fac.includes('zaragoza')) prefijo = 'FZ';
+  else if (fac.includes('cuautitlan') || fac.includes('cuautitlán')) prefijo = 'FC';
+  else if (fac.includes('quimica') || fac.includes('química')) prefijo = 'FQ';
+  else prefijo = 'FX';
   const works = getSheetData(db, 'works');
-  const total = works.filter(w => w.semester === semestre).length;
-  return letra + (total + 1).toString().padStart(2, '0');
+  const total = works.filter(w => {
+    const wf = String(w.facultad || '').trim().toLowerCase();
+    return (prefijo === 'FZ' && wf.includes('zaragoza')) ||
+           (prefijo === 'FC' && (wf.includes('cuautitlan') || wf.includes('cuautitlán'))) ||
+           (prefijo === 'FQ' && (wf.includes('quimica') || wf.includes('química'))) ||
+           (prefijo === 'FX' && !wf.includes('zaragoza') && !wf.includes('cuautitlan') && !wf.includes('cuautitlán') && !wf.includes('quimica') && !wf.includes('química'));
+  }).length;
+  return prefijo + (total + 1).toString().padStart(2, '0');
 }
 
 function hashPassword(password) {
@@ -289,7 +299,7 @@ function doPost(e) {
       const wSheet = db.getSheetByName('works');
       const h = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
       const row = new Array(h.length).fill("");
-      const sId = generarShortId(db, data.semester);
+      const sId = generarShortId(db, data.facultad);
       
       row[h.indexOf('id')] = Utilities.getUuid();
       row[h.indexOf('short_id')] = sId;

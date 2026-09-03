@@ -130,6 +130,8 @@ Funciones JS clave:
 
 **Cambio reciente:** `submitWork` ahora recibe `facultad` directamente del formulario (antes hacía lookup desde la hoja `users`). El campo `grupo` ya no se envía.
 
+**Cambio reciente (IDs):** `short_id` ahora se genera según la **facultad**, no el semestre: `FZXX` (FES Zaragoza), `FCXX` (FES Cuautitlán), `FQXX` (Facultad de Química), `FX` (otra/desconocida). El número es secuencial por facultad. Solo aplica a trabajos **nuevos**; los existentes conservan su ID.
+
 ---
 
 ## 8. Google Sheets Schema (hojas relevantes)
@@ -185,7 +187,13 @@ Requiere Node.js + Android Studio. Scripts en `package.json`:
 Config: `capacitor.config.ts` (`appId: mx.unam.encuentroiq`, `webDir: www`).
 `www/` y `node_modules/` NO se versionan (ignorados en `.gitignore`). `android/` SÍ se versiona.
 
-Nota: en paths de Windows con espacios y en "Mi unidad" el `npm install` a veces falla con `EBADF`/`EPERM` por antivirus — si pasa, probar en terminal no administrador o con Defender desactivado temporalmente.
+**IMPORTANTE (npm en Windows):** el `npm install` en `K:\Mi unidad\EncuentroIQ\EncuentroIQ` falla con `EBADF`/`EPERM` (`TAR_ENTRY_ERROR UNKNOWN: unknown error, write`) por la ruta con espacios y el antivirus/Defender. Solución verificada:
+1. **Instalar en una ruta sin espacios** (ej. `C:\EncuentroBuild`) — funciona en 4s.
+2. Usar `npm install --no-audit --no-fund` si hay warnings.
+3. Desactivar temporalmente la protección en tiempo real de Windows Defender si persiste.
+4. Si queda un `node_modules` corrupto: `taskkill /F /IM node.exe` luego `rd /s /q node_modules`.
+
+Script automatizado: `build/build-apk.bat` (copia a `C:\EncuentroBuild`, instala, genera `www/`, añade Android y abre). Adicionalmente `npm install -D typescript` es necesario para `capacitor.config.ts`.
 
 ---
 
