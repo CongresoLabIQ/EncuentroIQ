@@ -1,4 +1,4 @@
-const CACHE_NAME = 'encuentroiq-v3';
+const CACHE_NAME = 'encuentroiq-v4';
 const ASSETS = [
     '/',
     'index.html',
@@ -32,7 +32,7 @@ const ASSETS = [
 self.addEventListener('install', (e) => {
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
+            return Promise.allSettled(ASSETS.map(a => cache.add(a)));
         })
     );
     self.skipWaiting();
@@ -50,24 +50,12 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
     const url = new URL(e.request.url);
 
-    // API GET requests: cache then network
-    if (url.origin === 'https://script.google.com' && e.request.method === 'GET') {
-        e.respondWith(
-            caches.match(e.request).then(cached => {
-                return fetch(e.request).then(res => {
-                    if (res && res.ok) {
-                        const clone = res.clone();
-                        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-                        return res;
-                    }
-                    return res;
-                }).catch(() => cached);
-            })
-        );
+    // Google Apps Script: NUNCA interceptar. El API se consume directo a la red.
+    if (url.hostname === 'script.google.com' || url.hostname === 'script.googleusercontent.com') {
         return;
     }
 
-    // Navigation: stale-while-revalidate with safe index.html fallback
+    // Navegación: stale-while-revalidate con respaldo seguro a index.html
     if (e.request.mode === 'navigate') {
         e.respondWith(
             caches.match(e.request).then(cached => {
@@ -75,30 +63,30 @@ self.addEventListener('fetch', (e) => {
                     if (res && res.ok) {
                         const clone = res.clone();
                         caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-                        return res;
                     }
                     return res;
                 }).catch(() => null);
-                // never resolve undefined: fallback to index.html deterministically
+                // nunca resolver undefined: respaldo determinista a index.html
                 return fetchPromise.then(res => {
                     if (res) return res;
-                    return caches.match('index.html');
+                    return cached || caches.match('index.html');
                 });
             })
         );
         return;
     }
 
-    // Static assets: cache-first
+    // Assets estáticos: cache-first
     e.respondWith(
         caches.match(e.request).then(cached => {
-            return cached || fetch(e.request).then(res => {
-                if (res.ok) {
+            if (cached) return cached;
+            return fetch(e.request).then(res => {
+                if (res && res.ok) {
                     const clone = res.clone();
                     caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
                 }
                 return res;
-            }).catch(() => caches.match('index.html'));
-        }).then(res => res || Response.error())
+            }).catch(() => Response.error());
+        })
     );
 });

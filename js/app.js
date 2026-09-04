@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeApp() {
+    // Si ya hay sesión en páginas públicas, entrar directo al dashboard
+    autoRoute();
+
     // Listeners de Forms
     const loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
@@ -74,13 +77,13 @@ async function handleLogin(e) {
 
     const result = await window.apiClient.loginUser(email, password);
     
-    if (result.success) {
+    if (result.success && result.data && result.data.profile) {
         const user = result.data.profile;
         if (user.user_type === 'admin') window.location.href = 'admin-dashboard.html';
         else if (user.user_type === 'evaluator') window.location.href = 'evaluator-dashboard.html';
         else window.location.href = 'student-dashboard.html';
     } else {
-        showToast('Error: ' + result.error, 'error');
+        showToast('Error: ' + (result && result.error ? result.error : 'No se pudo iniciar sesión'), 'error');
         btn.disabled = false; btn.innerHTML = originalText;
     }
 }

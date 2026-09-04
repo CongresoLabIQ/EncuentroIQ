@@ -1,7 +1,26 @@
 // --- GESTIÓN DE SESIÓN LOCAL ---
 function saveSession(user) { localStorage.setItem('congreso_user', JSON.stringify(user)); }
-function getSession() { return JSON.parse(localStorage.getItem('congreso_user')); }
+function getSession() {
+    try { return JSON.parse(localStorage.getItem('congreso_user')); }
+    catch (e) { return null; }
+}
 function logoutUser() { localStorage.removeItem('congreso_user'); return Promise.resolve(true); }
+
+// Redirige al dashboard según el tipo de usuario
+function redirectToDashboard(user) {
+    if (user.user_type === 'admin') window.location.replace('admin-dashboard.html');
+    else if (user.user_type === 'evaluator') window.location.replace('evaluator-dashboard.html');
+    else window.location.replace('student-dashboard.html');
+}
+
+// En páginas públicas (index/login), si ya hay sesión se entra directo al dashboard
+function autoRoute() {
+    const path = window.location.pathname;
+    if (path.includes('student-dashboard') || path.includes('evaluator-dashboard') ||
+        path.includes('admin-dashboard') || path.includes('submit-work')) return;
+    const s = getSession();
+    if (s && s.id && s.user_type) redirectToDashboard(s);
+}
 
 // --- API CLIENTE ---
 const apiClient = {
@@ -63,27 +82,23 @@ const apiClient = {
     },
 
     async getStudentWorks(studentId) {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStudentWorks&studentId=${studentId}`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getStudentWorks&studentId=${studentId}`);
         return json.success ? json.data : [];
     },
 
     async getAllWorks() {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getWorks`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getWorks`);
         return json.success ? json.data : [];
     },
 
     // Admin / Evaluadores
     async getEvaluators() {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getEvaluators`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getEvaluators`);
         return json.success ? json.data : [];
     },
 
     async getAssignments() {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAssignments`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getAssignments`);
         return json.success ? json.data : [];
     },
 
@@ -128,8 +143,7 @@ const apiClient = {
     },
 
     async getLiveAssignments() {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getLiveAssignments`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getLiveAssignments`);
         return json.success ? json.data : [];
     },
 
@@ -139,8 +153,7 @@ const apiClient = {
     },
 
     async getWinners() {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getWinners`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getWinners`);
         return json.success ? json.data : { oral: [], poster: [] };
     },
 
@@ -149,10 +162,7 @@ const apiClient = {
     },
 
     async getProfessorsBySemester(semester) {
-        try {
-            const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getProfessorsBySemester&semester=${encodeURIComponent(semester)}`);
-            return await res.json();
-        } catch (e) { return { success: false, data: [] }; }
+        return await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getProfessorsBySemester&semester=${encodeURIComponent(semester)}`);
     },
 
     // ✅ NUEVO: Dashboard admin en vivo (requiere permiso de admin en backend)
@@ -163,8 +173,7 @@ const apiClient = {
 
     async getLiveAdminDashboard() {
         const userId = this._sessionId();
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getLiveAdminDashboard&admin_user_id=${encodeURIComponent(userId || '')}`);
-        const json = await res.json();
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getLiveAdminDashboard&admin_user_id=${encodeURIComponent(userId || '')}`);
         return json.success ? json.data : null;
     },
 
@@ -253,16 +262,39 @@ const apiClient = {
 };
 
 // --- HELPERS ---
-async function postData(data) {
+async function postData(data, timeoutMs = 60000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, {
             redirect: "follow",
             method: 'POST',
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            signal: controller.signal
         });
         return await res.json();
-    } catch (e) { return { success: false, error: e.message }; }
+    } catch (e) {
+        const mensaje = (e && e.name === 'AbortError')
+            ? 'La solicitud tardó demasiado. Revisa tu conexión e inténtalo de nuevo.'
+            : e.message;
+        return { success: false, error: mensaje };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function fetchJson(url, timeoutMs = 45000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const res = await fetch(url, { signal: controller.signal });
+        return await res.json();
+    } catch (e) {
+        return { success: false, error: (e && e.name === 'AbortError') ? 'Tiempo de espera agotado.' : e.message };
+    } finally {
+        clearTimeout(timer);
+    }
 }
 
 const toBase64 = file => new Promise((resolve, reject) => {
