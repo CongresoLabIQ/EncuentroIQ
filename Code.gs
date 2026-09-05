@@ -1255,9 +1255,17 @@ function signVapidJwt(signingInput, privateKeyB64Url) {
   return base64UrlSafe(decToBytes32(r).concat(decToBytes32(s)));
 }
 
+function getEndpointOrigin(endpoint) {
+  const s = String(endpoint || '');
+  const m = /^(https?):\/\/([^/]+)/.exec(s);
+  if (!m) return '';
+  return m[1] + '://' + m[2];
+}
+
 function pushToEndpoint(endpoint, publicKey, privateKey, now, ttl) {
   try {
-    const aud = new URL(endpoint).origin;
+    const aud = getEndpointOrigin(endpoint);
+    if (!aud) return { endpoint, code: 0, ok: false, error: 'Endpoint inválido' };
     const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));
     const jwtClaims = base64UrlSafe(JSON.stringify({ aud, exp: now + ttl, sub: 'mailto:contacto.encuentroestiq@gmail.com' }));
     const signingInput = jwtHeader + '.' + jwtClaims;
