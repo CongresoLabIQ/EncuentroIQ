@@ -1,4 +1,4 @@
-const CACHE_NAME = 'encuentroiq-v5';
+const CACHE_NAME = 'encuentroiq-v6';
 const PUSH_ICON = 'assets/icon-192.png';
 
 importScripts('js/config.js');
@@ -124,6 +124,20 @@ self.addEventListener('fetch', (e) => {
                     return cached || caches.match('index.html');
                 });
             })
+        );
+        return;
+    }
+
+    // JS/CSS/manifest propios: network-first para nunca servir código viejo en caché
+    if (url.origin === self.location.origin && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname === '/manifest.json')) {
+        e.respondWith(
+            fetch(e.request).then(res => {
+                if (res && res.ok) {
+                    const clone = res.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                }
+                return res;
+            }).catch(() => caches.match(e.request).then(cached => cached || Response.error()))
         );
         return;
     }
