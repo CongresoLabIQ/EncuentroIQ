@@ -1262,6 +1262,14 @@ function getEndpointOrigin(endpoint) {
   return m[1] + '://' + m[2];
 }
 
+// Concede el scope script.external_request (UrlFetchApp) al proyecto.
+// Ejecutar UNA vez desde el editor de Apps Script y aceptar los permisos,
+// luego desplegar una versión nueva.
+function AUTORIZAR_URLFETCH() {
+  const res = UrlFetchApp.fetch('https://www.google.com', { muteHttpExceptions: true });
+  Logger.log('UrlFetchApp OK, código: ' + res.getResponseCode());
+}
+
 function pushToEndpoint(endpoint, publicKey, privateKey, now, ttl) {
   try {
     const aud = getEndpointOrigin(endpoint);
