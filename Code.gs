@@ -654,6 +654,25 @@ function doPost(e) {
       result = { success: true };
     }
 
+    else if (data.action === 'testPushToAdmins') {
+      assertAdmin(db, data.admin_user_id);
+      const privateKey = getConfigValue('vapid_private', '');
+      const publicKey = getConfigValue('vapid_public', '');
+      if (!privateKey || !publicKey) throw new Error('Llaves VAPID no configuradas. Ejecuta ESCRIBIR_LLAVES_VAPID()');
+      const subs = getPushSubscriptionSheet(db).getDataRange().getValues();
+      const headers = subs[0];
+      const endpointIdx = headers.indexOf('endpoint');
+      const now = Math.floor(Date.now() / 1000);
+      const ttl = 3600;
+      const results = [];
+      for (let i = 1; i < subs.length; i++) {
+        const endpoint = String(subs[i][endpointIdx] || '');
+        if (!endpoint) continue;
+        results.push(pushToEndpoint(endpoint, publicKey, privateKey, now, ttl));
+      }
+      result = { success: true, date: new Date(), results };
+    }
+
     else if (data.action === 'resolveHelpRequest') {
       assertAdmin(db, data.admin_user_id);
       const sheet = getHelpSheet(db);
@@ -1236,6 +1255,29 @@ function signVapidJwt(signingInput, privateKeyB64Url) {
   return base64UrlSafe(decToBytes32(r).concat(decToBytes32(s)));
 }
 
+function pushToEndpoint(endpoint, publicKey, privateKey, now, ttl) {
+  try {
+    const aud = new URL(endpoint).origin;
+    const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));
+    const jwtClaims = base64UrlSafe(JSON.stringify({ aud, exp: now + ttl, sub: 'mailto:contacto.encuentroestiq@gmail.com' }));
+    const signingInput = jwtHeader + '.' + jwtClaims;
+    const jwt = signingInput + '.' + signVapidJwt(signingInput, privateKey);
+
+    const opts = {
+      method: 'post',
+      headers: { 'Authorization': 'vapid t=' + jwt + ', k=' + publicKey, 'TTL': String(ttl) },
+      payload: '',
+      contentType: 'text/plain;charset=UTF-8',
+      muteHttpExceptions: true
+    };
+    const res = UrlFetchApp.fetch(endpoint, opts);
+    const code = res.getResponseCode();
+    return { endpoint, code, ok: code >= 200 && code < 300 };
+  } catch (e) {
+    return { endpoint, code: 0, ok: false, error: e.message };
+  }
+}
+
 function sendHelpPushToAdmins(db, message, evaluatorName) {
   const privateKey = getConfigValue('vapid_private', '');
   const publicKey = getConfigValue('vapid_public', '');
@@ -1250,24 +1292,8 @@ function sendHelpPushToAdmins(db, message, evaluatorName) {
   for (let i = 1; i < subs.length; i++) {
     const endpoint = String(subs[i][endpointIdx] || '');
     if (!endpoint) continue;
-    try {
-      const aud = new URL(endpoint).origin;
-      const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));
-      const jwtClaims = base64UrlSafe(JSON.stringify({ aud, exp: now + ttl, sub: 'mailto:contacto.encuentroestiq@gmail.com' }));
-      const signingInput = jwtHeader + '.' + jwtClaims;
-      const jwt = signingInput + '.' + signVapidJwt(signingInput, privateKey);
-
-      const opts = {
-        method: 'post',
-        headers: { 'Authorization': 'vapid t=' + jwt + ', k=' + publicKey, 'TTL': String(ttl) },
-        payload: '',
-        contentType: 'text/plain;charset=UTF-8',
-        muteHttpExceptions: true
-      };
-      UrlFetchApp.fetch(endpoint, opts);
-    } catch (e) {
-      Logger.log('push a ' + endpoint + ' falló: ' + e.message);
-    }
+    const r = pushToEndpoint(endpoint, publicKey, privateKey, now, ttl);
+    if (!r.ok) Logger.log('push a ' + endpoint + ' no OK: ' + JSON.stringify(r));
   }
 }
 function ESCRIBIR_LLAVES_VAPID() {

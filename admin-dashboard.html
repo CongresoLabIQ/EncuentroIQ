@@ -128,9 +128,14 @@
                                         <small class="text-muted" id="pushStatusText">No activadas</small>
                                     </div>
                                 </div>
-                                <button class="btn btn-sm btn-outline-accent fw-bold" id="pushEnableBtn" onclick="enablePushNotifications()">
-                                    Activar notificaciones
-                                </button>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <button class="btn btn-sm btn-outline-accent fw-bold" id="pushEnableBtn" onclick="enablePushNotifications()">
+                                        Activar notificaciones
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary fw-bold" id="pushTestBtn" onclick="testAdminPush()">
+                                        Enviar push de prueba
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -763,6 +768,37 @@
             } catch (e) {
                 status.textContent = 'No se pudo activar.';
                 showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        async function testAdminPush() {
+            const btn = document.getElementById('pushTestBtn');
+            if (!btn) return;
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            try {
+                const res = await window.apiClient.testPushToAdmins();
+                if (!res.success) throw new Error(res.error || 'Error al enviar');
+                const results = res.results || [];
+                const total = results.length;
+                const ok = results.filter(r => r.ok).length;
+                const bad = results.filter(r => !r.ok);
+                if (total === 0) {
+                    showToast('No hay dispositivos suscritos. Activa las notificaciones primero.', 'warning');
+                    return;
+                }
+                if (bad.length === 0) {
+                    showToast(`Push de prueba enviado a ${ok} dispositivo(s) — 201 OK.`, 'success');
+                } else {
+                    const codes = [...new Set(bad.map(r => r.code))].join(', ');
+                    showToast(`${ok} OK, ${bad.length} no válido(s) (${codes}). Revisa la consola.`, 'warning');
+                    console.table(bad.map(r => ({ endpoint: r.endpoint, code: r.code, error: r.error || '' })));
+                }
+            } catch (e) {
+                showToast('Error en push de prueba: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enviar push de prueba';
             }
         }
 

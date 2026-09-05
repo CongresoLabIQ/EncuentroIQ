@@ -253,6 +253,13 @@ const apiClient = {
         return json.success ? json.data : { count: 0, lastMessage: '', evaluators: '' };
     },
 
+    async testPushToAdmins() {
+        return await postData({
+            action: 'testPushToAdmins',
+            admin_user_id: this._sessionId()
+        });
+    },
+
     // Recuperación de contraseña
     async forgotPassword(email) {
         return await postData({
