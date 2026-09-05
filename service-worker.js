@@ -1,4 +1,4 @@
-const CACHE_NAME = 'encuentroiq-v4';
+const CACHE_NAME = 'encuentroiq-v5';
 const PUSH_ICON = 'assets/icon-192.png';
 
 importScripts('js/config.js');

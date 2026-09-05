@@ -1033,13 +1033,207 @@ function getPushSubscriptionSheet(db) {
 }
 
 function base64UrlSafe(input, charset) {
+  if (Array.isArray(input)) return Utilities.base64EncodeWebSafe(input).replace(/=+$/, '');
   return Utilities.base64EncodeWebSafe(input, charset || Utilities.Charset.UTF_8).replace(/=+$/, '');
 }
 
-// Firma RS256 sobre "header.claims" con la llave privada VAPID (PEM PKCS#8)
-function signVapidJwt(signingInput, privateKeyPem) {
-  const sig = Utilities.computeRsaSha256Signature(signingInput, privateKeyPem);
-  return base64UrlSafe(sig);
+function urlBase64ToBytes(b64) {
+  const s = b64.replace(/-/g, '+').replace(/_/g, '/');
+  return Utilities.base64Decode(s).map(x => x & 0xff);
+}
+
+// ============================================================
+// ECDSA P-256 (ES256) — aritmética decimal-string (sin BigInt)
+// La llave privada VAPID se guarda como escalar de 32 bytes en base64url
+// ============================================================
+const EC_P = '115792089210356248762697446949407573530086143415290314195533631308867097853951';
+const EC_N = '115792089210356248762697446949407573529996955224135760342422259061068512044369';
+const EC_GX = '48439561293906451759052585252797914202762949526041747995844080717082404635286';
+const EC_GY = '36134250956749795798585127919587881956611106672985015071877198253568414405109';
+
+function bnTrim(s) { return s.replace(/^0+(?=\d)/, '') || '0'; }
+
+function bnCmp(a, b) {
+  a = bnTrim(a); b = bnTrim(b);
+  if (a.length !== b.length) return a.length < b.length ? -1 : 1;
+  return a < b ? -1 : (a > b ? 1 : 0);
+}
+
+function bnAdd(a, b) {
+  let i = a.length - 1, j = b.length - 1, c = 0, r = '';
+  while (i >= 0 || j >= 0 || c) {
+    const s = (i >= 0 ? a.charCodeAt(i--) - 48 : 0) + (j >= 0 ? b.charCodeAt(j--) - 48 : 0) + c;
+    r = (s % 10) + r;
+    c = s > 9 ? 1 : 0;
+  }
+  return r;
+}
+
+function bnSub(a, b) {
+  let i = a.length - 1, j = b.length - 1, br = 0, r = '';
+  while (i >= 0) {
+    let d = (a.charCodeAt(i--) - 48) - (j >= 0 ? b.charCodeAt(j--) - 48 : 0) - br;
+    if (d < 0) { d += 10; br = 1; } else br = 0;
+    r = d + r;
+  }
+  return bnTrim(r);
+}
+
+function bnMul(a, b) {
+  if (a === '0' || b === '0') return '0';
+  const out = new Array(a.length + b.length).fill(0);
+  for (let i = a.length - 1; i >= 0; i--) {
+    const da = a.charCodeAt(i) - 48;
+    for (let j = b.length - 1; j >= 0; j--) out[i + j + 1] += da * (b.charCodeAt(j) - 48);
+  }
+  for (let i = out.length - 1; i > 0; i--) { out[i - 1] += Math.floor(out[i] / 10); out[i] %= 10; }
+  return bnTrim(out.join(''));
+}
+
+function bnDivMod(a, b) {
+  if (bnCmp(a, b) < 0) return ['0', a];
+  let q = '', r = '';
+  for (let i = 0; i < a.length; i++) {
+    r = bnTrim(r + a[i]);
+    let d = 0;
+    while (bnCmp(r, b) >= 0) { r = bnSub(r, b); d++; }
+    q += d;
+  }
+  return [bnTrim(q), bnTrim(r)];
+}
+
+function bnMod(a, b) { return bnDivMod(a, b)[1]; }
+
+function bnModSub(a, b, m) {
+  return bnCmp(a, b) >= 0 ? bnMod(bnSub(a, b), m) : bnMod(bnSub(m, bnSub(b, a)), m);
+}
+
+function bnModInverse(a, m) {
+  let r0 = bnMod(a, m), r1 = m, s0 = '1', s1 = '0';
+  while (bnCmp(r1, '0') !== 0) {
+    const dm = bnDivMod(r0, r1);
+    const q = dm[0];
+    const oldR1 = r1, oldS1 = s1;
+    r1 = dm[1];
+    s1 = bnModSub(s0, bnMod(bnMul(q, oldS1), m), m);
+    r0 = oldR1; s0 = oldS1;
+  }
+  return bnMod(s0, m);
+}
+
+function bnIsOdd(s) { return (s.charCodeAt(s.length - 1) - 48) % 2 === 1; }
+
+function bnDiv2(s) {
+  let c = 0, r = '';
+  for (let i = 0; i < s.length; i++) {
+    const d = s.charCodeAt(i) - 48 + c * 10;
+    r += Math.floor(d / 2);
+    c = d % 2;
+  }
+  return bnTrim(r);
+}
+
+function modP(a) { return bnMod(a, EC_P); }
+
+function addP(a, b) { return modP(bnAdd(a, b)); }
+function subP(a, b) { return bnModSub(a, b, EC_P); }
+function mulP(a, b) { return modP(bnMul(a, b)); }
+
+function ecDouble(x, y) {
+  if (y === '0') return null;
+  const lam = mulP(subP(mulP('3', mulP(x, x)), '3'), bnModInverse(mulP('2', y), EC_P));
+  const x3 = subP(mulP(lam, lam), mulP('2', x));
+  const y3 = subP(mulP(lam, subP(x, x3)), y);
+  return [x3, y3];
+}
+
+function ecAddG(x1, y1) {
+  const num = subP(EC_GY, y1);
+  const den = subP(EC_GX, x1);
+  if (bnCmp(den, '0') === 0) return bnCmp(num, '0') === 0 ? ecDouble(x1, y1) : null;
+  const lam = mulP(num, bnModInverse(den, EC_P));
+  const x3 = subP(subP(mulP(lam, lam), x1), EC_GX);
+  const y3 = subP(mulP(lam, subP(x1, x3)), y1);
+  return [x3, y3];
+}
+
+function ecMul(kStr) {
+  const k = bnMod(kStr, EC_N);
+  if (bnCmp(k, '0') === 0) return null;
+  const bits = [];
+  let t = k;
+  while (bnCmp(t, '0') !== 0) { bits.push(bnIsOdd(t)); t = bnDiv2(t); }
+  let Q = null;
+  for (let i = bits.length - 1; i >= 0; i--) {
+    Q = Q === null ? null : ecDouble(Q[0], Q[1]);
+    if (bits[i]) Q = Q === null ? [EC_GX, EC_GY] : ecAddG(Q[0], Q[1]);
+  }
+  return Q;
+}
+
+function decToBytes32(v) {
+  const bytes = new Array(32).fill(0);
+  let s = v, idx = 31;
+  while (bnCmp(s, '0') !== 0) {
+    const dm = bnDivMod(s, '256');
+    bytes[idx--] = parseInt(dm[1], 10);
+    s = dm[0];
+  }
+  return bytes;
+}
+
+function bytesToDec(bytes) {
+  let s = '0';
+  for (let i = 0; i < bytes.length; i++) s = bnAdd(bnMul(s, '256'), String(bytes[i] & 0xff));
+  return s;
+}
+
+function ecHmacSha256(keyBytes, dataBytes) {
+  return Utilities.computeHmacSha256Signature(dataBytes, keyBytes).map(x => x & 0xff);
+}
+
+// Nonce determinista RFC 6979 §3.2 (HMAC-DRBG)
+function ecNonce(d, digest, attempt) {
+  const X = decToBytes32(bnMod(d, EC_N));
+  const h1 = decToBytes32(bnMod(bytesToDec(digest), EC_N));
+  let V = new Array(32).fill(1);
+  let K = new Array(32).fill(0);
+  K = ecHmacSha256(K, V.concat([0]).concat(X).concat(h1));
+  V = ecHmacSha256(K, V);
+  K = ecHmacSha256(K, V.concat([1]).concat(X).concat(h1));
+  V = ecHmacSha256(K, V);
+  for (let i = 0; i < attempt; i++) {
+    K = ecHmacSha256(K, V.concat([0]));
+    V = ecHmacSha256(K, V);
+  }
+  let k = bnMod(bytesToDec(V), EC_N);
+  while (bnCmp(k, '0') === 0) {
+    K = ecHmacSha256(K, V.concat([0]));
+    V = ecHmacSha256(K, V);
+    k = bnMod(bytesToDec(V), EC_N);
+  }
+  return k;
+}
+
+// Firma ES256 sobre "header.claims" con el escalar privado VAPID
+function signVapidJwt(signingInput, privateKeyB64Url) {
+  const d = bytesToDec(urlBase64ToBytes(privateKeyB64Url));
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, signingInput).map(x => x & 0xff);
+  const z = bnMod(bytesToDec(digest), EC_N);
+  let r = '0', s = '0';
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const k = ecNonce(d, digest, attempt);
+    const R = ecMul(k);
+    if (R === null) continue;
+    r = bnMod(R[0], EC_N);
+    if (bnCmp(r, '0') === 0) continue;
+    s = bnMod(bnMul(bnModInverse(k, EC_N), bnMod(bnAdd(z, bnMod(bnMul(r, d), EC_N)), EC_N)), EC_N);
+    if (bnCmp(s, '0') === 0) continue;
+    break;
+  }
+  if (bnCmp(s, '0') === 0) throw new Error('No se pudo generar la firma ES256');
+  if (bnCmp(s, bnDiv2(EC_N)) > 0) s = bnSub(EC_N, s); // firma low-s (JOSE)
+  return base64UrlSafe(decToBytes32(r).concat(decToBytes32(s)));
 }
 
 function sendHelpPushToAdmins(db, message, evaluatorName) {
@@ -1058,7 +1252,7 @@ function sendHelpPushToAdmins(db, message, evaluatorName) {
     if (!endpoint) continue;
     try {
       const aud = new URL(endpoint).origin;
-      const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'RS256' }));
+      const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'ES256' }));
       const jwtClaims = base64UrlSafe(JSON.stringify({ aud, exp: now + ttl, sub: 'mailto:contacto.encuentroestiq@gmail.com' }));
       const signingInput = jwtHeader + '.' + jwtClaims;
       const jwt = signingInput + '.' + signVapidJwt(signingInput, privateKey);
@@ -1077,36 +1271,9 @@ function sendHelpPushToAdmins(db, message, evaluatorName) {
   }
 }
 function ESCRIBIR_LLAVES_VAPID() {
-  const publicKey = `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqGUBL2Ja0lBfzEN32l9pacLFwNzR1ogJ17kEYX4uuvInU1bfyqiX5rKlvkHMYulGvXRWjITchhahwd9720BaObmJZ2QjAxqZ5mwGjR55HcMH7VoSSjL0qh6AaoshaiUHuOaWpLboqxafRWmMFXjlzzN30g3B9Fa4wA-jOk04vstQiRZIzzotmXeqfq0TwoW03L4lX78qcn6Ek3IBVjNcRicqj1xQDKCGS_j0SHwK_eJ7eFZyr0sqTx9XPKzNxXAdvznKxHhUsJke1CpBAHTwKxyqTe9QR9LTYQ9Ubd6jez_6P3pnnwZMOX-KjwUaKwfo0hXezut52EJtV2_zuRANCwIDAQAB`;
-
-  const privateKey = `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCoZQEvYlrSUF/M
-Q3faX2lpwsXA3NHWiAnXuQRhfi668idTVt/KqJfmsqW+Qcxi6Ua9dFaMhNyGFqHB
-33vbQFo5uYlnZCMDGpnmbAaNHnkdwwftWhJKMvSqHoBqiyFqJQe45paktuirFp9F
-aYwVeOXPM3fSDcH0VrjAD6M6TTi+y1CJFkjPOi2Zd6p+rRPChbTcviVfvypyfoST
-cgFWM1xGJyqPXFAMoIZL+PRIfAr94nt4VnKvSypPH1c8rM3FcB2/OcrEeFSwmR7U
-KkEAdPArHKpN71BH0tNhD1Rt3qN7P/o/emefBkw5f4qPBRorB+jSFd7O63nYQm1X
-b/O5EA0LAgMBAAECggEAUwND48uNMTutFiG2bmD1sszxNsPE8AitLXrIZZVSTRd9
-+nALr7iP9Yrg+Rsvuhz8of29gtUmbzWt9UiKIsolEGreCSmMtwWAk95yFlRM6baQ
-7FmoRYq8ITcbICrJRK3Pkj+eSMHgjiL/TjUbeSRZydy590OP9zdfKVMsKNwTmr4K
-NE/qknpzBfsOXB0TIR9hxbggUv4hvF8Vzgpkr6lulWFFLblwNl1h6mPP650Kx1Ji
-l+TSM2V+ji/hb4pCM5i1v3aFx7BEODgcvF1bp6uATSyvrvFEU96BIeFhQuiIQ1B7
-S4vTDYfKrSuKyS8/h0YIbSlbozPeHGh0DCisjtWJlQKBgQDtxSmLPu9BHMMn0Ss0
-wxP5JEJPG5qDHgTR0MsCn5BiDGMwVljXS8+9Rsp1SBZwr+mpYhbJ10+rWfKJxF2I
-wstb2B+NE9q/GW10jIVxzokT9h1zoVpw8QwRSNy5Jz1+MifdKvp0iv17vfSNo5xx
-gveoSZ6HPIQqj7FGl/XmLll7PwKBgQC1Tivc4zIjUBbWv6Avku9UyffxrII2d2zK
-+oegaD63BmBj0vEEfO1bP7ehv41jqKW2QpRROVJMVrPM5msDVqs6fprAivUCTEqc
-tNuJCnmiUWFaBoF9D/A+V20ORcV4oT7C5wQTOPgAlayPy1xKvSLxYExC/Df8ZtXr
-PSjFsDE3NQKBgQC657qxf+ZZO7/ZA96/2f1QYoVRZDSAj09gk42R4VaBDJXIAIhT
-rX9+nTA3I1Sofk/iW33oaj1xSAKU82xHPkDXULv0jT/t6pIVBQU9Igq1S0l5hMPw
-djtzNuBzF3qKQej+PXOlu0BpTjf4Qz2OKVJ+0mgwjIykXFIRWRDuQU8LxwKBgFpu
-yGAgDtUgUJQC9vJj1u6y4vJvum9SeDhyaA3xkT6XdqK0B7XWXkoCaSTLt8l6yFU1
-tmchMVSUdpCAaeY7Z6MAnU3mwbjItvqdF1eumucEsotF7Xak6Y8e6m2RDaNSwkxT
-EGxKISGhhnYe2EULPA+rmb5bsc06uf7g/aJFdPb1AoGBAJmnfWFD6BStxBdhYSl/
-o3lygyF1cCFtJOlaU73irYf7qSeHcEv5YNHBJN3J/3PFeUJOGnL7UJrjFgyOzgQR
-+DXHStO3PTwHMttD3j7M/zldJdr8vc2yrKi5ZfpsS5z2MS0D43vOChYWWGFRi3JN
-MrKoOc1et9EOPdrimUsX6+CH
------END PRIVATE KEY-----`;
+  // Llaves EC P-256 (ES256): la pública es el punto sin comprimir y la privada el escalar de 32 bytes
+  const publicKey = `BPW81JMHT9wczWCw3rDaABQU2OPN9ktex5xDcVzYC03SBl8kT1EiwImrz1zI05HhGl0tJIFnwsYV2-Fd22XnGC8`;
+  const privateKey = `AyJoWUJc2ytznsUNFhO4UKRtY1IUSyVIQQBBXF8hcCo`;
 
   SETUP_VAPID_KEYS(publicKey, privateKey);
 }
