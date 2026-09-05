@@ -1,1 +1,4 @@
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlMRzzh7vR5cQObXiccwLXay99SQtj78h9figkDZAy05XjOnJzDVGApgOriQ6Fxt-d/exec';
+
+// VAPID pública (Web Push) — la privada vive solo en el backend (hoja config)
+const VAPID_PUBLIC_KEY = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqGUBL2Ja0lBfzEN32l9pacLFwNzR1ogJ17kEYX4uuvInU1bfyqiX5rKlvkHMYulGvXRWjITchhahwd9720BaObmJZ2QjAxqZ5mwGjR55HcMH7VoSSjL0qh6AaoshaiUHuOaWpLboqxafRWmMFXjlzzN30g3B9Fa4wA-jOk04vstQiRZIzzotmXeqfq0TwoW03L4lX78qcn6Ek3IBVjNcRicqj1xQDKCGS_j0SHwK_eJ7eFZyr0sqTx9XPKzNxXAdvznKxHhUsJke1CpBAHTwKxyqTe9QR9LTYQ9Ubd6jez_6P3pnnwZMOX-KjwUaKwfo0hXezut52EJtV2_zuRANCwIDAQAB';

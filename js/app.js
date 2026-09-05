@@ -78,6 +78,11 @@ async function handleLogin(e) {
     const result = await window.apiClient.loginUser(email, password);
     
     if (result.success && result.data && result.data.profile) {
+        // Guardar credenciales en el gestor del dispositivo (si está disponible)
+        if (window.PasswordCredential && navigator.credentials && e.target) {
+            try { await navigator.credentials.store(new PasswordCredential(e.target)); }
+            catch (err) { /* el gestor puede no estar disponible; no es bloqueante */ }
+        }
         const user = result.data.profile;
         if (user.user_type === 'admin') window.location.href = 'admin-dashboard.html';
         else if (user.user_type === 'evaluator') window.location.href = 'evaluator-dashboard.html';

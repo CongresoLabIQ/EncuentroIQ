@@ -59,14 +59,14 @@
                 <form id="loginForm">
                     <div class="mb-3">
                         <label for="email" class="form-label">Correo Electrónico</label>
-                        <input type="email" class="form-control form-control-lg" id="email" required
-                            placeholder="tu@email.com">
+                        <input type="email" class="form-control form-control-lg" id="email" name="email"
+                            autocomplete="username" required placeholder="tu@email.com">
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label">Contraseña</label>
                         <div class="input-group">
-                            <input type="password" class="form-control form-control-lg" id="password" required
-                                placeholder="••••••">
+                            <input type="password" class="form-control form-control-lg" id="password" name="password"
+                                autocomplete="current-password" required placeholder="••••••">
                             <button class="btn btn-outline-secondary" type="button"
                                 onclick="togglePassword('password', this)" aria-label="Mostrar contraseña">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>

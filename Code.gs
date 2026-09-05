@@ -138,6 +138,18 @@ function doGet(e) {
         }
       };
     }
+    else if (action === 'getPendingHelpSummary') {
+      const requests = getSheetData(db, 'help_requests').filter(r => r.status === 'pending');
+      const last = requests[requests.length - 1] || null;
+      result = {
+        success: true,
+        data: {
+          count: requests.length,
+          lastMessage: last ? String(last.message || '') : '',
+          evaluators: last ? String(last.evaluator_name || '') : ''
+        }
+      };
+    }
   } catch (error) {
     result = { success: false, error: error.toString() };
   }
@@ -208,6 +220,20 @@ function obtenerCodigoEvaluador() {
     }
   }
   return 'zaragoza';
+}
+
+function getConfigValue(key, defaultValue) {
+  const db = SpreadsheetApp.getActiveSpreadsheet();
+  const configSheet = db.getSheetByName('config');
+  if (configSheet) {
+    const data = configSheet.getDataRange().getValues();
+    for (let i = 0; i < data.length; i++) {
+      const k = String(data[i][0] || '').trim().toLowerCase();
+      const v = data[i][1];
+      if (k === key && v !== '' && v !== null && v !== undefined) return String(v);
+    }
+  }
+  return defaultValue;
 }
 
 function shuffleArray(array) {
@@ -598,6 +624,33 @@ function doPost(e) {
     else if (data.action === 'requestHelp') {
       const evaluator = assertUser(db, data.user_id);
       addHelpRequest(db, evaluator, (data.message || '').toString().substring(0, 500));
+      try { sendHelpPushToAdmins(db, (data.message || '').toString().substring(0, 500), evaluator.name); }
+      catch (e) { Logger.log('sendHelpPushToAdmins error: ' + e.message); }
+      result = { success: true };
+    }
+
+    else if (data.action === 'registerPushSubscription') {
+      const admin = assertAdmin(db, data.admin_user_id);
+      const sub = data.subscription;
+      if (!sub || !sub.endpoint) throw new Error('Suscripción inválida');
+      const sheet = getPushSubscriptionSheet(db);
+      const rows = sheet.getDataRange().getValues();
+      const headers = rows[0];
+      const idIdx = headers.indexOf('admin_user_id');
+      let updated = false;
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][idIdx]) === String(admin.id)) {
+          sheet.getRange(i + 1, headers.indexOf('endpoint') + 1).setValue(sub.endpoint);
+          sheet.getRange(i + 1, headers.indexOf('keys_p256dh') + 1).setValue(sub.keys && sub.keys.p256dh || '');
+          sheet.getRange(i + 1, headers.indexOf('keys_auth') + 1).setValue(sub.keys && sub.keys.auth || '');
+          sheet.getRange(i + 1, headers.indexOf('updated_at') + 1).setValue(new Date());
+          updated = true;
+          break;
+        }
+      }
+      if (!updated) {
+        sheet.appendRow([admin.id, sub.endpoint, sub.keys && sub.keys.p256dh || '', sub.keys && sub.keys.auth || '', new Date()]);
+      }
       result = { success: true };
     }
 
@@ -949,4 +1002,111 @@ function logReassign(db, workId, oldEv, newEv, adminId, reason) {
     sheet.appendRow(['id', 'work_id', 'old_evaluator_id', 'new_evaluator_id', 'by_admin_id', 'reason', 'timestamp']);
   }
   sheet.appendRow([Utilities.getUuid(), workId, oldEv, newEv, adminId, reason, new Date()]);
+}
+
+// ============================================================
+// WEB PUSH (VAPID, sin servicios externos)
+// ============================================================
+
+// Script una sola vez tras desplegar: guarda las llaves VAPID en la hoja 'config'
+function SETUP_VAPID_KEYS(publicKey, privateKey) {
+  const db = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = db.getSheetByName('config');
+  if (!sheet) sheet = db.insertSheet('config');
+  const rows = sheet.getDataRange().getValues();
+  const set = (k, v) => {
+    const idx = rows.findIndex(r => String(r[0]).trim().toLowerCase() === k);
+    if (idx > -1) sheet.getRange(idx + 1, 2).setValue(v);
+    else sheet.appendRow([k, v]);
+  };
+  set('vapid_public', publicKey);
+  set('vapid_private', privateKey);
+}
+
+function getPushSubscriptionSheet(db) {
+  let sheet = db.getSheetByName('push_subscriptions');
+  if (!sheet) {
+    sheet = db.insertSheet('push_subscriptions');
+    sheet.appendRow(['admin_user_id', 'endpoint', 'keys_p256dh', 'keys_auth', 'created_at', 'updated_at']);
+  }
+  return sheet;
+}
+
+function base64UrlSafe(input, charset) {
+  return Utilities.base64EncodeWebSafe(input, charset || Utilities.Charset.UTF_8).replace(/=+$/, '');
+}
+
+// Firma RS256 sobre "header.claims" con la llave privada VAPID (PEM PKCS#8)
+function signVapidJwt(signingInput, privateKeyPem) {
+  const sig = Utilities.computeRsaSha256Signature(signingInput, privateKeyPem);
+  return base64UrlSafe(sig);
+}
+
+function sendHelpPushToAdmins(db, message, evaluatorName) {
+  const privateKey = getConfigValue('vapid_private', '');
+  const publicKey = getConfigValue('vapid_public', '');
+  if (!privateKey || !publicKey) return;
+
+  const subs = getPushSubscriptionSheet(db).getDataRange().getValues();
+  const headers = subs[0];
+  const endpointIdx = headers.indexOf('endpoint');
+  const now = Math.floor(Date.now() / 1000);
+  const ttl = 3600;
+
+  for (let i = 1; i < subs.length; i++) {
+    const endpoint = String(subs[i][endpointIdx] || '');
+    if (!endpoint) continue;
+    try {
+      const aud = new URL(endpoint).origin;
+      const jwtHeader = base64UrlSafe(JSON.stringify({ typ: 'JWT', alg: 'RS256' }));
+      const jwtClaims = base64UrlSafe(JSON.stringify({ aud, exp: now + ttl, sub: 'mailto:contacto.encuentroestiq@gmail.com' }));
+      const signingInput = jwtHeader + '.' + jwtClaims;
+      const jwt = signingInput + '.' + signVapidJwt(signingInput, privateKey);
+
+      const opts = {
+        method: 'post',
+        headers: { 'Authorization': 'vapid t=' + jwt + ', k=' + publicKey, 'TTL': String(ttl) },
+        payload: '',
+        contentType: 'text/plain;charset=UTF-8',
+        muteHttpExceptions: true
+      };
+      UrlFetchApp.fetch(endpoint, opts);
+    } catch (e) {
+      Logger.log('push a ' + endpoint + ' falló: ' + e.message);
+    }
+  }
+}
+function ESCRIBIR_LLAVES_VAPID() {
+  const publicKey = `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqGUBL2Ja0lBfzEN32l9pacLFwNzR1ogJ17kEYX4uuvInU1bfyqiX5rKlvkHMYulGvXRWjITchhahwd9720BaObmJZ2QjAxqZ5mwGjR55HcMH7VoSSjL0qh6AaoshaiUHuOaWpLboqxafRWmMFXjlzzN30g3B9Fa4wA-jOk04vstQiRZIzzotmXeqfq0TwoW03L4lX78qcn6Ek3IBVjNcRicqj1xQDKCGS_j0SHwK_eJ7eFZyr0sqTx9XPKzNxXAdvznKxHhUsJke1CpBAHTwKxyqTe9QR9LTYQ9Ubd6jez_6P3pnnwZMOX-KjwUaKwfo0hXezut52EJtV2_zuRANCwIDAQAB`;
+
+  const privateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCoZQEvYlrSUF/M
+Q3faX2lpwsXA3NHWiAnXuQRhfi668idTVt/KqJfmsqW+Qcxi6Ua9dFaMhNyGFqHB
+33vbQFo5uYlnZCMDGpnmbAaNHnkdwwftWhJKMvSqHoBqiyFqJQe45paktuirFp9F
+aYwVeOXPM3fSDcH0VrjAD6M6TTi+y1CJFkjPOi2Zd6p+rRPChbTcviVfvypyfoST
+cgFWM1xGJyqPXFAMoIZL+PRIfAr94nt4VnKvSypPH1c8rM3FcB2/OcrEeFSwmR7U
+KkEAdPArHKpN71BH0tNhD1Rt3qN7P/o/emefBkw5f4qPBRorB+jSFd7O63nYQm1X
+b/O5EA0LAgMBAAECggEAUwND48uNMTutFiG2bmD1sszxNsPE8AitLXrIZZVSTRd9
++nALr7iP9Yrg+Rsvuhz8of29gtUmbzWt9UiKIsolEGreCSmMtwWAk95yFlRM6baQ
+7FmoRYq8ITcbICrJRK3Pkj+eSMHgjiL/TjUbeSRZydy590OP9zdfKVMsKNwTmr4K
+NE/qknpzBfsOXB0TIR9hxbggUv4hvF8Vzgpkr6lulWFFLblwNl1h6mPP650Kx1Ji
+l+TSM2V+ji/hb4pCM5i1v3aFx7BEODgcvF1bp6uATSyvrvFEU96BIeFhQuiIQ1B7
+S4vTDYfKrSuKyS8/h0YIbSlbozPeHGh0DCisjtWJlQKBgQDtxSmLPu9BHMMn0Ss0
+wxP5JEJPG5qDHgTR0MsCn5BiDGMwVljXS8+9Rsp1SBZwr+mpYhbJ10+rWfKJxF2I
+wstb2B+NE9q/GW10jIVxzokT9h1zoVpw8QwRSNy5Jz1+MifdKvp0iv17vfSNo5xx
+gveoSZ6HPIQqj7FGl/XmLll7PwKBgQC1Tivc4zIjUBbWv6Avku9UyffxrII2d2zK
++oegaD63BmBj0vEEfO1bP7ehv41jqKW2QpRROVJMVrPM5msDVqs6fprAivUCTEqc
+tNuJCnmiUWFaBoF9D/A+V20ORcV4oT7C5wQTOPgAlayPy1xKvSLxYExC/Df8ZtXr
+PSjFsDE3NQKBgQC657qxf+ZZO7/ZA96/2f1QYoVRZDSAj09gk42R4VaBDJXIAIhT
+rX9+nTA3I1Sofk/iW33oaj1xSAKU82xHPkDXULv0jT/t6pIVBQU9Igq1S0l5hMPw
+djtzNuBzF3qKQej+PXOlu0BpTjf4Qz2OKVJ+0mgwjIykXFIRWRDuQU8LxwKBgFpu
+yGAgDtUgUJQC9vJj1u6y4vJvum9SeDhyaA3xkT6XdqK0B7XWXkoCaSTLt8l6yFU1
+tmchMVSUdpCAaeY7Z6MAnU3mwbjItvqdF1eumucEsotF7Xak6Y8e6m2RDaNSwkxT
+EGxKISGhhnYe2EULPA+rmb5bsc06uf7g/aJFdPb1AoGBAJmnfWFD6BStxBdhYSl/
+o3lygyF1cCFtJOlaU73irYf7qSeHcEv5YNHBJN3J/3PFeUJOGnL7UJrjFgyOzgQR
++DXHStO3PTwHMttD3j7M/zldJdr8vc2yrKi5ZfpsS5z2MS0D43vOChYWWGFRi3JN
+MrKoOc1et9EOPdrimUsX6+CH
+-----END PRIVATE KEY-----`;
+
+  SETUP_VAPID_KEYS(publicKey, privateKey);
 }

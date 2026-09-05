@@ -33,6 +33,8 @@
 .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
 .btn-outline-primary { color: var(--primary); border-color: var(--primary); }
 .btn-outline-primary:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-outline-accent { color: var(--accent); border-color: var(--accent); }
+.btn-outline-accent:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .spinner-border.text-primary { border-right-color: var(--primary); border-top-color: var(--primary); }
 
 * { box-sizing: border-box; }
@@ -1658,6 +1660,126 @@ body.has-bottom-nav .floating-logout {
 
 body.has-bottom-nav .floating-help {
   bottom: 80px;
+}
+
+/* ============================================================
+   Hint overlay "Ayuda disponible" (Fase 2 evaluador)
+   ============================================================ */
+.phase2-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 15, 35, 0.68);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.phase2-hint.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.phase2-hint-card {
+  max-width: 420px;
+  width: 100%;
+  background: var(--bg-card);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 30px 26px 24px;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  position: relative;
+}
+.phase2-hint-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(213, 159, 15, 0.14);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.phase2-hint-card h5 {
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.phase2-hint-card p {
+  font-size: 0.95rem;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.phase2-hint-card p strong {
+  color: var(--accent);
+}
+.phase2-hint-arrow {
+  margin: 14px auto 0;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 20px solid var(--accent);
+  animation: hint-bounce 1.1s ease-in-out infinite;
+  -webkit-filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+}
+@keyframes hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(7px); }
+}
+.phase2-hint-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 26px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.phase2-hint-btn:active {
+  transform: scale(0.96);
+}
+/* Puntero flotante que señala el botón real de Ayuda */
+.phase2-hint-pointer {
+  position: fixed;
+  z-index: 1201;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.phase2-hint-pointer.show {
+  opacity: 1;
+}
+.phase2-hint-pointer-label {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(213, 159, 15, 0.5);
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.phase2-hint-pointer-arrow {
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 16px solid var(--accent);
+  animation: hint-bounce 1.1s ease-in-out infinite;
 }
 
 /* ============================================================

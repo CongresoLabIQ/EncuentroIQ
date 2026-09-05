@@ -239,6 +239,20 @@ const apiClient = {
         });
     },
 
+    // Notificaciones push (Web Push)
+    async registerPushSubscription(subscription) {
+        return await postData({
+            action: 'registerPushSubscription',
+            admin_user_id: this._sessionId(),
+            subscription
+        });
+    },
+
+    async getPendingHelpSummary() {
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getPendingHelpSummary`);
+        return json.success ? json.data : { count: 0, lastMessage: '', evaluators: '' };
+    },
+
     // Recuperación de contraseña
     async forgotPassword(email) {
         return await postData({

@@ -781,6 +781,10 @@
             loadPhase1();
             loadPhase2();
 
+            // Hint al entrar a la Fase 2 (señala el botón Ayuda)
+            const phase2Tab = document.getElementById('phase2-tab');
+            if (phase2Tab) phase2Tab.addEventListener('shown.bs.tab', showPhase2Hint);
+
             // Limpiar iframe del PDF al cerrar el modal
             const evalModal = document.getElementById('evalModal');
             if (evalModal) {
@@ -790,6 +794,34 @@
                 });
             }
         });
+
+        // ============================================================
+        // HINT FASE 2 — Flash oscurece la pantalla y señala el botón Ayuda
+        // ============================================================
+        function positionHintPointer() {
+            const btn = document.getElementById('helpButton');
+            const ptr = document.getElementById('phase2HintPointer');
+            if (!btn || !ptr) return;
+            const r = btn.getBoundingClientRect();
+            ptr.style.left = (r.left + r.width / 2) + 'px';
+            ptr.style.bottom = (window.innerHeight - r.top + 12) + 'px';
+            ptr.classList.add('show');
+        }
+
+        function showPhase2Hint() {
+            const el = document.getElementById('phase2Hint');
+            if (!el) return;
+            el.classList.add('show');
+            positionHintPointer();
+            window.addEventListener('resize', positionHintPointer);
+        }
+
+        function hidePhase2Hint() {
+            const el = document.getElementById('phase2Hint');
+            if (el) el.classList.remove('show');
+            const ptr = document.getElementById('phase2HintPointer');
+            if (ptr) ptr.classList.remove('show');
+        }
 
         // ============================================================
         // FASE 1 — Evaluación Documental
@@ -1463,6 +1495,7 @@
         // PEDIR AYUDA AL ADMIN
         // ============================================================
         async function openHelpModal() {
+            hidePhase2Hint();
             const modalEl = document.getElementById('helpModal');
             document.getElementById('helpMessage').value = '';
             document.getElementById('helpCharCount').textContent = '0/500';
@@ -1487,6 +1520,23 @@
             }
         }
     </script>
+
+    <!-- Hint Fase 2: aviso con flecha hacia el botón Ayuda -->
+    <div class="phase2-hint" id="phase2Hint" role="dialog" aria-modal="true" aria-label="Recordatorio de ayuda">
+        <div class="phase2-hint-card">
+            <div class="phase2-hint-icon">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h5>Recuerda</h5>
+            <p>Si tienes algún inconveniente, puedes solicitar ayuda con el botón <strong>'Ayuda'</strong>. Un administrador acudirá a tu ubicación.</p>
+            <button class="phase2-hint-btn" onclick="hidePhase2Hint()">Entendido</button>
+        </div>
+        <div class="phase2-hint-arrow" aria-hidden="true"></div>
+    </div>
+    <div class="phase2-hint-pointer" id="phase2HintPointer" aria-hidden="true">
+        <span class="phase2-hint-pointer-label">Botón Ayuda</span>
+        <span class="phase2-hint-pointer-arrow"></span>
+    </div>
 
     <!-- Floating logout button -->
     <button class="floating-logout" onclick="logout()" aria-label="Cerrar sesión">

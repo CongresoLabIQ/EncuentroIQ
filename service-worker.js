@@ -1,4 +1,56 @@
 const CACHE_NAME = 'encuentroiq-v4';
+const PUSH_ICON = 'assets/icon-192.png';
+
+importScripts('js/config.js');
+
+// Web Push: notificación llegó al dispositivo (aunque esté bloqueado)
+self.addEventListener('push', (event) => {
+    event.waitUntil(handlePush(event));
+});
+
+async function handlePush(event) {
+    let count = 1;
+    let body = 'Un evaluador solicitó ayuda.';
+    let evaluatorName = '';
+    try {
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPendingHelpSummary`);
+        const json = await res.json();
+        if (json.success && json.data) {
+            count = json.data.count || 1;
+            evaluatorName = json.data.evaluators || '';
+            if (json.data.lastMessage) body = `"${json.data.lastMessage}"`;
+        }
+    } catch (e) { /* sin red, mostramos el aviso genérico */ }
+
+    const title = count > 1 ? `${count} evaluadores esperan ayuda` : 'Solicitud de ayuda';
+    const message = count > 1
+        ? 'Revisa el panel de administración para atender las solicitudes.'
+        : (evaluatorName ? `${evaluatorName}: ` : '') + body;
+
+    return self.registration.showNotification(title, {
+        body: message,
+        icon: PUSH_ICON,
+        badge: PUSH_ICON,
+        tag: 'help-request',
+        vibrate: [280, 100, 280],
+        data: { url: 'admin-dashboard.html' }
+    });
+}
+
+// Tocar la notificación abre el panel de administración
+self.addEventListener('notificationclick', (event) => {
+    const url = (event.notification.data && event.notification.data.url) || 'admin-dashboard.html';
+    event.notification.close();
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+            for (const client of list) {
+                if ('focus' in client) { client.focus(); return; }
+            }
+            if (clients.openWindow) clients.openWindow(url);
+        })
+    );
+});
+
 const ASSETS = [
     '/',
     'index.html',
