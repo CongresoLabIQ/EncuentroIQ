@@ -74,8 +74,9 @@ El panel tiene 3 pestañas accesibles desde la barra de navegación inferior:
 ## Paso 5: Dictaminar trabajos
 
 1. Cuando todos los trabajos en revisión tengan 3 evaluaciones completadas, haz clic en **Dictaminar (N)** en el Dashboard.
-2. El sistema aplica la regla **Top 2 por semestre** para ponencias orales.
-3. Se envían correos de notificación a los alumnos con el resultado.
+2. El sistema aplica la regla **Top 17 por facultad** (Top 2 a ponencia oral, resto a cartel) y guarda el dictamen en la hoja de cálculo.
+3. **Revisa** la tabla de evaluaciones para confirmar que todo quedó bien.
+4. Cuando estés seguro, haz clic en **Notificar** para enviar los correos de resultado a los alumnos. Solo se envían a los trabajos ya dictaminados.
 
 ---
 

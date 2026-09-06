@@ -421,7 +421,6 @@ function doPost(e) {
       const wSheet = db.getSheetByName('works');
       const works = getSheetData(db, 'works');
       const evals = getSheetData(db, 'evaluations');
-      const users = getSheetData(db, 'users');
       const h = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
 
       const MAX_POR_FACULTAD = 17;
@@ -484,14 +483,31 @@ function doPost(e) {
         wSheet.getRange(w.rowIndex, h.indexOf('feedback')+1).setValue(w.feedback);
         if (h.indexOf('auditorio')>-1) wSheet.getRange(w.rowIndex, h.indexOf('auditorio')+1).setValue(w.fAud || "");
         if (h.indexOf('horario')>-1) wSheet.getRange(w.rowIndex, h.indexOf('horario')+1).setValue("'" + (w.fHor || ""));
-        
-        const student = users.find(u => u.id === w.student_id);
-        if (student) {
-          let msg = `Dictamen: ${w.fStat}\nLugar: ${w.fAud || 'N/A'}\nHora: ${w.fHor || 'N/A'}\n\nRetroalimentación:\n${w.feedback}`;
-          try { MailApp.sendEmail(student.email, "Resultado Encuentro IQ", msg); } catch(e) {}
-        }
       });
-      result = { success: true };
+      result = { success: true, count: workPool.length };
+    }
+
+    else if (data.action === 'notifyFinalResults') {
+      const works = getSheetData(db, 'works');
+      const users = getSheetData(db, 'users');
+      const statusLabel = {
+        'accepted_oral': 'Aceptado — Ponencia Oral',
+        'accepted_poster': 'Aceptado — Cartel',
+        'rejected': 'No seleccionado'
+      };
+      let sent = 0;
+      works.forEach(w => {
+        if (!statusLabel[w.status]) return;
+        const student = users.find(u => u.id === w.student_id);
+        if (!student) return;
+        const hora = String(w.horario || '').replace(/^'/, '');
+        const msg = `Dictamen: ${statusLabel[w.status]}\nLugar: ${w.auditorio || 'N/A'}\nHora: ${hora || 'N/A'}\n\nRetroalimentación:\n${w.feedback || 'N/A'}`;
+        try {
+          MailApp.sendEmail(student.email, "Resultado Encuentro IQ", msg);
+          sent++;
+        } catch(e) {}
+      });
+      result = { success: true, count: sent };
     }
 
     else if (data.action === 'notifyJudgesAgenda') {

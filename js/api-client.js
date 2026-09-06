@@ -138,6 +138,10 @@ const apiClient = {
         return await postData({ action: 'batchFinalize' });
     },
 
+    async notifyFinalResults() {
+        return await postData({ action: 'notifyFinalResults' });
+    },
+
     async assignLiveWorks() {
         return await postData({ action: 'assignLiveWorks' });
     },

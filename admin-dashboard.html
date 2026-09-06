@@ -114,6 +114,10 @@
                             <button class="btn btn-success btn-sm fw-bold" onclick="finalizeAllReadyWorks()">
                                 Dictaminar (<span id="readyCountBadge">0</span>)
                             </button>
+                            <button class="btn btn-outline-primary btn-sm fw-bold" onclick="notifyAllResults()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Notificar
+                            </button>
                         </div>
                     </div>
 
@@ -1376,20 +1380,41 @@
 
         async function finalizeAllReadyWorks() {
             if (!readyWorksCache.length) return showToast('No hay trabajos con 3 evaluaciones completas.', 'warning');
-            if (!confirm(`¿Dictaminar ${readyWorksCache.length} trabajos?\n\nSe aceptarán los 17 mejores por facultad: los 2 primeros a ponencia y el resto a cartel. Se notificará a los alumnos por correo.`)) return;
+            if (!confirm(`¿Dictaminar ${readyWorksCache.length} trabajos?\n\nSe aceptarán los 17 mejores por facultad: los 2 primeros a ponencia y el resto a cartel. No se enviará ningún correo todavía.`)) return;
 
             progressModal.show();
-            document.getElementById('progressMessage').innerText = 'Dictaminando y enviando correos...';
+            document.getElementById('progressMessage').innerText = 'Dictaminando trabajos...';
             try {
                 const res = await window.apiClient.batchFinalize();
                 progressModal.hide();
                 if (res.success) {
-                    showToast(`Listo. ${res.count} trabajos dictaminados y notificados.`, 'success');
+                    showToast(`Listo. ${res.count} trabajos dictaminados. Recuerda revisar y luego notificar.`, 'success');
                     loadAdminDashboard();
                 } else {
                     showToast('Error: ' + res.error, 'error');
                 }
             } catch (e) { progressModal.hide(); showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function notifyAllResults() {
+            if (!confirm(`¿Notificar resultados por correo a todos los alumnos dictaminados?\n\nSe enviarán los correos de inmediato. Asegúrate de haber revisado el dictamen antes de continuar.`)) return;
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Notificando...';
+            try {
+                const res = await window.apiClient.notifyFinalResults();
+                if (res.success) {
+                    showToast(`Listo. ${res.count} correos de dictamen enviados.`, 'success');
+                    loadAdminDashboard();
+                } else {
+                    showToast('Error: ' + res.error, 'error');
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
 
         // ✅ CORREGIDO: Una sola llamada al backend en vez de loop de llamadas HTTP
