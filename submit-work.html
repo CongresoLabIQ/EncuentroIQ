@@ -251,8 +251,9 @@
         })();
     </script>
     <script>
-        // Bloquear si la subida está desactivada
-        if (localStorage.getItem('encuentroIQ_uploadsEnabled') === '0') {
+        // Bloquear si la subida está desactivada o la fase 1 está oculta
+        if (localStorage.getItem('encuentroIQ_uploadsEnabled') === '0'
+            || localStorage.getItem('encuentroIQ_phase1Enabled') === '0') {
             window.location.href = 'student-dashboard.html';
         }
 

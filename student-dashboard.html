@@ -55,6 +55,8 @@
             <div id="uploadAction"></div>
         </div>
 
+        <div id="presDeadlineBanner" class="d-none mb-3"></div>
+
         <div id="worksList">
             <div class="skeleton-card">
                 <div class="skeleton-row">
@@ -82,6 +84,46 @@
                 </div>
                 <div class="modal-body">
                     <div id="feedbackContent" class="feedback-box"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Subir Presentación (Fase 2, alumnos seleccionados a oral) -->
+    <div class="modal fade" id="presentationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-unam text-white">
+                    <h5 class="modal-title">Subir Presentación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Presentación para: <strong id="presWorkTitle" class="text-primary-theme"></strong></small>
+                    </div>
+                    <div class="mb-4 d-none" id="presAlreadyDiv">
+                        <span class="text-success small">Ya subiste una presentación. Puedes descargarla o reemplazarla.</span>
+                        <div class="mt-2" id="presAlreadyLinkBox"></div>
+                    </div>
+                    <div class="file-upload-area" id="presUploadArea">
+                        <p class="h2">📊</p>
+                        <p class="mb-0 fw-bold" id="presFileName">Haz clic para seleccionar archivo (PPTX o PDF)</p>
+                        <small class="text-muted">Formato PDF o PPTX (Máx 25MB)</small>
+                        <input type="file" class="d-none" id="presFileInput" accept=".pdf,.pptx,.ppt">
+                    </div>
+                    <div class="mb-3 d-none" id="presProgressGroup">
+                        <label class="form-label fw-bold">Subiendo archivo...</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="presProgressBar" role="progressbar" style="width: 0%;">0%</div>
+                        </div>
+                        <small class="text-muted mt-1" id="presProgressText">Iniciando...</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-primary fw-bold px-4" id="presSubmitBtn" onclick="submitPresentation()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Subir presentación
+                    </button>
                 </div>
             </div>
         </div>
@@ -148,22 +190,35 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            initPresentationUpload();
             const session = await window.apiClient.checkAuth();
             if (!session) return window.location.href = 'login.html';
 
             const uploadsEnabled = localStorage.getItem('encuentroIQ_uploadsEnabled');
+            const phase1Enabled = localStorage.getItem('encuentroIQ_phase1Enabled') !== '0';
             const actionEl = document.getElementById('uploadAction');
-            if (uploadsEnabled !== '0') {
+            if (uploadsEnabled !== '0' && phase1Enabled) {
                 actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-outline-accent fw-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir trabajo</a>';
             } else {
                 actionEl.innerHTML = '<span class="btn btn-outline-unam fw-bold" style="cursor:not-allowed;opacity:.65"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> La recepción de trabajos terminó</span>';
             }
 
             const works = await window.apiClient.getStudentWorks(session.user.id);
+            window._currentWorks = works;
+            window._sessionUserId = session.user.id;
+
+            let presDeadline = '';
+            try {
+                const cfg = await window.apiClient.getConfig();
+                presDeadline = (cfg.presentation_deadline || '').trim();
+            } catch (e) {}
+            window._presDeadline = presDeadline;
+            updateDeadlineBanner();
+
             const container = document.getElementById('worksList');
 
             if (works.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3 class="empty-state-title">Sin trabajos enviados</h3><p class="empty-state-desc">Aún no has enviado ningún trabajo al Encuentro. Sube tu resumen en PDF para participar.</p>' + (uploadsEnabled !== '0' ? '<a href="submit-work.html" class="btn btn-gold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Enviar mi primer trabajo</a>' : '') + '</div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3 class="empty-state-title">Sin trabajos enviados</h3><p class="empty-state-desc">Aún no has enviado ningún trabajo al Encuentro. Sube tu resumen en PDF para participar.</p>' + (uploadsEnabled !== '0' && phase1Enabled ? '<a href="submit-work.html" class="btn btn-gold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Enviar mi primer trabajo</a>' : '') + '</div>';
                 return;
             }
 
@@ -173,6 +228,21 @@
                 const feedbackBtn = hasFeedback
                     ? `<button class="btn btn-sm btn-outline-info mt-2" onclick="showFeedback('${escapeHtml(w.feedback)}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ver Retroalimentación</button>`
                     : '';
+                const isOral = w.status === 'accepted_oral';
+                const alreadyUploaded = w.presentation_url && w.presentation_url.length > 0;
+                const deadlinePassed = !!window._presDeadlinePassed;
+                const presViewBtn = alreadyUploaded
+                    ? `<a href="${w.presentation_url}" target="_blank" class="btn btn-sm btn-outline-success mt-2 me-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Ver presentación</a>`
+                    : '';
+                const presUploadBtn = deadlinePassed
+                    ? ''
+                    : alreadyUploaded
+                        ? `<button class="btn btn-sm btn-outline-accent mt-2" onclick="openPresentationModal('${w.id}','${escapeHtml(w.title)}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Reemplazar presentación</button>`
+                        : `<button class="btn btn-sm btn-unam mt-2" onclick="openPresentationModal('${w.id}','${escapeHtml(w.title)}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir presentación</button>`;
+                const presClosedBadge = deadlinePassed && !alreadyUploaded
+                    ? `<span class="badge bg-secondary mt-2">Plazo cerrado para subir presentación</span>`
+                    : '';
+                const presentationBtn = isOral ? `${presViewBtn}${presUploadBtn}${presClosedBadge}` : '';
 
                 return `
         <div class="content-card mb-3 animate-fadeUp animate-delay-${Math.min(i + 1, 4)}">
@@ -185,7 +255,7 @@
                         </h5>
                         <p class="mb-1"><strong>Estado:</strong> ${statusData.badge}</p>
                         <p class="mb-1 text-muted small">Fecha de envío: ${new Date(w.submitted_at).toLocaleDateString()}</p>
-                        ${feedbackBtn}
+                        <div class="mt-2">${presentationBtn}${feedbackBtn}</div>
                     </div>
                     <div>
                         <a href="${w.file_url}" target="_blank" class="btn btn-sm btn-outline-unam"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</a>
@@ -216,6 +286,139 @@
         function escapeHtml(text) {
             if (!text) return '';
             return text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+        }
+
+        // --- SUBIR PRESENTACIÓN (Fase 2 — seleccionados a oral) ---
+        let presWorkId = null;
+        let presSelectedFile = null;
+
+        function parseDeadline(dl) {
+            if (!dl) return null;
+            let s = String(dl).trim();
+            if (s.indexOf('T') === -1) s = s.replace(' ', 'T');
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function updateDeadlineBanner() {
+            const deadline = window._presDeadline || '';
+            const banner = document.getElementById('presDeadlineBanner');
+            if (!deadline) { banner.classList.add('d-none'); return; }
+            const dt = parseDeadline(deadline);
+            const passed = dt && new Date() > dt;
+            window._presDeadlinePassed = passed;
+            const dateStr = dt
+                ? dt.toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' })
+                : deadline;
+            if (passed) {
+                banner.className = 'alert alert-warning border-start border-4 border-warning mb-3';
+                banner.innerHTML = `⏰ <strong>Plazo cerrado.</strong> La fecha límite para subir tu presentación fue el <strong>${dateStr}</strong>.`;
+            } else {
+                banner.className = 'alert alert-info border-start border-4 border-info mb-3';
+                banner.innerHTML = `📅 La fecha límite para subir tu presentación es el <strong>${dateStr}</strong>.`;
+            }
+        }
+
+        function openPresentationModal(workId, title) {
+            if (window._presDeadlinePassed) {
+                showToast('El plazo para subir la presentación ya venció.', 'warning');
+                return;
+            }
+            presWorkId = workId;
+            presSelectedFile = null;
+            document.getElementById('presWorkTitle').textContent = title || '';
+            document.getElementById('presFileName').innerHTML = 'Haz clic para seleccionar archivo (PPTX o PDF)';
+            document.getElementById('presFileInput').value = '';
+            const pb = document.getElementById('presProgressBar');
+            pb.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            pb.style.width = '0%';
+            pb.textContent = '0%';
+            document.getElementById('presProgressGroup').classList.add('d-none');
+
+            // Mostrar presentación ya subida, si existe
+            const work = (window._currentWorks || []).find(w => w.id === workId);
+            const alreadyDiv = document.getElementById('presAlreadyDiv');
+            const linkBox = document.getElementById('presAlreadyLinkBox');
+            if (work && work.presentation_url) {
+                alreadyDiv.classList.remove('d-none');
+                linkBox.innerHTML = `<a href="${work.presentation_url}" target="_blank" class="btn btn-sm btn-outline-success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Ver presentación actual</a>`;
+            } else {
+                alreadyDiv.classList.add('d-none');
+                linkBox.innerHTML = '';
+            }
+
+            const btn = document.getElementById('presSubmitBtn');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir presentación';
+            new bootstrap.Modal(document.getElementById('presentationModal')).show();
+        }
+
+        function initPresentationUpload() {
+            const area = document.getElementById('presUploadArea');
+            const input = document.getElementById('presFileInput');
+            if (!area || !input) return;
+            area.addEventListener('click', () => input.click());
+            input.addEventListener('change', (e) => {
+                if (!e.target.files[0]) return;
+                const file = e.target.files[0];
+                const ok = /\.(pdf|pptx|ppt)$/i.test(file.name);
+                if (!ok) {
+                    showToast('Solo se permiten archivos PDF o PPTX', 'error');
+                    input.value = '';
+                    return;
+                }
+                presSelectedFile = file;
+                document.getElementById('presFileName').innerHTML = '✅ ' + file.name;
+                area.style.borderColor = '#198754';
+            });
+        }
+
+        async function submitPresentation() {
+            if (!presWorkId) { showToast('Falta el trabajo.', 'warning'); return; }
+            if (!presSelectedFile) { showToast('Selecciona un archivo PDF o PPTX.', 'warning'); return; }
+            if (window._presDeadlinePassed) { showToast('El plazo para subir la presentación ya venció.', 'warning'); return; }
+
+            const btn = document.getElementById('presSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando...';
+
+            document.getElementById('presProgressGroup').classList.remove('d-none');
+            const pb = document.getElementById('presProgressBar');
+            const pt = document.getElementById('presProgressText');
+            pb.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            pb.style.width = '0%';
+            pb.textContent = '0%';
+            pt.textContent = 'Iniciando...';
+
+            try {
+                const result = await window.apiClient.submitPresentation(
+                    presWorkId,
+                    window._sessionUserId,
+                    presSelectedFile,
+                    (e) => {
+                        if (e.lengthComputable) {
+                            const pct = Math.round((e.loaded / e.total) * 100);
+                            pb.style.width = pct + '%';
+                            pb.textContent = pct + '%';
+                            pt.textContent = `Subiendo... ${pct}% (${(e.loaded / 1024 / 1024).toFixed(1)} MB de ${(e.total / 1024 / 1024).toFixed(1)} MB)`;
+                        }
+                    }
+                );
+                if (result.success) {
+                    pb.className = 'progress-bar bg-success';
+                    pb.textContent = '100%';
+                    pt.textContent = '¡Completado! Redirigiendo...';
+                    showToast('Presentación subida correctamente.', 'success');
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                document.getElementById('presProgressGroup').classList.add('d-none');
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir presentación';
+                showToast('Error: ' + err.message, 'error');
+            }
         }
 
         async function logout() {

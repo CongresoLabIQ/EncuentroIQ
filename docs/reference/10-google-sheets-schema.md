@@ -167,6 +167,7 @@ Parámetros predefinidos:
 | `fecha_fin` | — | Fecha de fin del congreso |
 | `limite_envios` | — | Fecha límite para enviar trabajos |
 | `limite_evaluaciones` | — | Fecha límite para evaluar |
+| `presentation_deadline` | — | Fecha límite para subir presentaciones de Fase 2 |
 | `puntaje_minimo` | 60 | Puntaje mínimo para aprobar fase 1 |
 | `peso_fase1` | 0.4 | Peso de fase 1 en puntaje final |
 | `peso_fase2` | 0.6 | Peso de fase 2 en puntaje final |

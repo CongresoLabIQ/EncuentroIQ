@@ -55,20 +55,20 @@
 
     <main id="mainContent" class="admin-app-content">
 
-                <div class="stats-row mb-3">
+                <div class="stats-row mb-3" id="statsRow">
                     <div class="stat-item">
                         <span class="stat-number" id="totalWorks">0</span>
                         <span class="stat-label">Total</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-phase1>
                         <span class="stat-number" id="pendingWorks">0</span>
                         <span class="stat-label">Pendientes</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-phase1>
                         <span class="stat-number" id="assignedWorks">0</span>
                         <span class="stat-label">En Revisión</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-phase1>
                         <span class="stat-number" id="completedWorks">0</span>
                         <span class="stat-label">Dictaminados</span>
                     </div>
@@ -100,24 +100,35 @@
 
                     <!-- Barra de acciones -->
                     <div class="d-flex flex-wrap gap-2 mb-3 align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <small class="text-muted" id="uploadToggleLabel">Subida activa</small>
-                            <label class="upload-toggle">
-                                <input type="checkbox" id="uploadToggle" onchange="toggleUploads()">
-                                <span class="toggle-slider"></span>
-                            </label>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2" data-phase1>
+                                <small class="text-muted" id="uploadToggleLabel">Subida activa</small>
+                                <label class="upload-toggle">
+                                    <input type="checkbox" id="uploadToggle" onchange="toggleUploads()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted" id="phase1ToggleLabel">Fase 1 visible</small>
+                                <label class="upload-toggle">
+                                    <input type="checkbox" id="phase1Toggle" onchange="togglePhase1()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <button class="btn btn-warning btn-sm fw-bold" onclick="assignAllPendingWorks()">
-                                Asignar Fase 1
-                            </button>
-                            <button class="btn btn-success btn-sm fw-bold" onclick="finalizeAllReadyWorks()">
-                                Dictaminar (<span id="readyCountBadge">0</span>)
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm fw-bold" onclick="notifyAllResults()">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                Notificar
-                            </button>
+                        <div data-phase1>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-warning btn-sm fw-bold" onclick="assignAllPendingWorks()">
+                                    Asignar Fase 1
+                                </button>
+                                <button class="btn btn-success btn-sm fw-bold" onclick="finalizeAllReadyWorks()">
+                                    Dictaminar (<span id="readyCountBadge">0</span>)
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm fw-bold" onclick="notifyAllResults()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    Notificar
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -145,7 +156,7 @@
                     </div>
 
                     <!-- Progreso de evaluaciones por trabajo -->
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm" data-phase1>
                         <div class="card-body p-0">
                             <div class="px-3 pt-3 pb-2 d-flex flex-wrap gap-1 border-bottom" id="evalFilterBar">
                                 <span class="text-muted small me-1 align-self-center">Filtrar:</span>
@@ -202,7 +213,7 @@
                     </div>
 
                     <!-- Trabajos listos para dictaminar -->
-                    <div class="mt-4" id="readyWorksContainer">
+                    <div class="mt-4" id="readyWorksContainer" data-phase1>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
@@ -990,6 +1001,7 @@
                 calculateReadyWorks();
                 renderDashboard();
                 loadUploadToggle();
+                loadPhase1Toggle();
             } catch (e) { showToast('Error al cargar: ' + e.message, 'error'); }
         }
 
@@ -1612,6 +1624,40 @@
             document.getElementById('uploadToggle').checked = enabled;
             const label = document.getElementById('uploadToggleLabel');
             if (label) label.textContent = enabled ? 'Subida activa' : 'Subida desactivada';
+        }
+
+        // --- FASE 1 (subida y evaluación) toggle ---
+        function phase1Enabled() {
+            return localStorage.getItem('encuentroIQ_phase1Enabled') !== '0';
+        }
+
+        function togglePhase1() {
+            const enabled = document.getElementById('phase1Toggle').checked;
+            localStorage.setItem('encuentroIQ_phase1Enabled', enabled ? '1' : '0');
+            updatePhase1UI();
+        }
+
+        function loadPhase1Toggle() {
+            document.getElementById('phase1Toggle').checked = phase1Enabled();
+            updatePhase1UI();
+        }
+
+        // Oculta / muestra los elementos de Fase 1 en el panel admin según el toggle
+        function updatePhase1UI() {
+            const enabled = phase1Enabled();
+            const label = document.getElementById('phase1ToggleLabel');
+            if (label) label.textContent = enabled ? 'Fase 1 visible' : 'Fase 1 oculta';
+
+            document.querySelectorAll('[data-phase1]').forEach(el => {
+                const cond = el.dataset.phase1;
+                const shouldShow = cond === 'false'
+                    ? !enabled   // elementos que SOLO se muestran cuando está oculta
+                    : enabled;   // elementos de fase 1
+                el.classList.toggle('d-none', !shouldShow);
+            });
+
+            const statsRow = document.getElementById('statsRow');
+            if (statsRow) statsRow.classList.toggle('phase1-hidden', !enabled);
         }
 
         let winnersInterval;

@@ -27,6 +27,13 @@ function doGet(e) {
       const data = works.filter(w => w.student_id === studentId);
       result = { success: true, data: data };
     }
+    else if (action === 'getConfig') {
+      const presDeadline = parseConfigDateStr(getConfigValue('presentation_deadline', ''));
+      result = { success: true, data: {
+        event_date: getConfigValue('event_date', ''),
+        presentation_deadline: presDeadline ? presDeadline.toISOString() : ''
+      } };
+    }
     else if (action === 'getEvaluators') {
       const users = getSheetData(db, 'users');
       result = { success: true, data: users.filter(u => u.user_type === 'evaluator') };
@@ -236,6 +243,20 @@ function getConfigValue(key, defaultValue) {
   return defaultValue;
 }
 
+function parseConfigDateStr(value) {
+  if (!value) return null;
+  let s = String(value).trim();
+  if (s.indexOf('T') === -1) s = s.replace(' ', 'T');
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function presentationDeadlinePassed() {
+  const deadline = getConfigValue('presentation_deadline', '');
+  const d = parseConfigDateStr(deadline);
+  return d && new Date() > d;
+}
+
 function shuffleArray(array) {
   let shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -345,6 +366,50 @@ function doPost(e) {
       wSheet.appendRow(row);
       SpreadsheetApp.flush();
       result = { success: true, shortId: sId };
+    }
+
+    else if (data.action === 'submitPresentation') {
+      const works = getSheetData(db, 'works');
+      const work = works.find(w => w.id === data.work_id);
+      if (!work) {
+        result = { success: false, error: 'Trabajo no encontrado.' };
+      } else if (work.student_id !== data.student_id) {
+        result = { success: false, error: 'Solo el autor del trabajo puede subir la presentación.' };
+      } else if (work.status !== 'accepted_oral') {
+        result = { success: false, error: 'Solo los trabajos aceptados para ponencia oral pueden subir presentación.' };
+      } else if (presentationDeadlinePassed()) {
+        result = { success: false, error: 'La fecha límite para subir la presentación ya pasó.' };
+      } else {
+        const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+        const ext = (data.fileName || '').split('.').pop().toLowerCase();
+        const mime = ext === 'pptx' || ext === 'ppt'
+          ? MimeType.MICROSOFT_POWERPOINT
+          : MimeType.PDF;
+        const blob = Utilities.newBlob(Utilities.base64Decode(data.fileBase64), mime, data.fileName);
+        const file = folder.createFile(blob);
+        let fileUrl = "";
+        try {
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          fileUrl = file.getUrl();
+        } catch(e) { fileUrl = "https://drive.google.com/open?id=" + file.getId(); }
+
+        // Asegurar que las columnas de presentación existan en la hoja
+        const wSheet = db.getSheetByName('works');
+        const headers = wSheet.getDataRange().getValues()[0].map(h => String(h).trim());
+        ['presentation_url', 'presentation_file_id', 'presentation_updated_at'].forEach(col => {
+          if (headers.indexOf(col) === -1) {
+            wSheet.getRange(1, headers.length + 1).setValue(col);
+            headers.push(col);
+          }
+        });
+
+        updateRow(db, 'works', 'id', data.work_id, {
+          presentation_url: fileUrl,
+          presentation_file_id: file.getId(),
+          presentation_updated_at: new Date()
+        });
+        result = { success: true, fileUrl: fileUrl };
+      }
     }
 
     else if (data.action === 'assignWork') {

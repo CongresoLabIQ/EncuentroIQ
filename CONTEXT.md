@@ -146,7 +146,7 @@ Funciones JS clave:
 `id`, `work_id`, `evaluator_id`, `score`, `rubrica`, `status`, `completed_at`
 
 ### Hoja `config`
-`event_date`, `evaluator_code`
+`event_date`, `evaluator_code`, `presentation_deadline` (fecha límite para subir presentaciones de Fase 2; se valida en el backend con `presentationDeadlinePassed()` y se muestra como banner en el panel del alumno)
 
 ### Hoja `live_evaluator_status` (fase 2 — actividad en vivo)
 `evaluator_id`, `status`, `last_activity`, `updated_at`

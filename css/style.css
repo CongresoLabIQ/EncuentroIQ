@@ -165,6 +165,12 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
 }
 
+/* Solo queda el stat "Total" cuando Fase 1 está oculta */
+.stats-row.phase1-hidden {
+  grid-template-columns: 1fr;
+  max-width: 320px;
+}
+
 .stat-item {
   background: var(--bg);
   border-radius: var(--radius);

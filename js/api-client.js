@@ -86,6 +86,26 @@ const apiClient = {
         return json.success ? json.data : [];
     },
 
+    async getConfig() {
+        const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getConfig`);
+        return json.success ? json.data : {};
+    },
+
+    // Sube la presentación (PPTX/PDF) de un trabajo seleccionado a oral
+    async submitPresentation(workId, studentId, file, onProgress) {
+        try {
+            const base64 = await toBase64(file);
+            const body = JSON.stringify({
+                action: 'submitPresentation',
+                work_id: workId,
+                student_id: studentId,
+                fileName: file.name,
+                fileBase64: base64.split(',')[1]
+            });
+            return await postDataProgress(body, onProgress);
+        } catch (e) { return { success: false, error: e.message }; }
+    },
+
     async getAllWorks() {
         const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getWorks`);
         return json.success ? json.data : [];
