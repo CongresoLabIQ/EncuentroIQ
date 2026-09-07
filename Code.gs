@@ -31,7 +31,8 @@ function doGet(e) {
       const presDeadline = parseConfigDateStr(getConfigValue('presentation_deadline', ''));
       result = { success: true, data: {
         event_date: getConfigValue('event_date', ''),
-        presentation_deadline: presDeadline ? presDeadline.toISOString() : ''
+        presentation_deadline: presDeadline ? presDeadline.toISOString() : '',
+        fase1_enabled: getConfigValue('fase1_enabled', '1')
       } };
     }
     else if (action === 'getEvaluators') {
@@ -241,6 +242,20 @@ function getConfigValue(key, defaultValue) {
     }
   }
   return defaultValue;
+}
+
+function setConfigValue(key, value) {
+  const db = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = db.getSheetByName('config');
+  if (!sheet) sheet = db.insertSheet('config');
+  const rows = sheet.getDataRange().getValues();
+  const k = String(key).trim().toLowerCase();
+  const idx = rows.findIndex(r => String(r[0]).trim().toLowerCase() === k);
+  if (idx > -1) {
+    sheet.getRange(idx + 1, 2).setValue(value);
+  } else {
+    sheet.appendRow([k, value]);
+  }
 }
 
 function parseConfigDateStr(value) {
@@ -827,6 +842,15 @@ function doPost(e) {
       }
 
       logReassign(db, work_id, old_ev, new_ev, data.admin_user_id, data.reason || '');
+      result = { success: true };
+    }
+
+    else if (data.action === 'setConfig') {
+      assertAdmin(db, data.admin_user_id);
+      const key = String(data.key || '').trim().toLowerCase();
+      const value = String(data.value === undefined ? '' : data.value).trim();
+      if (!key) throw new Error('Falta el nombre de la clave de configuración.');
+      setConfigValue(key, value);
       result = { success: true };
     }
 

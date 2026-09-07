@@ -91,6 +91,15 @@ const apiClient = {
         return json.success ? json.data : {};
     },
 
+    async setConfig(key, value) {
+        return await postData({
+            action: 'setConfig',
+            admin_user_id: this._sessionId(),
+            key,
+            value
+        });
+    },
+
     // Sube la presentación (PPTX/PDF) de un trabajo seleccionado a oral
     async submitPresentation(workId, studentId, file, onProgress) {
         try {

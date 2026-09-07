@@ -155,6 +155,26 @@ Enviar un nuevo trabajo académico.
 
 ---
 
+### `submitPresentation`
+
+Subir la presentación (PPTX/PDF) de un trabajo aceptado a ponencia oral.
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"submitPresentation"` |
+| `work_id` | string | Sí | ID del trabajo (debe ser `accepted_oral`) |
+| `student_id` | string | Sí | ID del alumno autor (valida contra el trabajo) |
+| `fileName` | string | Sí | Nombre del archivo (`.pptx`, `.ppt` o `.pdf`) |
+| `fileBase64` | string | Sí | Archivo codificado en base64 |
+
+Rechaza si el plazo `presentation_deadline` ya pasó. Guarda `presentation_url`, `presentation_file_id` y `presentation_updated_at` en la hoja `works`.
+
+```json
+{ "action": "submitPresentation", "work_id": "work_1", "student_id": "user_abc123", "fileName": "presentacion.pptx", "fileBase64": "..." }
+```
+
+---
+
 ### `getStudentWorks`
 
 Obtener los trabajos enviados por un estudiante específico.
@@ -341,6 +361,45 @@ Obtener el catálogo de profesores asesores.
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"getProfessors"` |
 | `token` | string | Sí | Token de administrador |
+
+---
+
+## Acciones de configuración
+
+### `getConfig`
+
+Leer la configuración pública del evento (fechas y visibilidad de fases).
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"getConfig"` |
+
+Respuesta (`data`):
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `event_date` | string | Fecha del evento (texto) |
+| `presentation_deadline` | string | Fecha límite para subir presentaciones (ISO) o vacío |
+| `fase1_enabled` | string | `"1"` = Fase 1 visible; `"0"` = oculta |
+
+---
+
+### `setConfig`
+
+Guardar un valor en la hoja `config` (solo administradores).
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"setConfig"` |
+| `admin_user_id` | string | Sí | ID del usuario administrador (valida con `assertAdmin`) |
+| `key` | string | Sí | Clave de configuración (ej. `fase1_enabled`) |
+| `value` | string | Sí | Valor a guardar (ej. `"1"` o `"0"`) |
+
+Ejemplo: ocultar Fase 1 para evaluadores.
+
+```json
+{ "action": "setConfig", "admin_user_id": "admin_1", "key": "fase1_enabled", "value": "0" }
+```
 
 ---
 

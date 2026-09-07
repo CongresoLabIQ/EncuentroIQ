@@ -1631,14 +1631,31 @@
             return localStorage.getItem('encuentroIQ_phase1Enabled') !== '0';
         }
 
-        function togglePhase1() {
+        async function togglePhase1() {
             const enabled = document.getElementById('phase1Toggle').checked;
             localStorage.setItem('encuentroIQ_phase1Enabled', enabled ? '1' : '0');
             updatePhase1UI();
+            try {
+                const res = await window.apiClient.setConfig('fase1_enabled', enabled ? '1' : '0');
+                if (!res.success) throw new Error(res.error || 'No se pudo guardar la configuración');
+                showToast(enabled ? 'Fase 1 visible para todos los evaluadores.' : 'Fase 1 oculta para todos los evaluadores.', 'success');
+            } catch (e) {
+                localStorage.setItem('encuentroIQ_phase1Enabled', enabled ? '0' : '1');
+                updatePhase1UI();
+                showToast('Error al sincronizar: ' + e.message, 'error');
+            }
         }
 
-        function loadPhase1Toggle() {
-            document.getElementById('phase1Toggle').checked = phase1Enabled();
+        async function loadPhase1Toggle() {
+            const cb = document.getElementById('phase1Toggle');
+            try {
+                const cfg = await window.apiClient.getConfig();
+                const enabled = cfg.fase1_enabled !== '0';
+                localStorage.setItem('encuentroIQ_phase1Enabled', enabled ? '1' : '0');
+                cb.checked = enabled;
+            } catch (e) {
+                cb.checked = phase1Enabled();
+            }
             updatePhase1UI();
         }
 

@@ -257,6 +257,17 @@
             window.location.href = 'student-dashboard.html';
         }
 
+        // Verificación server-side: fase 1 la controla el admin desde el backend
+        (async () => {
+            try {
+                const cfg = await window.apiClient.getConfig();
+                if (cfg.fase1_enabled === '0') {
+                    localStorage.setItem('encuentroIQ_phase1Enabled', '0');
+                    window.location.href = 'student-dashboard.html';
+                }
+            } catch (e) {}
+        })();
+
         // --- VARIABLES GLOBALES ---
         let members = [];
         let asesores = [];

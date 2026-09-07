@@ -195,8 +195,22 @@
             if (!session) return window.location.href = 'login.html';
 
             const uploadsEnabled = localStorage.getItem('encuentroIQ_uploadsEnabled');
-            const phase1Enabled = localStorage.getItem('encuentroIQ_phase1Enabled') !== '0';
             const actionEl = document.getElementById('uploadAction');
+            let phase1Enabled = true;
+
+            let presDeadline = '';
+            try {
+                const cfg = await window.apiClient.getConfig();
+                presDeadline = (cfg.presentation_deadline || '').trim();
+                phase1Enabled = cfg.fase1_enabled !== '0';
+                localStorage.setItem('encuentroIQ_phase1Enabled', phase1Enabled ? '1' : '0');
+            } catch (e) {
+                phase1Enabled = localStorage.getItem('encuentroIQ_phase1Enabled') !== '0';
+            }
+            window._presDeadline = presDeadline;
+            window._phase1Enabled = phase1Enabled;
+            updateDeadlineBanner();
+
             if (uploadsEnabled !== '0' && phase1Enabled) {
                 actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-outline-accent fw-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir trabajo</a>';
             } else {
@@ -206,14 +220,6 @@
             const works = await window.apiClient.getStudentWorks(session.user.id);
             window._currentWorks = works;
             window._sessionUserId = session.user.id;
-
-            let presDeadline = '';
-            try {
-                const cfg = await window.apiClient.getConfig();
-                presDeadline = (cfg.presentation_deadline || '').trim();
-            } catch (e) {}
-            window._presDeadline = presDeadline;
-            updateDeadlineBanner();
 
             const container = document.getElementById('worksList');
 

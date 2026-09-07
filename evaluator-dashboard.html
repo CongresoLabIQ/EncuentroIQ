@@ -778,8 +778,16 @@
         document.addEventListener('DOMContentLoaded', async () => {
             session = await window.apiClient.checkAuth();
             if (!session) return window.location.href = 'login.html';
+
             loadPhase1();
             loadPhase2();
+
+            // Fase 1 visible/oculta viene del backend (la controla el admin)
+            try {
+                const cfg = await window.apiClient.getConfig();
+                window._fase1Enabled = cfg.fase1_enabled !== '0';
+                if (!window._fase1Enabled) hidePhase1Section();
+            } catch (e) { window._fase1Enabled = true; }
 
             // Hint al entrar a la Fase 2 (señala el botón Ayuda)
             const phase2Tab = document.getElementById('phase2-tab');
@@ -794,6 +802,20 @@
                 });
             }
         });
+
+        // Oculta la pestaña y el panel de Fase 1 cuando el admin la desactiva
+        function hidePhase1Section() {
+            const tab = document.getElementById('phase1-tab');
+            const tabPhase1 = document.getElementById('phase1');
+            const tabPhase2 = document.getElementById('phase2-tab');
+            if (tab) tab.style.display = 'none';
+            if (tabPhase1) tabPhase1.classList.remove('active', 'show');
+            if (tabPhase2) tabPhase2.classList.add('active');
+            const phase2Pane = document.getElementById('phase2');
+            if (phase2Pane) phase2Pane.classList.add('active', 'show');
+            const phase1List = document.getElementById('phase1List');
+            if (phase1List) phase1List.innerHTML = '';
+        }
 
         // ============================================================
         // HINT FASE 2 — Flash oscurece la pantalla y señala el botón Ayuda

@@ -66,8 +66,9 @@ service-worker.js           # Cache-first SW
 ### ⚠️ Conocimiento importante
 - **localStorage `encuentroIQ_uploadsEnabled`:** `'1'` = activo, `'0'` = inactivo. Default: activo si es null.
 - **localStorage `congreso_user`:** Sesión del usuario logueado (JSON con id, name, email, type, facultad).
-- **Google Sheets `config` sheet:** `event_date` y `evaluator_code` se leen desde ahí.
-- **submit-work.html** redirige a student-dashboard si uploads desactivados (seguridad).
+- **Google Sheets `config` sheet:** `event_date`, `evaluator_code`, `presentation_deadline`, `fase1_enabled` se leen desde ahí.
+- **Toggle de Fase 1 es server-side:** el admin usa `setConfig('fase1_enabled', '1'|'0')` (endpoint admin-only). El backend lo guarda en la hoja `config` y los dashboards de evaluador y alumno lo leen vía `getConfig()`. `localStorage.encuentroIQ_phase1Enabled` es solo caché.
+- **submit-work.html** redirige a student-dashboard si uploads desactivados o fase 1 oculta (seguridad, verifica en backend).
 - **Chrome DevTools mobile emulation** no es igual a un dispositivo real — siempre probar en celular físico.
 
 ---
@@ -146,7 +147,7 @@ Funciones JS clave:
 `id`, `work_id`, `evaluator_id`, `score`, `rubrica`, `status`, `completed_at`
 
 ### Hoja `config`
-`event_date`, `evaluator_code`, `presentation_deadline` (fecha límite para subir presentaciones de Fase 2; se valida en el backend con `presentationDeadlinePassed()` y se muestra como banner en el panel del alumno)
+`event_date`, `evaluator_code`, `presentation_deadline` (fecha límite para subir presentaciones de Fase 2; se valida en el backend con `presentationDeadlinePassed()` y se muestra como banner en el panel del alumno), `fase1_enabled` (1/0 — oculta Fase 1 para evaluadores y alumnos)
 
 ### Hoja `live_evaluator_status` (fase 2 — actividad en vivo)
 `evaluator_id`, `status`, `last_activity`, `updated_at`

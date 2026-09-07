@@ -168,6 +168,7 @@ Parámetros predefinidos:
 | `limite_envios` | — | Fecha límite para enviar trabajos |
 | `limite_evaluaciones` | — | Fecha límite para evaluar |
 | `presentation_deadline` | — | Fecha límite para subir presentaciones de Fase 2 |
+| `fase1_enabled` | 1 | 1 = Fase 1 visible para evaluadores; 0 = oculta (la controla el admin) |
 | `puntaje_minimo` | 60 | Puntaje mínimo para aprobar fase 1 |
 | `peso_fase1` | 0.4 | Peso de fase 1 en puntaje final |
 | `peso_fase2` | 0.6 | Peso de fase 2 en puntaje final |
