@@ -183,24 +183,6 @@ Estados: `pending | acknowledged | resolved`
 - El evaluador envía `user_id` y se valida con `assertUser` en: `registerActivity`, `requestHelp`.
 - `js/api-client.js` expone `_sessionId()` para enviar el id desde la sesión local en cada request.
 
-## 9c. Generación de APK (Capacitor)
-
-Requiere Node.js + Android Studio. Scripts en `package.json`:
-- `npm run build:www` → copia el sitio estático a `www/`
-- `npm run sync` → build + `npx cap sync android`
-- `npm run open` → `npx cap open android` (compila APK en Android Studio)
-
-Config: `capacitor.config.ts` (`appId: mx.unam.encuentroiq`, `webDir: www`).
-`www/` y `node_modules/` NO se versionan (ignorados en `.gitignore`). `android/` SÍ se versiona.
-
-**IMPORTANTE (npm en Windows):** el `npm install` en `K:\Mi unidad\EncuentroIQ\EncuentroIQ` falla con `EBADF`/`EPERM` (`TAR_ENTRY_ERROR UNKNOWN: unknown error, write`) por la ruta con espacios y el antivirus/Defender. Solución verificada:
-1. **Instalar en una ruta sin espacios** (ej. `C:\EncuentroBuild`) — funciona en 4s.
-2. Usar `npm install --no-audit --no-fund` si hay warnings.
-3. Desactivar temporalmente la protección en tiempo real de Windows Defender si persiste.
-4. Si queda un `node_modules` corrupto: `taskkill /F /IM node.exe` luego `rd /s /q node_modules`.
-
-Script automatizado: `build/build-apk.bat` (copia a `C:\EncuentroBuild`, instala, genera `www/`, añade Android y abre). Adicionalmente `npm install -D typescript` es necesario para `capacitor.config.ts`.
-
 ---
 
 ## 10. Cómo probar localmente

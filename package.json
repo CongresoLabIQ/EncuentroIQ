@@ -1,21 +1,10 @@
 {
-  "name": "encuentroiq-capacitor",
+  "name": "encuentroiq",
   "version": "1.0.0",
-  "description": "APK para el 9no Encuentro Estudiantil de Ingeniería Química (UNAM) — Panel Admin y Evaluadores",
+  "description": "Portal del 9no Encuentro Estudiantil de Ingeniería Química (UNAM) — GitHub Pages",
   "private": true,
   "scripts": {
     "test": "node tests/run.js",
-    "simular": "node tests/simulacion.js",
-    "build:www": "node scripts/build-www.js",
-    "sync": "node scripts/build-www.js && npx cap sync android",
-    "open": "npx cap open android"
-  },
-  "dependencies": {
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/core": "^6.1.2"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^6.1.2",
-    "typescript": "^5.5.4"
+    "simular": "node tests/simulacion.js"
   }
 }

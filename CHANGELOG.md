@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.8.0] — 2026-09-11
+
+### Removed
+- **Empaquetado APK / Capacitor:** se elimina todo lo relacionado con la app nativa (no es necesaria).
+  - Archivos/carpetas: `capacitor.config.ts`, `android/`, `build/` (`build-apk.bat`, `exclusions.txt`) y `scripts/build-www.js`.
+  - `package.json`: sin dependencias de Capacitor/TypeScript ni scripts `build:www`/`sync`/`open`; se conservan `test` y `simular`.
+  - `.gitignore`: se quitan las entradas de `www/` y `capacitor-cordova-android-plugins/`.
+  - `CONTEXT.md`: se elimina la sección "Generación de APK".
+  - `admin-dashboard.html`: se quita el fallback de vibración vía Capacitor Haptics.
+- **Service worker:** caché actualizado a `encuentroiq-v10`.
+
 ## [1.7.0] — 2026-09-11
 
 ### Added

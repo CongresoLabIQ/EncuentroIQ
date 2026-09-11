@@ -852,12 +852,7 @@
 
         function vibrateAdmin() {
             try {
-                if (navigator.vibrate) {
-                    navigator.vibrate([280, 100, 280]);
-                } else if (window.Capacitor?.Plugins?.Haptics) {
-                    window.Capacitor.Plugins.Haptics.vibrate({ duration: 280 });
-                    setTimeout(() => window.Capacitor.Plugins.Haptics.vibrate({ duration: 280 }), 380);
-                }
+                if (navigator.vibrate) navigator.vibrate([280, 100, 280]);
             } catch (e) { /* vibración no disponible */ }
         }
 
