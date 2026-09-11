@@ -31,11 +31,14 @@ function run(t) {
       evaluator_id: a.evaluator_id,
       assignment_id: a.id,
       total_score: 70 + (i % 30),
+      rubrica: JSON.stringify({ seccion_demo: 70 + (i % 30) }),
       comments: 'Comentario de prueba'
     });
     if (r.success) submitted++;
   });
   t.equal(submitted, assigns.length, 'todas las asignaciones se evalúan (' + assigns.length + ')');
+  const liveEvals = readSheet(spreadsheet, 'live_evaluations');
+  t.ok(liveEvals.every(e => e.rubrica && e.rubrica !== ''), 'cada evaluación guarda su rúbrica');
 
   // 3) live_score y estado de las asignaciones
   const works = readSheet(spreadsheet, 'works');

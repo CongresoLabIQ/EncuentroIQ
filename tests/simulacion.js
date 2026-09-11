@@ -137,6 +137,7 @@ liveAssigns.forEach((a, i) => {
     evaluator_id: a.evaluator_id,
     assignment_id: a.id,
     total_score: 60 + ((i * 11) % 40),
+    rubrica: JSON.stringify({ seccion_demo: 60 + ((i * 11) % 40) }),
     comments: 'Presentación simulada'
   });
   if (r.success) liveSent++;

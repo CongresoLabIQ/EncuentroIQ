@@ -775,11 +775,7 @@ function doPost(e) {
         work_id: data.work_id,
         evaluator_id: data.evaluator_id,
         total_score: data.total_score,
-        s1: data.s1, s2: data.s2, s3: data.s3, s4: data.s4,
-        s5: data.s5, s6: data.s6, s7: data.s7, s8: data.s8,
-        c1: data.c1, c2: data.c2, c3: data.c3, c4: data.c4,
-        c5: data.c5, c6: data.c6, c7: data.c7, c8: data.c8,
-        c9: data.c9, c10: data.c10,
+        rubrica: data.rubrica || '',
         comments: data.comments,
         timestamp: new Date()
       };

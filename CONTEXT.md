@@ -72,6 +72,7 @@ service-worker.js           # Cache-first SW
 - **Fase 2 carteles (NUEVO):** cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los **carteles de otra facultad** con rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel** (15 carteles / 5 evaluadores = 3 c/u). Si faltan evaluadores, se completa con otras facultades sin conflicto.
 - **Fase 2 ponencias (NUEVO):** cada ponencia recibe **3 evaluadores, uno por facultad**; se permite la misma facultad del trabajo y solo se evita al asesor (`esAutoEvaluacion`).
 - **Ganadores (NUEVO):** ponencia = top 3 **general** (todo el pool); cartel = top 3 **por facultad/entidad**. `getWinners` devuelve `{ oral, poster }` con `poster` plano (top 3 por facultad, con `facultad_key` y `poster_rank`). `generarPremiacionMasiva` genera 12 reconocimientos (3 orales + 3 por facultad).
+- **Rúbricas Fase 2 (NUEVO):** el modal en vivo usa un **control por sección** (Opción B) escalado a **0–100**. Cartel y ponencia tienen 9 secciones; cada una vale su peso ×10. La rúbrica vive en `evaluator-dashboard.html` (`LIVE_RUBRICAS`) y se envía como `rubrica` (JSON) + `total_score` en `submitLiveEvaluation`.
 - **Chrome DevTools mobile emulation** no es igual a un dispositivo real — siempre probar en celular físico.
 
 ---

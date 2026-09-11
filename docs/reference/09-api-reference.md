@@ -237,17 +237,28 @@ Enviar una evaluación de fase 1.
 
 ### `submitLiveEvaluation`
 
-Enviar una evaluación en vivo (fase 2).
+Enviar una evaluación en vivo (fase 2) con la rúbrica por secciones (0–100).
 
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"submitLiveEvaluation"` |
-| `token` | string | Sí | Token del evaluador |
-| `assignmentId` | string | Sí | ID de la asignación en vivo |
-| `score` | number | Sí | Puntaje (0–100) |
+| `assignment_id` | string | Sí | ID de la asignación en vivo |
+| `work_id` | string | Sí | ID del trabajo |
+| `evaluator_id` | string | Sí | ID del evaluador |
+| `total_score` | number | Sí | Puntaje total (0–100) |
+| `rubrica` | string (JSON) | No | Objeto JSON con el puntaje por sección (ej. `{"cartel_diseno":18,"cartel_dominio":15}`) |
+| `comments` | string | No | Comentarios del evaluador |
 
 ```json
-{ "action": "submitLiveEvaluation", "token": "tok_abc", "assignmentId": "assign_456", "score": 90 }
+{
+  "action": "submitLiveEvaluation",
+  "assignment_id": "assign_456",
+  "work_id": "work_123",
+  "evaluator_id": "user_eval",
+  "total_score": 90,
+  "rubrica": "{\"cartel_estructura\":9,\"cartel_diseno\":18,\"cartel_dominio\":16}",
+  "comments": "Muy buena presentación."
+}
 ```
 
 ---

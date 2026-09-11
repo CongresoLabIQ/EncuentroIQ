@@ -574,35 +574,17 @@
             </div>
 
             <div id="liveRubric">
-              <div style="font-weight:600;font-size:0.82rem;margin-bottom:6px;">Revisión del Material de Apoyo</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Título <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Docente <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Participantes <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Objetivos <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Resultados <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-                <label class="contenido-practice" style="background:#f0f0f0;padding:3px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;">
-                  Conclusión <input type="checkbox" onchange="updateLiveTotal()"> 
-                </label>
-              </div>
-
-              <div style="font-weight:600;font-size:0.82rem;margin-bottom:6px;">Criterios de presentación</div>
-
-              <div class="rubric-row"><label>Tono de voz (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
-              <div class="rubric-row"><label>Calidad (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
-              <div class="rubric-row"><label>Dominio (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div style="font-weight:600;font-size:0.82rem;margin-bottom:6px;">Rúbrica de Cartel — un control por sección (0–100)</div>
+              <div class="rubric-row"><label>Estructura del cartel (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Diseño de cartel (0-20)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="20" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Comunicación escrita (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Expresión oral (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
               <div class="rubric-row"><label>Lenguaje corporal (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
-              <div class="rubric-row"><label>Trabajo en equipo (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Trabajo en equipo (0-10)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="10" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Dominio del contenido (0-20)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="20" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Defensa de preguntas (0-15)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="15" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <div class="rubric-row"><label>Innovación u optimización (0-5)</label><div class="range-wrap"><input type="range" class="form-range rubric-slider-practice" min="0" max="5" step="1" value="0" oninput="updateLiveTotal()"></div><span class="val-badge">0</span></div>
+              <small style="color:var(--text-light);font-size:0.72rem;">La ponencia usa las mismas secciones con distinta ponderación (total 100).</small>
 
               <div class="tutorial-score-card" style="margin-top:8px;">
                 <small>Puntaje Total</small>
@@ -967,8 +949,6 @@
     }
 
     function updateLiveTotal() {
-      const checks = document.querySelectorAll('#liveRubric .contenido-practice input:checked');
-      const checkSum = checks.length;
       const sliders = document.querySelectorAll('#liveRubric .rubric-slider-practice');
       let sliderSum = 0;
       sliders.forEach(s => {
@@ -976,7 +956,7 @@
         const badge = s.closest('.rubric-row').querySelector('.val-badge');
         if (badge) badge.textContent = s.value;
       });
-      document.getElementById('liveTotalScore').textContent = checkSum + sliderSum;
+      document.getElementById('liveTotalScore').textContent = sliderSum;
     }
 
     function submitPracticeLive() {

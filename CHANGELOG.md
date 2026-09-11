@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.0] — 2026-09-11
+
+### Added
+- **Nuevas rúbricas de Fase 2 (cartel y ponencia):** formulario del evaluador re-hecho con **un control por sección** (Escala 0–100). Cartel y ponencia tienen 9 secciones cada una; el puntaje por sección es su peso ×10.
+  - Cartel: Estructura (10), Diseño (20), Comunicación escrita (5), Expresión oral (10), Lenguaje corporal (5), Trabajo en equipo (10), Dominio (20), Defensa de preguntas (15), Innovación (5).
+  - Ponencia: Estructura (10), Diseño (20), Apoyo visual (10), Expresión oral (5), Lenguaje corporal (5), Trabajo en equipo (5), Dominio (30), Defensa (10), Innovación (5).
+- **Prueba `tests/rubricas.test.js`:** valida que cada rúbrica sume 100 y que los sub-criterios cuadren con el máximo de su sección (302 aserciones en total).
+
+### Changed
+- **`submitLiveEvaluation`:** guarda `rubrica` (JSON con el puntaje por sección) y `total_score`; se dejan de usar las columnas `s1..s8`/`c1..c10`.
+- **Se elimina el checklist "Material de Apoyo"** del modal en vivo; la sección **Estructura** de la nueva rúbrica lo cubre.
+- **Tutorial del evaluador:** la práctica de Fase 2 usa las nuevas secciones (0–100).
+- **Service worker:** caché actualizado a `encuentroiq-v8`.
+
 ## [1.6.0] — 2026-09-11
 
 ### Added

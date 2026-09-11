@@ -7,6 +7,7 @@ const T = require('./harness/t');
 const suites = [
   require('./fase2.test'),
   require('./winners.test'),
+  require('./rubricas.test'),
   require('./e2e.test')
 ];
 

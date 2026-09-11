@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista previa de rúbricas — EncuentroIQ</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  :root { --primary:#003D79; --accent:#D59F0F; --success:#198754; }
+  body { background:#f4f6f9; font-family: 'Segoe UI', Roboto, sans-serif; padding-bottom: 90px; }
+  .top { background: var(--primary); color:#fff; padding: 1rem 1.25rem; position: sticky; top:0; z-index: 20; }
+  .top h1 { font-size: 1.1rem; margin:0; font-weight:700; }
+  .seg { display:inline-flex; background:#e9edf2; border-radius: 10px; padding:4px; gap:4px; }
+  .seg button { border:0; background:transparent; padding:.35rem .8rem; border-radius:8px; font-weight:600; font-size:.85rem; color:#46566b; }
+  .seg button.active { background: var(--primary); color:#fff; }
+  .rubrica-card { background:#fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 1rem 1.1rem; margin-bottom: 1rem; }
+  .rubrica-card h3 { font-size: .95rem; font-weight: 700; color: var(--primary); display:flex; justify-content:space-between; align-items:center; margin-bottom: .6rem; }
+  .rubrica-card h3 .max { background: var(--accent); color:#22303f; font-size:.75rem; padding:.15rem .5rem; border-radius: 999px; }
+  .item-row { padding:.45rem .25rem; border-bottom:1px dashed #e6e9ee; }
+  .item-row:last-child { border-bottom:0; }
+  .item-row label { font-size:.85rem; font-weight:600; margin-bottom:.15rem; display:flex; justify-content:space-between; gap:.5rem; }
+  .item-row small { color:#7b8794; font-size:.74rem; display:block; margin-bottom:.2rem; }
+  .val-badge { background: var(--primary); color:#fff; min-width: 42px; text-align:center; border-radius: 6px; font-size:.78rem; padding:.1rem .35rem; }
+  input[type="range"] { width:100%; }
+  .section-desc { color:#7b8794; font-size:.78rem; margin-bottom:.4rem; }
+  .total-bar { position: fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #e2e6ec; padding:.7rem 1.25rem; display:flex; justify-content:space-between; align-items:center; z-index:30; box-shadow: 0 -4px 14px rgba(0,0,0,.05); }
+  .total-bar .big { font-size:1.35rem; font-weight:800; color: var(--primary); }
+  .total-bar .scaled { color:#6b7785; font-size:.85rem; }
+  .nota { background:#fff8e6; border:1px solid #f2dfa8; border-radius:10px; padding:.7rem .9rem; font-size:.82rem; color:#6a5a20; }
+  .pill-mod { background:#eef3f9; color:#33506f; border-radius:999px; padding:.15rem .5rem; font-size:.72rem; }
+</style>
+</head>
+<body>
+<div class="top d-flex flex-wrap gap-3 justify-content-between align-items-center">
+  <h1>Vista previa de rúbricas — Fase 2 <span class="pill-mod">Implementado: Opción B, rubros ×10 (total 100)</span></h1>
+  <div class="seg" id="segOpt">
+    <button data-opt="A" class="active">Opción A · por sub-criterio</button>
+    <button data-opt="B">Opción B · por sección</button>
+  </div>
+  <div class="seg" id="segMod">
+    <button data-mod="cartel" class="active">Cartel</button>
+    <button data-mod="ponencia">Ponencia</button>
+  </div>
+</div>
+
+<div class="container my-4">
+  <div class="nota mb-3" id="notaOpt"></div>
+  <div id="rubrica"></div>
+</div>
+
+<div class="total-bar">
+  <div>
+    <span class="text-muted small" id="lblMod">Cartel</span>
+    <div><span class="big" id="total10">0.0</span> <span class="text-muted">/ 10</span></div>
+  </div>
+  <div class="scaled">Equivale a <b id="total100">0</b> / 100 (x10)</div>
+</div>
+
+<script>
+const RUBRICAS = {
+  cartel: { label: 'Cartel', secciones: [
+    { id:'cartel_estructura', nombre:'Estructura del cartel', max:1.0, items:[
+      { id:'c_est_cintillo', texto:'Cintillo', peso:0.1 },
+      { id:'c_est_facultad', texto:'Facultad a la que pertenece', peso:0.1 },
+      { id:'c_est_titulo', texto:'Título del proyecto', peso:0.1 },
+      { id:'c_est_integrantes', texto:'Integrantes', peso:0.1 },
+      { id:'c_est_intro', texto:'Introducción o Resumen', peso:0.1 },
+      { id:'c_est_objetivos', texto:'Objetivos', peso:0.1 },
+      { id:'c_est_metodologia', texto:'Metodología', peso:0.1 },
+      { id:'c_est_resultados', texto:'Resultados', peso:0.1 },
+      { id:'c_est_conclusion', texto:'Conclusión', peso:0.1 },
+      { id:'c_est_referencias', texto:'Referencias Bibliográficas', peso:0.1 }
+    ]},
+    { id:'cartel_diseno', nombre:'Diseño de cartel', max:2.0, items:[
+      { id:'c_dis_original', texto:'Es original y creativo', peso:0.5 },
+      { id:'c_dis_saturacion', texto:'No hay saturación de texto', peso:0.5 },
+      { id:'c_dis_colores', texto:'Usa combinación de colores con contraste adecuado', peso:0.5 },
+      { id:'c_dis_imagenes', texto:'Emplean imágenes alusivas al tema', peso:0.5 }
+    ]},
+    { id:'cartel_escrita', nombre:'Comunicación escrita', max:0.5, items:[
+      { id:'c_esc_redaccion', texto:'La redacción es clara y precisa', peso:0.2 },
+      { id:'c_esc_nomenclatura', texto:'Utiliza nomenclatura, símbolos y terminología precisa de la disciplina', peso:0.2 },
+      { id:'c_esc_ortografia', texto:'Sin errores de ortografía', peso:0.1 }
+    ]},
+    { id:'cartel_expresion', nombre:'Expresión oral', max:1.0, items:[
+      { id:'c_exp_clara', texto:'Las y los ponentes cuentan con expresión oral clara', peso:0.2 },
+      { id:'c_exp_volumen', texto:'Volumen adecuado de voz', peso:0.2 },
+      { id:'c_exp_muletillas', texto:'Sin muletillas ni lectura textual', peso:0.2 },
+      { id:'c_exp_naturalidad', texto:'La comunicación fluye con naturalidad', peso:0.2 },
+      { id:'c_exp_atencion', texto:'Atrae y mantiene al público atento', peso:0.2 }
+    ]},
+    { id:'cartel_lenguaje', nombre:'Lenguaje corporal', max:0.5, items:[
+      { id:'c_len_postura', texto:'Postura profesional', peso:0.1 },
+      { id:'c_len_vestimenta', texto:'Vestimenta formal para el evento', peso:0.1 },
+      { id:'c_len_seguridad', texto:'Demuestran seguridad', peso:0.1 },
+      { id:'c_len_escenario', texto:'Buen manejo del escenario', peso:0.1 },
+      { id:'c_len_visual', texto:'Contacto visual con la audiencia', peso:0.1 }
+    ]},
+    { id:'cartel_equipo', nombre:'Trabajo en equipo', max:1.0, items:[
+      { id:'c_equ_tiempo', texto:'Mantienen el control del tiempo de la presentación', peso:0.3 },
+      { id:'c_equ_transicion', texto:'La transición es fluida entre ponentes', peso:0.3 },
+      { id:'c_equ_participacion', texto:'La participación es equitativa entre los integrantes del equipo', peso:0.4 }
+    ]},
+    { id:'cartel_dominio', nombre:'Dominio del contenido', max:2.0, items:[
+      { id:'c_dom_tema', texto:'Demuestran dominio del tema al exponer', peso:1.0 },
+      { id:'c_dom_leer', texto:'Evitan limitarse a leer lo que está escrito en el cartel', peso:0.5 },
+      { id:'c_dom_graficas', texto:'Interpretan correctamente datos y/o gráficas', peso:0.5 }
+    ]},
+    { id:'cartel_defensa', nombre:'Defensa de preguntas', max:1.5, items:[
+      { id:'c_def_respuesta', texto:'Responden con precisión, seguridad y sustento técnico al evaluador', peso:1.5 }
+    ]},
+    { id:'cartel_innovacion', nombre:'Innovación u optimización', max:0.5, items:[
+      { id:'c_inn_relevancia', texto:'Destacan las relevancias del estudio, aplicabilidad industrial o propuesta de mejora', peso:0.5 }
+    ]}
+  ]},
+  ponencia: { label: 'Ponencia', secciones: [
+    { id:'pon_estructura', nombre:'Estructura de la ponencia', max:1.0, items:[
+      { id:'p_est_caratula', texto:'Respeta el formato de la carátula del encuentro (tipo proyecto, facultad, nombre del proyecto, integrantes y asesor)', peso:0.3 },
+      { id:'p_est_cintillo', texto:'Las diapositivas posteriores contienen cintillo representativo del evento', peso:0.3 },
+      { id:'p_est_contenido', texto:'Incluye: Índice, Introducción o Resumen, Objetivos, Metodología, Resultados, Conclusión y Referencias Bibliográficas', peso:0.4 }
+    ]},
+    { id:'pon_diseno', nombre:'Diseño de la presentación', max:2.0, items:[
+      { id:'p_dis_original', texto:'Es original y creativo', peso:0.5 },
+      { id:'p_dis_saturacion', texto:'No hay saturación de texto', peso:0.5 },
+      { id:'p_dis_colores', texto:'Usa combinación de colores con contraste adecuado', peso:0.5 },
+      { id:'p_dis_imagenes', texto:'Emplean imágenes alusivas al tema', peso:0.5 }
+    ]},
+    { id:'pon_apoyo', nombre:'Apoyo visual', max:1.0, items:[
+      { id:'p_apo_recursos', texto:'Uso adecuado de diagramas de flujo, estadísticas y/o tablas, ecuaciones en formato legible, cuenta con pie de imagen-texto', peso:1.0 }
+    ]},
+    { id:'pon_expresion', nombre:'Expresión oral', max:0.5, items:[
+      { id:'p_exp_general', texto:'Expresión oral clara y volumen adecuado, sin muletillas ni lectura textual; la comunicación fluye, atrae y mantiene al público atento, y transmite seguridad', peso:0.5 }
+    ]},
+    { id:'pon_lenguaje', nombre:'Lenguaje corporal', max:0.5, items:[
+      { id:'p_len_postura', texto:'Postura profesional', peso:0.1 },
+      { id:'p_len_vestimenta', texto:'Vestimenta formal para el evento', peso:0.1 },
+      { id:'p_len_seguridad', texto:'Demuestran seguridad', peso:0.1 },
+      { id:'p_len_escenario', texto:'Buen manejo del escenario', peso:0.1 },
+      { id:'p_len_visual', texto:'Contacto visual con la audiencia', peso:0.1 }
+    ]},
+    { id:'pon_equipo', nombre:'Trabajo en equipo', max:0.5, items:[
+      { id:'p_equ_tiempo', texto:'Se ajustan estrictamente al tiempo asignado (15 min)', peso:0.1 },
+      { id:'p_equ_transicion', texto:'La transición es fluida entre ponentes', peso:0.2 },
+      { id:'p_equ_participacion', texto:'La participación es equitativa entre los integrantes del equipo', peso:0.2 }
+    ]},
+    { id:'pon_dominio', nombre:'Dominio del contenido', max:3.0, items:[
+      { id:'p_dom_leer', texto:'Evitan limitarse a leer lo que está escrito en la presentación', peso:0.5 },
+      { id:'p_dom_graficas', texto:'Interpretan correctamente datos y/o gráficas', peso:1.5 },
+      { id:'p_dom_literatura', texto:'Demuestran conocimientos de la literatura especializada comparando sus resultados con lo reportado por otros autores', peso:1.0 }
+    ]},
+    { id:'pon_defensa', nombre:'Defensa de preguntas', max:1.0, items:[
+      { id:'p_def_respuesta', texto:'Responden con precisión, seguridad y sustento técnico al evaluador', peso:1.0 }
+    ]},
+    { id:'pon_innovacion', nombre:'Innovación u optimización', max:0.5, items:[
+      { id:'p_inn_relevancia', texto:'Destacan las relevancias del estudio, aplicabilidad industrial o propuesta de mejora', peso:0.5 }
+    ]}
+  ]}
+};
+
+let opt = 'A';
+let mod = 'cartel';
+
+function r1(x){ return Math.round(x*10)/10; }
+
+function render() {
+  const rub = RUBRICAS[mod];
+  document.getElementById('lblMod').textContent = rub.label;
+  document.getElementById('notaOpt').innerHTML = opt === 'A'
+    ? '<b>Opción A — por sub-criterio.</b> Cada elemento de la rúbrica tiene su propio control con su peso exacto (0.1, 0.2, 0.5…). Es la más fiel y granular, pero el evaluador mueve más controles (cartel: 35, ponencia: 22).'
+    : '<b>Opción B — por sección.</b> Un solo control por sección, de 0 a su máximo (ej. Estructura 0–1.0, Dominio 0–3.0), mostrando el detalle como texto. Más rápida de usar en el evento (cartel: 9 controles, ponencia: 9).';
+
+  const cont = document.getElementById('rubrica');
+  cont.innerHTML = rub.secciones.map(sec => {
+    if (opt === 'B') {
+      return `<div class="rubrica-card">
+        <h3>${sec.nombre} <span class="max">${sec.max.toFixed(1)} pts</span></h3>
+        <div class="section-desc">${sec.items.map(i => '• ' + i.texto + ' <span class="pill-mod">' + i.peso.toFixed(1) + '</span>').join('<br>')}</div>
+        <label class="d-flex justify-content-between align-items-center mt-2">
+          <span class="small fw-bold">Puntaje de la sección</span>
+          <span class="val-badge" id="val_${sec.id}">0</span>
+        </label>
+        <input type="range" min="0" max="${sec.max}" step="0.1" value="0" data-sec="${sec.id}" data-max="${sec.max}">
+      </div>`;
+    }
+    return `<div class="rubrica-card">
+      <h3>${sec.nombre} <span class="max">${sec.max.toFixed(1)} pts</span></h3>
+      ${sec.items.map(it => `
+        <div class="item-row">
+          <label>${it.texto}<span class="val-badge" id="val_${it.id}">0</span></label>
+          <input type="range" min="0" max="${it.peso}" step="0.1" value="0" data-item="${it.id}" data-peso="${it.peso}">
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  cont.querySelectorAll('input[type="range"]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const key = inp.dataset.item || inp.dataset.sec;
+      const badge = document.getElementById('val_' + key);
+      if (badge) badge.textContent = r1(parseFloat(inp.value)).toFixed(1);
+      total();
+    });
+  });
+  total();
+}
+
+function total() {
+  let sum = 0;
+  document.querySelectorAll('#rubrica input[type="range"]').forEach(inp => { sum += parseFloat(inp.value) || 0; });
+  sum = r1(sum);
+  document.getElementById('total10').textContent = sum.toFixed(1);
+  document.getElementById('total100').textContent = Math.round(sum * 10);
+}
+
+document.getElementById('segOpt').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  opt = b.dataset.opt;
+  document.querySelectorAll('#segOpt button').forEach(x => x.classList.toggle('active', x === b));
+  render();
+});
+document.getElementById('segMod').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  mod = b.dataset.mod;
+  document.querySelectorAll('#segMod button').forEach(x => x.classList.toggle('active', x === b));
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
