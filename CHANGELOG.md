@@ -7,6 +7,7 @@
   - Cartel: Estructura (10), Diseño (20), Comunicación escrita (5), Expresión oral (10), Lenguaje corporal (5), Trabajo en equipo (10), Dominio (20), Defensa de preguntas (15), Innovación (5).
   - Ponencia: Estructura (10), Diseño (20), Apoyo visual (10), Expresión oral (5), Lenguaje corporal (5), Trabajo en equipo (5), Dominio (30), Defensa (10), Innovación (5).
 - **Prueba `tests/rubricas.test.js`:** valida que cada rúbrica sume 100 y que los sub-criterios cuadren con el máximo de su sección (302 aserciones en total).
+- **Recurso "Convocatoria":** nuevo acceso directo a la convocatoria oficial (PDF en Google Drive) en la sección "Recursos y Plantillas" del index.
 
 ### Changed
 - **`submitLiveEvaluation`:** guarda `rubrica` (JSON con el puntaje por sección) y `total_score`; se dejan de usar las columnas `s1..s8`/`c1..c10`.
