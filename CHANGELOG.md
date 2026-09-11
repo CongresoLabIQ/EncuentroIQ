@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.6.0] — 2026-09-11
+
+### Added
+- **Nueva lógica de asignación de carteles (Fase 2):** Cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los carteles de otra facultad con rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel**, repartido de forma balanceada (15 carteles / 5 evaluadores = 3 cada uno).
+- **Fallback de evaluadores:** Si una facultad no tiene 5 evaluadores, se completan con evaluadores de otras facultades, evitando siempre la facultad del cartel.
+- **Nueva lógica de ponencias (Fase 2):** Cada ponencia recibe **3 evaluadores, uno por cada facultad**. Se permite la misma facultad del trabajo; solo se evita al asesor del trabajo.
+- **Ganadores por modalidad:** Ponencia = top 3 **general** (todo el pool). Cartel = top 3 **por facultad/entidad**. El admin muestra una tarjeta de carteles por facultad y `generarPremiacionMasiva` produce 12 reconocimientos (3 orales + 3 por facultad).
+- **Resumen de asignación:** `assignLiveWorks` devuelve `resumen: { carteles, orales, sinEvaluador }` y el admin lo muestra al terminar.
+- **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga el `Code.gs` real en un sandbox en memoria —sin red, sin Google— y valida Fase 2 y ganadores (250 aserciones). Incluye `tests/Code.pruebas.gs` para pruebas dirigidas de notificaciones y constancias en un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+- **`crearSlideEditable` acepta carpeta opcional** (`folderId`) para generar constancias en una carpeta de prueba.
+- **`generateCertificates` usa los asesores** (`getAsesores`) del trabajo en lugar de `profesor_cargo` directo.
+- **Constancias con varios asesores:** `formatearAsesores()` coloca cada asesor en su propia línea al reemplazar `{{PROFESOR}}`; si no hay asesor usa "No asignado".
+
+### Changed
+- **`assignLiveWorks` reescrito:** Se elimina el reparto aleatorio de 3 evaluadores por cartel y el split de ponencias por auditorio (`p1`/`p2`). Los grupos por facultad se calculan por carga y se reutilizan entre carteles y ponencias.
+- **Conflicto según modalidad:** `assignManualLive` y `reassignLiveEvaluator` ahora solo aplican la restricción de facultad a carteles; en ponencias se permite la misma facultad y solo se bloquea si el evaluador es asesor del trabajo.
+- **Auto-evaluación por asesores:** El helper `esAutoEvaluacion` compara contra los asesores del trabajo (`getAsesores`, con respaldo a `profesor_cargo`).
+- **Textos de Fase 2 en el admin:** Se actualizan la descripción del bloque y el `confirm`/toast de `assignLiveJudges()`.
+- **Service worker:** Caché actualizado a `encuentroiq-v7`.
+
 ## [1.5.0] — 2026-09-03
 
 ### Added

@@ -302,7 +302,7 @@
                                         </svg>
                                         Asignar Evaluadores Fase 2
                                     </h5>
-                                    <p class="mb-0 text-muted">Asigna 3 evaluadores aleatorios a todos los trabajos aceptados.</p>
+                                    <p class="mb-0 text-muted">Carteles: 5 evaluadores por facultad evalúan los carteles de otra facultad (1 por cartel, rotación FQ → FC → FZ → FQ). Ponencias: 3 evaluadores, uno por facultad.</p>
                                 </div>
                                 <div class="col-md-5 text-md-end">
                                     <button class="btn btn-primary btn-lg w-100 w-md-auto" onclick="assignLiveJudges()">
@@ -425,7 +425,7 @@
                             <polygon
                                 points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                         </svg>
-                        Reconocimientos por Ciclo Académico
+                        Ganadores
                     </h3>
                     <div class="row mb-4" id="winnersByCycle">
                         <div class="col-12 text-center text-muted py-3">Cargando ganadores...</div>
@@ -1467,15 +1467,19 @@
 
         // --- FASE 2 ---
         async function assignLiveJudges() {
-            if (!confirm('¿Asignar evaluadores a todos los trabajos aceptados para la evaluación presencial?')) return;
+            if (!confirm('¿Asignar evaluadores a todos los trabajos aceptados para la evaluación presencial?\n\nCarteles: 5 evaluadores por facultad evalúan los carteles de otra facultad (1 por cartel).\nPonencias: 3 evaluadores, uno por facultad.')) return;
             progressModal.show();
             document.getElementById('progressMessage').innerText = 'Asignando evaluadores presenciales...';
             try {
                 const res = await window.apiClient.assignLiveWorks();
                 progressModal.hide();
-                if (res.success) showToast(`Se generaron ${res.count} asignaciones para el evento.`, 'success');
-                else showToast('Error: ' + res.error, 'error');
-            } catch (e) { progressModal.hide(); showToast('Error: ' + e.message, 'error'); }
+                if (res.success) {
+                    const r = res.resumen || {};
+                    let msg = `Se generaron ${res.count} asignaciones (${r.carteles || 0} carteles, ${r.orales || 0} ponencias).`;
+                    if (r.sinEvaluador) msg += ` Sin evaluador: ${r.sinEvaluador}.`;
+                    showToast(msg, 'success');
+                } else showToast('Error: ' + res.error, 'error');
+            } catch (e) { progressModal.hide(); showToast('Error de red: ' + e.message, 'error'); }
         }
 
         async function loadWinners() {
@@ -1548,32 +1552,53 @@
                 `).join('');
             }
 
-            el.innerHTML = `
+            const oralCard = `
             <div class="col-md-6 mb-3">
                 <div class="card border-0 h-100 shadow-sm">
                     <div class="card-header bg-primary text-white text-center fw-bold">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        Top 3 Ponencia Oral
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        Top 3 Ponencia Oral (General)
                     </div>
                     <div class="card-body">
                         ${workCard('oral', data.oral, null, 'var(--primary)')}
                         ${(!data.oral || !data.oral.length) ? '<div class="text-center text-muted small py-3">Sin evaluaciones de ponencia oral.</div>' : ''}
                     </div>
                 </div>
-            </div>
+            </div>`;
+
+            const posterGroups = [];
+            const groupIndex = {};
+            (data.poster || []).forEach(w => {
+                const key = w.facultad_key || w.facultad || 'Sin Facultad';
+                if (groupIndex[key] === undefined) {
+                    groupIndex[key] = posterGroups.length;
+                    posterGroups.push({ facultad: w.facultad || key, winners: [] });
+                }
+                posterGroups[groupIndex[key]].winners.push(w);
+            });
+
+            const posterCards = posterGroups.map(g => `
             <div class="col-md-6 mb-3">
                 <div class="card border-0 h-100 shadow-sm">
                     <div class="card-header bg-success text-white text-center fw-bold">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="3" width="18" height="14" rx="2" ry="2"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
-                        Top 3 Cartel
+                        Top 3 Cartel — ${g.facultad}
                     </div>
                     <div class="card-body">
-                        ${workCard('poster', data.poster, null, 'var(--success)')}
-                        ${(!data.poster || !data.poster.length) ? '<div class="text-center text-muted small py-3">Sin evaluaciones de cartel.</div>' : ''}
+                        ${workCard('poster', g.winners, null, 'var(--success)')}
                     </div>
                 </div>
-            </div>
-            `;
+            </div>`).join('');
+
+            const emptyPosterCard = posterGroups.length ? '' : `
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 h-100 shadow-sm">
+                    <div class="card-header bg-success text-white text-center fw-bold">Top 3 Cartel por facultad</div>
+                    <div class="card-body"><div class="text-center text-muted small py-3">Sin evaluaciones de cartel.</div></div>
+                </div>
+            </div>`;
+
+            el.innerHTML = oralCard + posterCards + emptyPosterCard;
         }
 
         async function generateCertificates(workId) {

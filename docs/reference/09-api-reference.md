@@ -303,13 +303,18 @@ Asignar automáticamente todos los trabajos pendientes a evaluadores disponibles
 
 ### `assignLiveWorks`
 
-Asignar trabajos para evaluación en vivo.
+Asignar evaluadores a los trabajos aceptados para la evaluación presencial (Fase 2).
+
+Reglas:
+- **Carteles:** cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los carteles de otra facultad según rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel**, repartido de forma balanceada. Si una facultad no tiene 5 evaluadores, se completa con evaluadores de otras facultades, evitando siempre la facultad del cartel.
+- **Ponencias:** cada ponencia recibe **3 evaluadores, uno por cada facultad**. Se permite la misma facultad del trabajo; solo se evita que el evaluador sea asesor del trabajo.
+- No reasigna trabajos que ya tengan una fila en `live_assignments`.
 
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"assignLiveWorks"` |
-| `token` | string | Sí | Token de administrador |
-| `phase` | string | Sí | Número de fase o sesión |
+
+Respuesta: `{ "success": true, "count": 63, "resumen": { "carteles": 45, "orales": 18, "sinEvaluador": 0 } }`.
 
 ---
 
@@ -329,12 +334,16 @@ Obtener asignaciones en vivo para un evaluador.
 
 ### `getWinners`
 
-Obtener la lista de ganadores publicados.
+Obtener los ganadores publicados.
+
+- **Ponencia oral:** top 3 **general** (todo el pool de ponencias).
+- **Cartel:** top 3 **por facultad/entidad**; cada trabajo incluye `facultad`, `facultad_key` y `poster_rank` (0, 1, 2).
 
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"getWinners"` |
-| `token` | string | Sí | Token de administrador o evaluador |
+
+Respuesta: `{ "success": true, "data": { "oral": [...], "poster": [...] } }`.
 
 ---
 

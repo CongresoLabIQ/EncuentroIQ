@@ -99,11 +99,12 @@ Los pesos (40%/60%) son configurables por el administrador.
 
 ## Publicación de resultados
 
-1. El administrador revisa los puntajes consolidados.
-2. Selecciona los ganadores por categoría (oral / cartel).
-3. Publica los resultados.
+Los ganadores se determinan automáticamente con el puntaje de Fase 2 (`live_score`):
+
+1. **Ponencia oral:** 1.º, 2.º y 3.er lugar **general** (todo el pool).
+2. **Cartel:** 1.º, 2.º y 3.er lugar **por facultad/entidad** (una terna por facultad).
+3. El administrador los revisa en la pestaña **Fase 2** y genera las constancias (12 reconocimientos).
 4. Los estudiantes ven su estado y retroalimentación en su panel.
-5. Los evaluadores ven los ganadores en su sección de resultados.
 
 ---
 

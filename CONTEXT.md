@@ -69,6 +69,9 @@ service-worker.js           # Cache-first SW
 - **Google Sheets `config` sheet:** `event_date`, `evaluator_code`, `presentation_deadline`, `fase1_enabled` se leen desde ahí.
 - **Toggle de Fase 1 es server-side:** el admin usa `setConfig('fase1_enabled', '1'|'0')` (endpoint admin-only). El backend lo guarda en la hoja `config` y los dashboards de evaluador y alumno lo leen vía `getConfig()`. `localStorage.encuentroIQ_phase1Enabled` es solo caché.
 - **submit-work.html** redirige a student-dashboard si uploads desactivados o fase 1 oculta (seguridad, verifica en backend).
+- **Fase 2 carteles (NUEVO):** cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los **carteles de otra facultad** con rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel** (15 carteles / 5 evaluadores = 3 c/u). Si faltan evaluadores, se completa con otras facultades sin conflicto.
+- **Fase 2 ponencias (NUEVO):** cada ponencia recibe **3 evaluadores, uno por facultad**; se permite la misma facultad del trabajo y solo se evita al asesor (`esAutoEvaluacion`).
+- **Ganadores (NUEVO):** ponencia = top 3 **general** (todo el pool); cartel = top 3 **por facultad/entidad**. `getWinners` devuelve `{ oral, poster }` con `poster` plano (top 3 por facultad, con `facultad_key` y `poster_rank`). `generarPremiacionMasiva` genera 12 reconocimientos (3 orales + 3 por facultad).
 - **Chrome DevTools mobile emulation** no es igual a un dispositivo real — siempre probar en celular físico.
 
 ---
@@ -98,13 +101,13 @@ El index usa clases `ml-*` para el layout mobile-app:
 |-----|-----------|
 | **Dashboard** | Stats · Toggle subida · Asignar Fase 1 · Dictaminar (N) · Tabla de evaluaciones con filtros · Botón "Ver evaluadores" · Listos para Dictaminar |
 | **Horarios** | Asignar Fase 2 · Caso de Emergencia · Enviar Agendas · Tabla horario general |
-| **Fase 2** | Top 3 Oral + Top 3 Cartel · Generar constancias |
+| **Fase 2** | Top 3 Oral general + Top 3 Cartel por facultad · Generar constancias |
 
 Funciones JS clave:
 - `toggleUploads()` — setea `localStorage.encuentroIQ_uploadsEnabled`
 - `assignAllPendingWorks()` — asigna trabajos pendientes a 3 evaluadores
 - `finalizeAllReadyWorks()` — dictamina trabajos con 3 evaluaciones completas
-- `assignLiveJudges()` — asigna evaluadores Fase 2
+- `assignLiveJudges()` — asigna evaluadores Fase 2 (carteles por rotación de facultad; ponencias 1 por facultad)
 - `generateCertificates()` — genera constancias en Google Slides
 
 ---
@@ -128,6 +131,7 @@ Funciones JS clave:
 | `requestHelp` | Evaluador pide ayuda |
 | `resolveHelpRequest` | Admin atiende solicitud de ayuda |
 | `reassignLiveEvaluator` | Sustituir evaluador ausente en Fase 2 |
+| `assignLiveWorks` | Asignar Fase 2: carteles por rotación de facultad (1 evaluador/cartel) y ponencias (1 por facultad). No reasigna trabajos ya asignados |
 
 **Cambio reciente:** `submitWork` ahora recibe `facultad` directamente del formulario (antes hacía lookup desde la hoja `users`). El campo `grupo` ya no se envía.
 
@@ -207,3 +211,4 @@ Script automatizado: `build/build-apk.bat` (copia a `C:\EncuentroBuild`, instala
 5. Mobile: probar en dispositivo real, no solo Chrome DevTools (diferencias reales en viewport).
 6. **Fase 2 en vivo (admin):** el tab Dashboard hace polling cada 20s (`pollLiveDashboard`) → solicitudes de ayuda, actividad de evaluadores, mapa de salones.
 7. **Actividad de evaluador:** se registra al abrir Fase 2 (`available`), abrir presentación (`busy`), enviar (`available`). "Sin actividad" = >5 min sin `last_activity`, distinto de "Ausente" (manual).
+8. **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga `Code.gs` en un sandbox en memoria (sin red ni Google) y valida Fase 2 y ganadores. Guía completa en `tests/README.md`; `tests/Code.pruebas.gs` contiene las pruebas dirigidas de notificaciones/constancias para un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).

@@ -83,14 +83,7 @@ function doGet(e) {
        result = { success: true, data: filtered };
     }
     else if (action === 'getWinners') {
-      const works = getSheetData(db, 'works');
-      const users = getSheetData(db, 'users');
-      const scoredWorks = works.filter(w => w.live_score !== "" && Number(w.live_score) > 0).map(w => ({
-          ...w, student_name: (users.find(u => u.id === w.student_id) || {}).name || 'N/A'
-      }));
-      const oral = scoredWorks.filter(w => w.status === 'accepted_oral').sort((a, b) => b.live_score - a.live_score).slice(0, 3);
-      const poster = scoredWorks.filter(w => w.status === 'accepted_poster').sort((a, b) => b.live_score - a.live_score).slice(0, 3);
-      result = { success: true, data: { oral, poster } };
+      result = { success: true, data: obtenerGanadores(db) };
     }
     else if (action === 'getLiveAdminDashboard') {
       assertAdmin(db, e.parameter.admin_user_id);
@@ -173,10 +166,15 @@ function tieneConflictoDeFacultad(work, evaluator) {
   return wFac !== '' && eFac !== '' && wFac === eFac;
 }
 
+function getAsesores(work) {
+  if (!work) return '';
+  return String(work.asesores || work.profesor_cargo || '');
+}
+
 function esAutoEvaluacion(work, evaluator) {
   if (!work || !evaluator) return false;
   const nombreEv = String(evaluator.name).trim().toUpperCase();
-  return String(work.profesor_cargo || '').split(',').some(n => String(n).trim().toUpperCase() === nombreEv);
+  return getAsesores(work).split(',').some(n => String(n).trim().toUpperCase() === nombreEv);
 }
 
 function generarShortId(db, facultad) {
@@ -195,6 +193,74 @@ function generarShortId(db, facultad) {
            (prefijo === 'FX' && !wf.includes('zaragoza') && !wf.includes('cuautitlan') && !wf.includes('cuautitlán') && !wf.includes('quimica') && !wf.includes('química'));
   }).length;
   return prefijo + (total + 1).toString().padStart(2, '0');
+}
+
+// --- FASE 2: asignación por facultad (carteles con rotación, orales 1 por facultad) ---
+
+const FACULTADES_ROTACION = ['FQ', 'FC', 'FZ'];
+const ROTACION_CARTELES = { FQ: 'FC', FC: 'FZ', FZ: 'FQ' };
+
+function facultadKey(facultad) {
+  const s = String(facultad || '').trim().toLowerCase();
+  if (s.includes('zaragoza')) return 'FZ';
+  if (s.includes('cuautitlan') || s.includes('cuautitlán')) return 'FC';
+  if (s.includes('quimica') || s.includes('química')) return 'FQ';
+  return null;
+}
+
+// Grupos de hasta 5 evaluadores por facultad, ordenados por menor carga actual.
+function cargarGruposEvaluadores(db) {
+  const evaluators = getSheetData(db, 'users').filter(u => u.user_type === 'evaluator');
+  const liveAssigns = getSheetData(db, 'live_assignments');
+  const carga = {};
+  evaluators.forEach(ev => {
+    carga[ev.id] = liveAssigns.filter(a => String(a.evaluator_id) === String(ev.id)).length;
+  });
+  const grupos = { FQ: [], FC: [], FZ: [] };
+  FACULTADES_ROTACION.forEach(fac => {
+    grupos[fac] = evaluators
+      .filter(ev => facultadKey(ev.facultad) === fac)
+      .sort((a, b) => (carga[a.id] - carga[b.id]) || String(a.name).localeCompare(String(b.name)))
+      .slice(0, 5);
+  });
+  return { evaluators, carga, grupos };
+}
+
+// Grupo que evalúa los carteles de `targetFac`: los 5 de la facultad que le toca
+// por rotación; si faltan, se completan con evaluadores de facultades distintas a
+// la del cartel (sin conflicto), hasta 5.
+function grupoParaObjetivo(grupos, evaluators, carga, targetFac) {
+  const evalFac = FACULTADES_ROTACION.find(f => ROTACION_CARTELES[f] === targetFac);
+  const grupo = evalFac ? grupos[evalFac].slice() : [];
+  if (grupo.length < 5) {
+    const usados = grupo.map(e => e.id);
+    evaluators
+      .filter(ev => {
+        if (usados.indexOf(ev.id) !== -1) return false;
+        if (targetFac && facultadKey(ev.facultad) === targetFac) return false;
+        return true;
+      })
+      .sort((a, b) => (carga[a.id] - carga[b.id]) || String(a.name).localeCompare(String(b.name)))
+      .forEach(ev => { if (grupo.length < 5) grupo.push(ev); });
+  }
+  return grupo;
+}
+
+// Elige al evaluador de menor carga del grupo que no sea asesor del trabajo.
+function elegirEvaluador(grupo, work, conteo) {
+  let mejor = null, mejorCarga = Infinity;
+  grupo.forEach(ev => {
+    if (esAutoEvaluacion(work, ev)) return;
+    const c = conteo[ev.id] || 0;
+    if (c < mejorCarga) { mejorCarga = c; mejor = ev; }
+  });
+  if (!mejor) {
+    grupo.forEach(ev => {
+      const c = conteo[ev.id] || 0;
+      if (c < mejorCarga) { mejorCarga = c; mejor = ev; }
+    });
+  }
+  return mejor;
 }
 
 function hashPassword(password) {
@@ -611,26 +677,71 @@ function doPost(e) {
 
     else if (data.action === 'assignLiveWorks') {
       const works = getSheetData(db, 'works');
-      const evaluators = getSheetData(db, 'users').filter(u => u.user_type === 'evaluator');
       const existing = getSheetData(db, 'live_assignments');
       const lSheet = db.getSheetByName('live_assignments');
-      let workload = {};
-      evaluators.forEach(ev => workload[ev.id] = existing.filter(a => a.evaluator_id === ev.id).length);
-      
-      const p1 = evaluators.slice(0, Math.ceil(evaluators.length/2)), p2 = evaluators.slice(Math.ceil(evaluators.length/2));
-      let count = 0;
-      function asignar(lista, w) {
-        let aptos = lista.filter(ev => {
-           return !tieneConflictoDeFacultad(w, ev) && !esAutoEvaluacion(w, ev);
-        });
-        aptos.sort((a,b) => workload[a.id] - workload[b.id]).slice(0,3).forEach(ev => {
-          lSheet.appendRow([Utilities.getUuid(), w.id, ev.id, 'assigned', new Date(), '']);
-          workload[ev.id]++; count++;
-        });
+      const { evaluators, carga, grupos } = cargarGruposEvaluadores(db);
+
+      const conteo = {};
+      evaluators.forEach(ev => conteo[ev.id] = 0);
+
+      const yaAsignados = {};
+      existing.forEach(a => { yaAsignados[String(a.work_id)] = true; });
+
+      const filas = [];
+      let carteles = 0, orales = 0, sinEvaluador = 0;
+
+      // --- CARTELES: cada facultad evalúa los carteles de otra (rotación).
+      // 5 evaluadores por facultad, 1 evaluador por cartel.
+      const gruposCartel = {};
+      function grupoCartel(targetFac) {
+        const key = targetFac || 'FX';
+        if (!gruposCartel[key]) gruposCartel[key] = grupoParaObjetivo(grupos, evaluators, carga, targetFac);
+        return gruposCartel[key];
       }
-      works.filter(w => w.status === 'accepted_oral').forEach(w => { if(!existing.some(a => a.work_id === w.id)) asignar(w.auditorio==='UMIEZ'?p1:p2, w); });
-      works.filter(w => w.status === 'accepted_poster').forEach(w => { if(!existing.some(a => a.work_id === w.id)) asignar(evaluators, w); });
-      result = { success: true, count: count };
+
+      works.filter(w => w.status === 'accepted_poster' && !yaAsignados[String(w.id)]).forEach(w => {
+        const grupo = grupoCartel(facultadKey(w.facultad));
+        if (!grupo.length) { sinEvaluador++; return; }
+        const ev = elegirEvaluador(grupo, w, conteo);
+        if (!ev) { sinEvaluador++; return; }
+        conteo[ev.id]++;
+        filas.push([Utilities.getUuid(), w.id, ev.id, 'assigned', new Date(), '']);
+        carteles++;
+      });
+
+      // --- ORALES: 1 evaluador de cada facultad por ponencia (misma facultad permitida,
+      // solo se evita al asesor del trabajo).
+      works.filter(w => w.status === 'accepted_oral' && !yaAsignados[String(w.id)]).forEach(w => {
+        const usados = {};
+        FACULTADES_ROTACION.forEach(fac => {
+          let grupo = grupos[fac];
+          if (!grupo.length) grupo = evaluators.filter(ev => !usados[ev.id]);
+          let ev = null, mejor = Infinity;
+          grupo.forEach(cand => {
+            if (usados[cand.id] || esAutoEvaluacion(w, cand)) return;
+            const c = conteo[cand.id] || 0;
+            if (c < mejor) { mejor = c; ev = cand; }
+          });
+          if (!ev) {
+            grupo.forEach(cand => {
+              if (usados[cand.id]) return;
+              const c = conteo[cand.id] || 0;
+              if (c < mejor) { mejor = c; ev = cand; }
+            });
+          }
+          if (ev) {
+            usados[ev.id] = true;
+            conteo[ev.id]++;
+            filas.push([Utilities.getUuid(), w.id, ev.id, 'assigned', new Date(), '']);
+            orales++;
+          } else {
+            sinEvaluador++;
+          }
+        });
+      });
+
+      filas.forEach(f => lSheet.appendRow(f));
+      result = { success: true, count: filas.length, resumen: { carteles, orales, sinEvaluador } };
     }
 
     else if (data.action === 'assignManualLive') {
@@ -643,11 +754,15 @@ function doPost(e) {
         const ev = getSheetData(db, 'users').find(u => u.id === data.evaluator_id);
         if (!work || !ev) {
           result = { success: false, error: 'Trabajo o evaluador no encontrado.' };
-        } else if (tieneConflictoDeFacultad(work, ev) || esAutoEvaluacion(work, ev)) {
-          result = { success: false, error: 'Conflicto: El evaluador pertenece a la misma facultad que el autor del trabajo.' };
         } else {
-          lSheet.appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
-          result = { success: true };
+          const esOral = String(work.status || '').includes('oral');
+          const conflicto = esAutoEvaluacion(work, ev) || (!esOral && tieneConflictoDeFacultad(work, ev));
+          if (conflicto) {
+            result = { success: false, error: 'Conflicto: el evaluador es asesor del trabajo o pertenece a la misma facultad (en ponencias se permite la misma facultad).' };
+          } else {
+            lSheet.appendRow([Utilities.getUuid(), data.work_id, data.evaluator_id, 'assigned', new Date(), '']);
+            result = { success: true };
+          }
         }
       }
     }
@@ -802,11 +917,12 @@ function doPost(e) {
       const newEvaluator = getSheetData(db, 'users').find(u => u.id === new_ev);
       if (!work || !newEvaluator) throw new Error('Trabajo o evaluador nuevo no encontrado');
 
-      if (tieneConflictoDeFacultad(work, newEvaluator)) {
-        throw new Error('Conflicto: El nuevo evaluador pertenece a la misma facultad que el autor del trabajo.');
+      const esOral = String(work.status || '').includes('oral');
+      if (!esOral && tieneConflictoDeFacultad(work, newEvaluator)) {
+        throw new Error('Conflicto: El nuevo evaluador pertenece a la misma facultad que el autor del trabajo (solo se permite en ponencias).');
       }
       if (esAutoEvaluacion(work, newEvaluator)) {
-        throw new Error('Conflicto: El nuevo evaluador es el profesor del autor del trabajo.');
+        throw new Error('Conflicto: El nuevo evaluador es asesor del trabajo.');
       }
 
       const lSheet = db.getSheetByName('live_assignments');
@@ -856,7 +972,7 @@ function doPost(e) {
 
     else if (data.action === 'generateCertificates') {
       const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
-      const prof = work.profesor_cargo || "No asignado";
+      const prof = getAsesores(work) || "No asignado";
       const url = crearSlideEditable(work, prof, "Participación");
       result = { success: true, fileUrl: url };
     }
@@ -941,27 +1057,68 @@ function doPost(e) {
 // FUNCIONES DE RECONOCIMIENTOS EDITABLES (12 GANADORES)
 // ============================================================
 
+// Oral: top 3 general. Cartel: top 3 por facultad (entidad).
+function obtenerGanadores(db) {
+  const works = getSheetData(db, 'works');
+  const users = getSheetData(db, 'users');
+  const scored = works
+    .filter(w => w.live_score !== "" && w.live_score !== null && w.live_score !== undefined && Number(w.live_score) > 0)
+    .map(w => ({ ...w, student_name: (users.find(u => u.id === w.student_id) || {}).name || 'N/A' }));
+
+  const oral = scored.filter(w => w.status === 'accepted_oral')
+    .sort((a, b) => Number(b.live_score) - Number(a.live_score))
+    .slice(0, 3);
+
+  const byFac = {};
+  scored.filter(w => w.status === 'accepted_poster').forEach(w => {
+    const key = facultadKey(w.facultad) || String(w.facultad || 'Sin Facultad');
+    (byFac[key] = byFac[key] || []).push(w);
+  });
+
+  const orden = { FQ: 0, FC: 1, FZ: 2 };
+  const poster = [];
+  Object.keys(byFac)
+    .sort((a, b) => (orden[a] === undefined ? 99 : orden[a]) - (orden[b] === undefined ? 99 : orden[b]) || String(a).localeCompare(String(b)))
+    .forEach(key => {
+      byFac[key]
+        .sort((a, b) => Number(b.live_score) - Number(a.live_score))
+        .slice(0, 3)
+        .forEach((w, i) => {
+          w.facultad_key = key;
+          w.facultad = w.facultad || key;
+          w.poster_rank = i;
+          poster.push(w);
+        });
+    });
+
+  return { oral, poster };
+}
+
 function generarPremiacionMasiva() {
   const db = SpreadsheetApp.getActiveSpreadsheet();
-  const works = getSheetData(db, 'works');
-  const scored = works.filter(w => w.live_score && Number(w.live_score) > 0);
+  const { oral, poster } = obtenerGanadores(db);
 
   let listaGanadores = [];
 
-  scored.filter(w => w.status === 'accepted_oral').sort((a,b) => b.live_score - a.live_score).slice(0, 3).forEach((w,i) => {
+  oral.forEach((w, i) => {
     listaGanadores.push({ w, l: `${i + 1}er Lugar Ponencia Oral` });
   });
 
-  scored.filter(w => w.status === 'accepted_poster').sort((a,b) => b.live_score - a.live_score).slice(0, 3).forEach((w,i) => {
-    listaGanadores.push({ w, l: `${i + 1}er Lugar Cartel` });
+  poster.forEach(w => {
+    listaGanadores.push({ w, l: `${w.poster_rank + 1}er Lugar Cartel — ${w.facultad}` });
   });
 
-  listaGanadores.forEach(g => crearSlideEditable(g.w, g.w.profesor_cargo || "No asignado", g.l));
+  listaGanadores.forEach(g => crearSlideEditable(g.w, getAsesores(g.w) || "No asignado", g.l));
   Logger.log(`✅ ${listaGanadores.length} reconocimientos editables generados.`);
 }
 
-function crearSlideEditable(work, profesor, lugarTexto) {
-  const folder = DriveApp.getFolderById(CERTIFICATES_FOLDER_ID);
+function formatearAsesores(profesor) {
+  const lista = String(profesor || '').split(',').map(s => s.trim()).filter(Boolean);
+  return lista.length ? lista.join('\n') : 'No asignado';
+}
+
+function crearSlideEditable(work, profesor, lugarTexto, folderId) {
+  const folder = DriveApp.getFolderById(folderId || CERTIFICATES_FOLDER_ID);
   const copy = DriveApp.getFileById(TEMPLATE_ID).makeCopy(`EDITABLE: ${lugarTexto} - ${work.short_id}`, folder);
   const pres = SlidesApp.openById(copy.getId());
   const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -969,7 +1126,7 @@ function crearSlideEditable(work, profesor, lugarTexto) {
 
   pres.replaceAllText('{{INTEGRANTES}}', work.team_members);
   pres.replaceAllText('{{TITULO}}', work.title);
-  pres.replaceAllText('{{PROFESOR}}', profesor);
+  pres.replaceAllText('{{PROFESOR}}', formatearAsesores(profesor));
   pres.replaceAllText('{{MODALIDAD}}', work.status === 'accepted_oral' ? 'Ponencia Oral' : 'Cartel');
   pres.replaceAllText('{{LUGAR}}', lugarTexto);
   pres.replaceAllText('{{FECHA}}', `${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`);

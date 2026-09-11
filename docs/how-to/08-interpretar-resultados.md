@@ -47,14 +47,18 @@ En la sección **Resultados** del panel de evaluador puedes ver:
 
 ---
 
-## Publicar ganadores
+## Ganadores
 
-El administrador debe:
+El sistema determina los ganadores automáticamente a partir del puntaje de Fase 2 (`live_score`):
 
-1. Revisar los puntajes en la sección **Resultados**.
-2. Seleccionar manualmente los ganadores por categoría (oral / cartel) o usar la opción **Seleccionar automáticamente**.
-3. Hacer clic en **Publicar resultados**.
-4. Los resultados se vuelven visibles para todos los participantes.
+- **Ponencia oral:** 1.º, 2.º y 3.er lugar **general**, considerando todo el pool de ponencias.
+- **Cartel:** 1.º, 2.º y 3.er lugar **por facultad/entidad** (una terna por facultad).
+
+El administrador los revisa en la pestaña **Fase 2** del panel, donde puede generar las constancias:
+
+1. Ver las tarjetas de **Top 3 Ponencia Oral (General)** y **Top 3 Cartel** por facultad.
+2. Generar la constancia individual de cada ganador con el botón **Constancia**.
+3. Para generar los 12 reconocimientos de una sola vez, ejecutar `generarPremiacionMasiva()` en el editor de Apps Script.
 
 ---
 
