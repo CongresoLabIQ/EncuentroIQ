@@ -139,4 +139,57 @@ function toObjects(rows) {
   });
 }
 
-module.exports = { FAC, FACULTADES, HEADERS, seedSheets, toObjects };
+// Trajes "pending" para simular el ciclo completo desde Fase 1.
+function buildPendingWorks(perFac) {
+  const works = [];
+  FACULTADES.forEach(fac => {
+    for (let i = 0; i < perFac; i++) {
+      const id = fac + '-W' + i;
+      works.push({
+        id,
+        short_id: fac + String(i + 1).padStart(2, '0'),
+        student_id: 'alumno-' + fac + '-' + i,
+        title: fac + ' Trabajo ' + (i + 1),
+        abstract: 'Resumen ' + id,
+        semester: String(1 + (i % 9)),
+        facultad: FAC[fac],
+        profesor_cargo: '',
+        team_members: 'Equipo ' + id,
+        modality: 'Pendiente',
+        file_url: 'https://example.test/' + id + '.pdf',
+        file_id: 'file-' + id,
+        status: 'pending',
+        submitted_at: '2026-09-01',
+        final_score: '',
+        feedback: '',
+        auditorio: '',
+        horario: '',
+        live_score: ''
+      });
+    }
+  });
+  return works;
+}
+
+function seedPendingSheets(opts) {
+  const options = opts || {};
+  const perFac = options.worksPerFaculty || 20;
+  const counts = options.counts || { FQ: 5, FC: 5, FZ: 5 };
+  const users = buildUsers({ counts, includeTestAccounts: options.includeTestAccounts });
+  const works = buildPendingWorks(perFac);
+  return {
+    users: [HEADERS.users].concat(users.map(u => row(HEADERS.users, u))),
+    works: [HEADERS.works].concat(works.map(w => row(HEADERS.works, w))),
+    assignments: [HEADERS.assignments],
+    evaluations: [HEADERS.evaluations],
+    live_assignments: [HEADERS.live_assignments],
+    live_evaluations: [HEADERS.live_evaluations],
+    live_evaluator_status: [HEADERS.live_evaluator_status],
+    push_subscriptions: [HEADERS.push_subscriptions],
+    config: [HEADERS.config,
+      row(HEADERS.config, { key: 'event_date', value: '2026-10-23' }),
+      row(HEADERS.config, { key: 'evaluator_code', value: 'zaragoza' })]
+  };
+}
+
+module.exports = { FAC, FACULTADES, HEADERS, seedSheets, seedPendingSheets, toObjects };

@@ -6,7 +6,8 @@ const T = require('./harness/t');
 
 const suites = [
   require('./fase2.test'),
-  require('./winners.test')
+  require('./winners.test'),
+  require('./e2e.test')
 ];
 
 let passed = 0;

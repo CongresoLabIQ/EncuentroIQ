@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "node tests/run.js",
+    "simular": "node tests/simulacion.js",
     "build:www": "node scripts/build-www.js",
     "sync": "node scripts/build-www.js && npx cap sync android",
     "open": "npx cap open android"

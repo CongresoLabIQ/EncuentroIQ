@@ -23,7 +23,9 @@ Carga el `Code.gs` **real** en un entorno falso de Apps Script:
 Cubre: rotación de carteles (FQ→FC→FZ→FQ), 1 evaluador por cartel, límite de 5,
 fallback, balance, orales (3 por ponencia, una por facultad, anti-asesor),
 idempotencia, conflictos por modalidad (`assignManualLive`/`reassignLiveEvaluator`),
-`esAutoEvaluacion`/`getAsesores` y `getWinners` (oral top 3 general; cartel top 3 por facultad).
+`esAutoEvaluacion`/`getAsesores`, `formatearAsesores` y `getWinners`
+(oral top 3 general; cartel top 3 por facultad). Incluye una suite **E2E** que
+encadena asignar → evaluar en vivo → ganadores.
 
 Ejecutar (desde la raíz del repo):
 
@@ -32,6 +34,18 @@ node tests/run.js
 ```
 
 Salida esperada: `✅ TODO OK`. No requiere `npm install`.
+
+### Simulación del workflow
+
+Para ver el ciclo completo con datos ficticios y un reporte legible:
+
+```powershell
+node tests/simulacion.js   # o: npm run simular
+```
+
+Encadena 60 trabajos (20 por facultad) → asignación Fase 1 → 180 evaluaciones →
+dictamen → Fase 2 (45 carteles + 6 ponencias) → evaluaciones en vivo → ganadores,
+y verifica cada etapa sin enviar notificaciones.
 
 ---
 
@@ -91,7 +105,7 @@ Nunca ejecutar estas funciones contra la hoja de producción.
 
 ## Criterios de aceptación
 
-- `node tests/run.js` termina con `✅ TODO OK` (250 aserciones).
+- `node tests/run.js` termina con `✅ TODO OK` (270 aserciones).
 - El sensor de notificaciones queda en **0** en la Fase A.
 - En Fase C, los correos/push llegan **únicamente** a `TestE1`, `MiguelF` y `admin-001`.
 - `PRUEBA_limpiar()` deja la hoja clon sin rastros de la prueba.

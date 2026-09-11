@@ -8,7 +8,8 @@
 - **Nueva lógica de ponencias (Fase 2):** Cada ponencia recibe **3 evaluadores, uno por cada facultad**. Se permite la misma facultad del trabajo; solo se evita al asesor del trabajo.
 - **Ganadores por modalidad:** Ponencia = top 3 **general** (todo el pool). Cartel = top 3 **por facultad/entidad**. El admin muestra una tarjeta de carteles por facultad y `generarPremiacionMasiva` produce 12 reconocimientos (3 orales + 3 por facultad).
 - **Resumen de asignación:** `assignLiveWorks` devuelve `resumen: { carteles, orales, sinEvaluador }` y el admin lo muestra al terminar.
-- **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga el `Code.gs` real en un sandbox en memoria —sin red, sin Google— y valida Fase 2 y ganadores (250 aserciones). Incluye `tests/Code.pruebas.gs` para pruebas dirigidas de notificaciones y constancias en un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+- **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga el `Code.gs` real en un sandbox en memoria —sin red, sin Google— y valida Fase 2, ganadores y el flujo completo end-to-end (270 aserciones). Incluye `tests/Code.pruebas.gs` para pruebas dirigidas de notificaciones y constancias en un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+- **Simulación del workflow:** `npm run simular` (o `node tests/simulacion.js`) encadena 60 trabajos → asignación Fase 1 → evaluaciones → dictamen → Fase 2 → evaluaciones en vivo → ganadores, con reporte en consola y verificaciones.
 - **`crearSlideEditable` acepta carpeta opcional** (`folderId`) para generar constancias en una carpeta de prueba.
 - **`generateCertificates` usa los asesores** (`getAsesores`) del trabajo en lugar de `profesor_cargo` directo.
 - **Constancias con varios asesores:** `formatearAsesores()` coloca cada asesor en su propia línea al reemplazar `{{PROFESOR}}`; si no hay asesor usa "No asignado".
