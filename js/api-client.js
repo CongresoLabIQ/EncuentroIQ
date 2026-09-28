@@ -100,17 +100,16 @@ const apiClient = {
     },
 
     // Sube la presentación (PPTX/PDF) de un trabajo seleccionado a oral
-    async submitPresentation(workId, studentId, file, onProgress) {
+    async submitPresentation(workId, studentId, file) {
         try {
             const base64 = await toBase64(file);
-            const body = JSON.stringify({
+            return await postData({
                 action: 'submitPresentation',
                 work_id: workId,
                 student_id: studentId,
                 fileName: file.name,
                 fileBase64: base64.split(',')[1]
-            });
-            return await postDataProgress(body, onProgress);
+            }, 120000);
         } catch (e) { return { success: false, error: e.message }; }
     },
 
@@ -364,31 +363,6 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 });
-
-function postDataProgress(body, onProgress) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', GOOGLE_SCRIPT_URL, true);
-        xhr.timeout = 120000;
-        xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-        xhr.onload = () => {
-            if (xhr.status < 200 || xhr.status >= 300) {
-                reject(new Error(`El servidor respondió con el estado HTTP ${xhr.status}.`));
-                return;
-            }
-            try {
-                resolve(JSON.parse(xhr.responseText));
-            } catch (e) {
-                reject(new Error('El servidor devolvió una respuesta inválida. Intenta de nuevo; si continúa, avisa a soporte.'));
-            }
-        };
-        xhr.onerror = () => reject(new Error('No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'));
-        xhr.ontimeout = () => reject(new Error('La subida tardó demasiado y se agotó el tiempo de espera. Revisa tu conexión antes de volver a intentarlo.'));
-        xhr.onabort = () => reject(new Error('La subida fue cancelada.'));
-        xhr.upload.onprogress = onProgress || (() => {});
-        xhr.send(body);
-    });
-}
 
 // Exponer globalmente
 window.apiClient = apiClient;

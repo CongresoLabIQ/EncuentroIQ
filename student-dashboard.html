@@ -112,9 +112,9 @@
                         <input type="file" class="d-none" id="presFileInput" accept=".pdf,.pptx,.ppt">
                     </div>
                     <div class="mb-3 d-none" id="presProgressGroup">
-                        <label class="form-label fw-bold">Subiendo archivo...</label>
+                        <label class="form-label fw-bold">Enviando presentación...</label>
                         <div class="progress" style="height: 25px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="presProgressBar" role="progressbar" style="width: 0%;">0%</div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="presProgressBar" role="progressbar" style="width: 100%;"></div>
                         </div>
                         <small class="text-muted mt-1" id="presProgressText">Iniciando...</small>
                     </div>
@@ -392,23 +392,15 @@
             const pb = document.getElementById('presProgressBar');
             const pt = document.getElementById('presProgressText');
             pb.className = 'progress-bar progress-bar-striped progress-bar-animated';
-            pb.style.width = '0%';
-            pb.textContent = '0%';
-            pt.textContent = 'Iniciando...';
+            pb.style.width = '100%';
+            pb.textContent = '';
+            pt.textContent = 'Enviando y esperando confirmación del servidor...';
 
             try {
                 const result = await window.apiClient.submitPresentation(
                     presWorkId,
                     window._sessionUserId,
-                    presSelectedFile,
-                    (e) => {
-                        if (e.lengthComputable) {
-                            const pct = Math.round((e.loaded / e.total) * 100);
-                            pb.style.width = pct + '%';
-                            pb.textContent = pct + '%';
-                            pt.textContent = `Subiendo... ${pct}% (${(e.loaded / 1024 / 1024).toFixed(1)} MB de ${(e.total / 1024 / 1024).toFixed(1)} MB)`;
-                        }
-                    }
+                    presSelectedFile
                 );
                 if (result.success) {
                     pb.className = 'progress-bar bg-success';
