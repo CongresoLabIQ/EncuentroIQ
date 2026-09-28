@@ -362,12 +362,22 @@ function postDataProgress(body, onProgress) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', GOOGLE_SCRIPT_URL, true);
+        xhr.timeout = 120000;
         xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                try { resolve(JSON.parse(xhr.responseText)); } catch (e) { resolve({ success: false, error: e.message }); }
+        xhr.onload = () => {
+            if (xhr.status < 200 || xhr.status >= 300) {
+                reject(new Error(`El servidor respondió con el estado HTTP ${xhr.status}.`));
+                return;
+            }
+            try {
+                resolve(JSON.parse(xhr.responseText));
+            } catch (e) {
+                reject(new Error('El servidor devolvió una respuesta inválida. Intenta de nuevo; si continúa, avisa a soporte.'));
             }
         };
+        xhr.onerror = () => reject(new Error('No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'));
+        xhr.ontimeout = () => reject(new Error('La subida tardó demasiado y se agotó el tiempo de espera. Revisa tu conexión antes de volver a intentarlo.'));
+        xhr.onabort = () => reject(new Error('La subida fue cancelada.'));
         xhr.upload.onprogress = onProgress || (() => {});
         xhr.send(body);
     });
