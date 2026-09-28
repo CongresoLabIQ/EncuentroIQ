@@ -177,12 +177,12 @@
                     </div>
 
                     <div class="mb-3 d-none" id="progressGroup">
-                        <label class="form-label fw-bold">Subiendo archivo...</label>
+                        <label class="form-label fw-bold">Enviando y guardando trabajo...</label>
                         <div class="progress" style="height: 25px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgressBar"
-                                role="progressbar" style="width: 0%;">0%</div>
+                                role="progressbar" style="width: 100%;"></div>
                         </div>
-                        <small class="text-muted mt-1" id="progressText">Iniciando...</small>
+                        <small class="text-muted mt-1" id="progressText">La confirmación puede tardar hasta dos minutos.</small>
                     </div>
 
                     <div class="d-grid">
@@ -438,8 +438,8 @@
             const progressText = document.getElementById('progressText');
 
             progressGroup.classList.remove('d-none');
-            progressBar.style.width = '0%';
-            progressBar.textContent = '0%';
+            progressBar.style.width = '100%';
+            progressBar.textContent = '';
             btn.classList.add('d-none');
 
             try {
@@ -461,14 +461,7 @@
                     team_members: membersString
                 };
 
-                const result = await window.apiClient.submitWork(workData, fileInput.files[0], (e) => {
-                    if (e.lengthComputable) {
-                        const pct = Math.round((e.loaded / e.total) * 100);
-                        progressBar.style.width = pct + '%';
-                        progressBar.textContent = pct + '%';
-                        progressText.textContent = `Subiendo... ${pct}% (${(e.loaded / 1024 / 1024).toFixed(1)} MB de ${(e.total / 1024 / 1024).toFixed(1)} MB)`;
-                    }
-                });
+                const result = await window.apiClient.submitWork(workData, fileInput.files[0]);
 
                 if (result.success) {
                     progressBar.className = 'progress-bar bg-success';

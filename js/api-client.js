@@ -64,7 +64,7 @@ const apiClient = {
     async submitWork(workData, file, onProgress) {
         try {
             const base64 = await toBase64(file);
-            const body = JSON.stringify({
+            return await postData({
                 action: 'submitWork',
                 student_id: workData.student_id,
                 title: workData.title,
@@ -76,8 +76,7 @@ const apiClient = {
                 modality: "Pendiente",
                 fileName: file.name,
                 fileBase64: base64.split(',')[1]
-            });
-            return await postDataProgress(body, onProgress);
+            }, 120000);
         } catch (e) { return { success: false, error: e.message }; }
     },
 
@@ -327,7 +326,15 @@ async function postData(data, timeoutMs = 60000) {
             body: JSON.stringify(data),
             signal: controller.signal
         });
-        return await res.json();
+        const responseText = await res.text();
+        if (!responseText.trim()) {
+            return { success: false, error: 'El servidor respondió sin confirmar el envío. Revisa tu conexión antes de volver a intentarlo.' };
+        }
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            return { success: false, error: `El servidor devolvió una respuesta inválida (HTTP ${res.status}).` };
+        }
     } catch (e) {
         const mensaje = (e && e.name === 'AbortError')
             ? 'La solicitud tardó demasiado. Revisa tu conexión e inténtalo de nuevo.'
