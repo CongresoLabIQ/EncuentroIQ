@@ -167,12 +167,12 @@
 
                     <!-- Subida de Archivo -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Subir Archivo PDF *</label>
+                        <label class="form-label fw-bold">Subir Archivo PDF o PPTX *</label>
                         <div class="file-upload-area" id="fileUploadArea">
                             <p class="h2">📎</p>
                             <p class="mb-0 fw-bold" id="fileName">Haz clic para seleccionar archivo</p>
-                            <small class="text-muted">Solo formato PDF (Máx 10MB)</small>
-                            <input type="file" class="d-none" id="fileInput" accept=".pdf" required>
+                            <small class="text-muted">Formatos PDF o PPTX (Máx 10MB)</small>
+                            <input type="file" class="d-none" id="fileInput" accept=".pdf,.pptx,.ppt" required>
                         </div>
                     </div>
 
@@ -378,15 +378,18 @@
             if (asesores.length > 0) document.getElementById('asesoresError').classList.add('d-none');
         }
 
-        // --- 2. MANEJO DE ARCHIVOS (PDF) ---
+        // --- 2. MANEJO DE ARCHIVOS (PDF / PPTX) ---
         const area = document.getElementById('fileUploadArea');
         area.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
             if (e.target.files[0]) {
                 const file = e.target.files[0];
-                const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
-                if (!isPdf) {
-                    showToast('Solo se permiten archivos PDF', 'error');
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                const isAllowed = ['pdf', 'pptx', 'ppt'].includes(ext)
+                    || file.type === 'application/pdf'
+                    || file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+                if (!isAllowed) {
+                    showToast('Solo se permiten archivos PDF o PPTX', 'error');
                     fileInput.value = '';
                     return;
                 }
@@ -425,7 +428,7 @@
             if (etapa === 'proyecto escolar (estudiantes)' && !semesterSelect.value)
                 return showToast('Selecciona tu semestre.', 'warning');
 
-            if (fileInput.files.length === 0) return showToast('Selecciona un archivo PDF', 'warning');
+            if (fileInput.files.length === 0) return showToast('Selecciona un archivo PDF o PPTX', 'warning');
             if (fileInput.files[0].size > 10 * 1024 * 1024)
                 return showToast('El archivo supera el límite de 10 MB.', 'warning');
 

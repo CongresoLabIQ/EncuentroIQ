@@ -416,7 +416,11 @@ function doPost(e) {
 
     else if (data.action === 'submitWork') {
       const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-      const blob = Utilities.newBlob(Utilities.base64Decode(data.fileBase64), 'application/pdf', data.fileName);
+      const ext = (data.fileName || '').split('.').pop().toLowerCase();
+      const mime = (ext === 'pptx' || ext === 'ppt')
+        ? MimeType.MICROSOFT_POWERPOINT
+        : MimeType.PDF;
+      const blob = Utilities.newBlob(Utilities.base64Decode(data.fileBase64), mime, data.fileName);
       const file = folder.createFile(blob);
       let fileUrl = "";
       try {
