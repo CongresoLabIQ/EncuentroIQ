@@ -1310,43 +1310,66 @@
                 </div>`).join('');
         }
 
-        function renderGeneralSchedule() {            const body = document.getElementById('scheduleBody');
-            const oralWorks = allWorks.filter(w => w.status === 'accepted_oral');
+        // Normaliza una hora del Sheet: quita apóstrofo inicial, espacios y extrae HH:MM
+        function formatHora(v) {
+            if (v === null || v === undefined || v === '') return 'Sin hora';
+            if (v instanceof Date) {
+                return String(v.getHours()).padStart(2, '0') + ':' + String(v.getMinutes()).padStart(2, '0');
+            }
+            const s = String(v).replace(/^'/, '').trim();
+            const iso = s.match(/T(\d{2}):(\d{2})/);
+            if (iso) return iso[1] + ':' + iso[2];
+            const hm = s.match(/(\d{1,2}):(\d{2})/);
+            if (hm) return hm[1].padStart(2, '0') + ':' + hm[2];
+            return s;
+        }
+
+        function renderGeneralSchedule() {
+            const body = document.getElementById('scheduleBody');
+            if (!body) return;
+            const works = (allWorks && allWorks.length) ? allWorks : ((liveData && liveData.works) || []);
+            const oralWorks = works.filter(w => w.status === 'accepted_oral');
 
             if (oralWorks.length === 0) {
                 body.innerHTML = '<tr><td colspan="3" class="text-muted p-4">No hay ponencias dictaminadas aún.</td></tr>';
                 return;
             }
 
-            // Obtener horas únicas y ordenarlas
-            const horasUnicas = [...new Set(oralWorks.map(w => w.horario))].sort();
+            const roomOf = w => {
+                const r = String(w.auditorio === null || w.auditorio === undefined ? '' : w.auditorio).trim();
+                return (r || 'UMIEZ').toLowerCase();
+            };
+            const toMinutes = h => {
+                const m = String(h).match(/(\d{1,2}):(\d{2})/);
+                return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+            };
 
-            body.innerHTML = horasUnicas.map(hora => {
-                // Buscar qué trabajo hay en cada salón a esa hora
-                const workUMIEZ = oralWorks.find(w => w.horario === hora && w.auditorio === 'UMIEZ');
-                const workPrincipal = oralWorks.find(w => w.horario === hora && w.auditorio === 'Auditorio Principal');
+            // Agrupar TODOS los trabajos por hora (ya normalizada)
+            const groups = {};
+            oralWorks.forEach(w => {
+                const h = formatHora(w.horario);
+                (groups[h] = groups[h] || []).push(w);
+            });
+            const horas = Object.keys(groups).sort((a, b) => toMinutes(a) - toMinutes(b));
+
+            body.innerHTML = horas.map(hora => {
+                const umiez = groups[hora].filter(w => roomOf(w) === 'umiez');
+                const principal = groups[hora].filter(w => roomOf(w) !== 'umiez');
+
+                const renderCell = list => list.length
+                    ? list.map(w => `
+                        <div class="p-2 border rounded bg-white shadow-sm mb-2">
+                            <span class="badge ${roomOf(w) === 'umiez' ? 'bg-primary' : 'bg-success'} mb-1">${w.short_id || ''}</span><br>
+                            <small class="fw-bold d-block schedule-title">${w.title || ''}</small>
+                            <small class="text-muted">${w.semester || ''}</small>
+                        </div>`).join('')
+                    : '<em class="text-muted small">Disponible</em>';
 
                 return `
             <tr>
                 <td class="fw-bold bg-light">${hora}</td>
-                <td>
-                    ${workUMIEZ ? `
-                        <div class="p-2 border rounded bg-white shadow-sm">
-                            <span class="badge bg-primary mb-1">${workUMIEZ.short_id}</span><br>
-                            <small class="fw-bold d-block schedule-title">${workUMIEZ.title}</small>
-                            <small class="text-muted">${workUMIEZ.semester}</small>
-                        </div>
-                    ` : '<em class="text-muted small">Disponible</em>'}
-                </td>
-                <td>
-                    ${workPrincipal ? `
-                        <div class="p-2 border rounded bg-white shadow-sm">
-                            <span class="badge bg-success mb-1">${workPrincipal.short_id}</span><br>
-                            <small class="fw-bold d-block schedule-title">${workPrincipal.title}</small>
-                            <small class="text-muted">${workPrincipal.semester}</small>
-                        </div>
-                    ` : '<em class="text-muted small">Disponible</em>'}
-                </td>
+                <td>${renderCell(umiez)}</td>
+                <td>${renderCell(principal)}</td>
             </tr>
         `;
             }).join('');
