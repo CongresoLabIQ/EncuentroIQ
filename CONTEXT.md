@@ -1,6 +1,6 @@
 # Contexto del Proyecto — EncuentroIQ
 
-> Archivo de contexto para sesiones de desarrollo. Última actualización: 2026-09-03.
+> Archivo de contexto para sesiones de desarrollo. Última actualización: 2026-09-29.
 
 ---
 
@@ -194,4 +194,5 @@ Estados: `pending | acknowledged | resolved`
 5. Mobile: probar en dispositivo real, no solo Chrome DevTools (diferencias reales en viewport).
 6. **Fase 2 en vivo (admin):** el tab Dashboard hace polling cada 20s (`pollLiveDashboard`) → solicitudes de ayuda, actividad de evaluadores, mapa de salones.
 7. **Actividad de evaluador:** se registra al abrir Fase 2 (`available`), abrir presentación (`busy`), enviar (`available`). "Sin actividad" = >5 min sin `last_activity`, distinto de "Ausente" (manual).
-8. **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga `Code.gs` en un sandbox en memoria (sin red ni Google) y valida Fase 2 y ganadores. Guía completa en `tests/README.md`; `tests/Code.pruebas.gs` contiene las pruebas dirigidas de notificaciones/constancias para un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+8. **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga `Code.gs` en un sandbox en memoria (sin red ni Google) y valida Fase 2 y ganadores (380 aserciones). Guía completa en `tests/README.md`; `tests/Code.pruebas.gs` contiene las pruebas dirigidas de notificaciones/constancias para un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+9. **Simulacro de Fase 2 por etapas (clon):** en `tests/Code.pruebas.gs`, `PRUEBA_f2_preparar()` crea 19 cuentas demo + 45 trabajos ya aceptados (13 carteles + 2 ponencias por facultad) y los asigna; el equipo evalúa a mano y `PRUEBA_f2_finalizar()` completa lo que falte y muestra ganadores. Menú **🔬 Simulacro Fase 2** en la hoja. Cubierto por `tests/fase2-simulacro.test.js`.

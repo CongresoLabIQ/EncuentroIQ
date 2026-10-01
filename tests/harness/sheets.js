@@ -78,6 +78,11 @@ class FakeSheet {
     return this;
   }
 
+  deleteRow(row) {
+    this.rows.splice(row - 1, 1);
+    return this;
+  }
+
   getLastRow() {
     return this.rows.length;
   }

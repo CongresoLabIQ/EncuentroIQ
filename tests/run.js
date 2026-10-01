@@ -8,7 +8,9 @@ const suites = [
   require('./fase2.test'),
   require('./winners.test'),
   require('./rubricas.test'),
-  require('./e2e.test')
+  require('./e2e.test'),
+  require('./poblado.test'),
+  require('./fase2-simulacro.test')
 ];
 
 let passed = 0;

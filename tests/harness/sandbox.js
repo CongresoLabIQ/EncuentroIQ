@@ -25,7 +25,7 @@ function forbiddenProxy(name, notifications) {
   });
 }
 
-function createSandbox(sheetMap) {
+function createSandbox(sheetMap, codeSource) {
   const notifications = [];
   const spreadsheet = new FakeSpreadsheet(sheetMap);
   let uuid = 0;
@@ -89,7 +89,7 @@ function createSandbox(sheetMap) {
   };
 
   vm.createContext(sandbox);
-  vm.runInContext(CODE_CACHE, sandbox, { filename: 'Code.gs' });
+  vm.runInContext(codeSource || CODE_CACHE, sandbox, { filename: 'Code.gs' });
 
   return { sandbox, spreadsheet, notifications };
 }

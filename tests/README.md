@@ -47,6 +47,28 @@ Encadena 60 trabajos (20 por facultad) → asignación Fase 1 → 180 evaluacion
 dictamen → Fase 2 (45 carteles + 6 ponencias) → evaluaciones en vivo → ganadores,
 y verifica cada etapa sin enviar notificaciones.
 
+### Simulación de Fase 2 por etapas
+
+Si solo se evalúa la Fase 2, en el clon hay un flujo por etapas (13 carteles +
+2 ponencias por facultad) que se ejecuta desde el menú **🔬 Simulacro Fase 2** de la
+hoja o llamando cada función desde el editor. Cada paso es idempotente, no toca
+Google Drive y es seguro repetirlo:
+
+| Paso | Función | Qué hace |
+|------|---------|----------|
+| — | `PRUEBA_f2_estado()` | Cuenta usuarios, trabajos, asignaciones y evaluaciones |
+| 1 | `PRUEBA_f2_paso1_usuarios()` | Crea 19 cuentas demo (admin, 3 alumnos, 5 evaluadores por facultad) |
+| 2 | `PRUEBA_f2_paso2_trabajos()` | Crea 45 trabajos ya aceptados: 13 carteles + 2 ponencias por facultad |
+| 3 | `PRUEBA_f2_paso3_asignar()` | Asigna carteles por rotación (1 evaluador) y ponencias (1 por facultad) |
+| 4 | `PRUEBA_f2_paso4_pendientes()` | Lista las asignaciones sin evaluar, para hacerlo a mano en la UI |
+| 5 | `PRUEBA_f2_paso5_autoevaluar()` | Completa las evaluaciones pendientes y recalcula el puntaje |
+| 6 | `PRUEBA_f2_paso6_ganadores()` | Muestra el top 3 oral general y el top 3 cartel por facultad |
+
+Atajos: `PRUEBA_f2_preparar()` corre los pasos 1–4 (queda listo para evaluar a
+mano); `PRUEBA_f2_finalizar()` corre 5–6; `PRUEBA_f2_reiniciarEvaluaciones()`
+borra las evaluaciones demo para repetir la dinámica; `PRUEBA_limpiar()` elimina
+todo al final. Cubierto por `tests/fase2-simulacro.test.js`.
+
 ---
 
 ## Fase B — Render del admin (manual, sin escrituras)
@@ -76,13 +98,22 @@ Nunca ejecutar estas funciones contra la hoja de producción.
 
 1. Duplica la Google Sheet y abre **Extensiones → Apps Script** del clon.
 2. Pega `Code.gs` (actualizado) y añade `tests/Code.pruebas.gs` como archivo nuevo.
-3. Crea una **carpeta de prueba** en Drive y pon su ID en
-   `PRUEBA_CERT_FOLDER_ID` (dentro de `Code.pruebas.gs`).
-4. Despliega el Web App del clon (Implementar → Nueva implementación → Aplicación web).
-5. Ejecuta las funciones desde el editor (menú Ejecutar):
+3. Opcional, solo si vas a probar carga de archivos o constancias: crea carpetas
+   exclusivas y una copia de la plantilla de Slides; configura `DRIVE_FOLDER_ID`,
+   `TEMPLATE_ID`, `CERTIFICATES_FOLDER_ID` y `PRUEBA_CERT_FOLDER_ID` con sus IDs de
+   prueba y ejecuta `PRUEBA_validarDrive()`. El sembrado de datos **no usa Drive**
+   y funciona aunque esas constantes todavía no existan.
+4. Vacía/anónimiza en el clon los registros reales de usuarios, trabajos,
+   asignaciones, evaluaciones, actividad, solicitudes de ayuda, suscripciones
+   push y datos de reinicio. Conserva encabezados/configuración y, si se usarán las pruebas de
+   notificaciones dirigidas, solo las cuentas `TestE1`, `MiguelF`, `admin-001`.
+5. Despliega el Web App del clon (Implementar → Nueva implementación → Aplicación web).
+6. Ejecuta las funciones desde el editor (menú Ejecutar):
 
 | Función | Verifica |
 |---------|----------|
+| `PRUEBA_poblarDatos()` | crea 81 trabajos, 19 cuentas demo y evaluaciones ficticias en el clon limpio (no usa Drive) |
+| `PRUEBA_validarDrive()` | comprueba IDs de Drive de prueba y rechaza los de producción (antes de subir/constancias) |
 | `PRUEBA_estado()` | que existen `TestE1`, `MiguelF`, `admin-001` |
 | `PRUEBA_todo()` | flujo completo tolerante a fallos |
 | `PRUEBA_notifDictamen()` | correo de dictamen **solo** a `TestE1` |
@@ -92,8 +123,9 @@ Nunca ejecutar estas funciones contra la hoja de producción.
 | `PRUEBA_constancia()` | genera un slide en la carpeta de prueba y valida placeholders |
 | `PRUEBA_asignarFase2()` | llama al endpoint real del clon (asignación) |
 
-6. **Al terminar, ejecuta `PRUEBA_limpiar()`**: borra el trabajo de prueba, sus
-   asignaciones de Fase 2 y manda a la papelera las constancias de prueba.
+7. **Al terminar, ejecuta `PRUEBA_limpiar()`**: borra trabajos, evaluaciones,
+   asignaciones y cuentas creadas por el simulacro; manda a la papelera las
+   constancias de prueba identificadas por su trabajo demo.
 
 ### Qué NO debe ejecutarse nunca sobre producción
 - `notifyFinalResults` / `notifyJudgesAgenda` sin el modo dirigido (notifican a todos).
@@ -101,11 +133,17 @@ Nunca ejecutar estas funciones contra la hoja de producción.
 - `generarPremiacionMasiva()` sin filtrar (genera constancias de ganadores reales).
 - `submitWork` / `submitPresentation` con datos reales.
 
+### Simulacro de la interfaz desde celulares
+
+Para abrir los dashboards en celulares conectados a la misma Wi-Fi, consulta
+[`GUIA-SIMULACRO-LOCAL.md`](GUIA-SIMULACRO-LOCAL.md). El servidor local requiere
+la URL del Web App del clon y rechaza la URL de producción configurada en el proyecto.
+
 ---
 
 ## Criterios de aceptación
 
-- `node tests/run.js` termina con `✅ TODO OK` (270 aserciones).
+- `node tests/run.js` termina con `✅ TODO OK` (380 aserciones).
 - El sensor de notificaciones queda en **0** en la Fase A.
 - En Fase C, los correos/push llegan **únicamente** a `TestE1`, `MiguelF` y `admin-001`.
-- `PRUEBA_limpiar()` deja la hoja clon sin rastros de la prueba.
+- `PRUEBA_limpiar()` elimina las filas demo marcadas y conserva las filas ajenas.

@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "node tests/run.js",
-    "simular": "node tests/simulacion.js"
+    "simular": "node tests/simulacion.js",
+    "servir-prueba": "node scripts/servidor-pruebas.js"
   }
 }
