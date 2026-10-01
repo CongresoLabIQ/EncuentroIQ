@@ -424,7 +424,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Comentarios adicionales</label>
+                                <label class="form-label">Comentarios adicionales (opcional)</label>
                                 <textarea class="form-control" id="liveComments" rows="3"
                                     placeholder="Observaciones sobre la presentación en vivo..."></textarea>
                             </div>
@@ -1212,7 +1212,7 @@
                 evaluator_id: session.user.id,
                 rubrica: JSON.stringify(rubricObj),
                 total_score: total,
-                comments: document.getElementById('liveComments').value
+                comments: (document.getElementById('liveComments').value || '').trim()
             };
 
             btn.disabled = true;

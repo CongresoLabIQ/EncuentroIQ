@@ -1668,6 +1668,11 @@ body.has-bottom-nav .floating-help {
   bottom: 80px;
 }
 
+/* Con un modal abierto (p. ej. la rúbrica), el botón de Ayuda queda por detrás */
+body.modal-open .floating-help {
+  z-index: 1040;
+}
+
 /* ============================================================
    Hint overlay "Ayuda disponible" (Fase 2 evaluador)
    ============================================================ */
