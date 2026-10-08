@@ -173,6 +173,24 @@ const apiClient = {
         return await postData({ action: 'assignLiveWorks' });
     },
 
+    // Asigna horarios (un solo auditorio) a todos los trabajos aceptados
+    async assignSchedules() {
+        return await postData({
+            action: 'assignSchedules',
+            admin_user_id: this._sessionId()
+        }, 120000);
+    },
+
+    // Importa trabajos + alumnos de FES Zaragoza desde Google Sheets (CSV)
+    async importFesZaragoza(worksCsvUrl, usersCsvUrl) {
+        return await postData({
+            action: 'importFesZaragoza',
+            admin_user_id: this._sessionId(),
+            works_csv_url: worksCsvUrl,
+            users_csv_url: usersCsvUrl || ''
+        }, 120000);
+    },
+
     async getLiveAssignments() {
         const json = await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getLiveAssignments`);
         return json.success ? json.data : [];

@@ -361,8 +361,8 @@ function PRUEBA_poblarDatos() {
 
       if (status === 'accepted_oral') {
         const oralIndex = index - 10;
-        work.auditorio = oralIndex === 0 ? 'Auditorio Principal' : 'UMIEZ';
-        work.horario = oralIndex === 0 ? '10:00' : '10:20';
+        work.auditorio = 'Auditorio Principal';
+        work.horario = slotHora(oralIndex);
         work.live_score = 84 + ((workFacIndex[fac.key] * 3 + oralIndex * 2) % 13);
       } else if (status === 'accepted_poster') {
         const posterIndex = index - 12;
@@ -722,8 +722,8 @@ function PRUEBA_f2_paso2_trabajos() {
         submitted_at: new Date(now.getTime() - (PRUEBA_F2_TRABAJOS_POR_FACULTAD - i) * 86400000),
         final_score: 72 + ((i * 3 + facIndex * 5) % 27),
         feedback: 'Seleccionado para la Fase 2. Retroalimentación ficticia.',
-        auditorio: esPonencia ? (n === 1 ? 'Auditorio Principal' : 'UMIEZ') : 'Área de Carteles',
-        horario: esPonencia ? (n === 1 ? '10:00' : '10:20') : '11:' + String((n * 4) % 60).padStart(2, '0'),
+        auditorio: esPonencia ? 'Auditorio Principal' : 'Área de Carteles',
+        horario: esPonencia ? slotHora(n - 1) : 'Sesión Carteles',
         live_score: ''
       });
     }

@@ -47,7 +47,7 @@ function createSandbox(sheetMap, codeSource) {
     parseInt,
     Promise,
     Logger: { log() {} },
-    SpreadsheetApp: { getActiveSpreadsheet: () => spreadsheet },
+    SpreadsheetApp: { getActiveSpreadsheet: () => spreadsheet, flush: () => {} },
     ContentService: {
       MimeType: { JSON: 'application/json' },
       createTextOutput(text) {

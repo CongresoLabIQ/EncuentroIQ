@@ -73,6 +73,9 @@ service-worker.js           # Cache-first SW
 - **Fase 2 ponencias (NUEVO):** cada ponencia recibe **3 evaluadores, uno por facultad**; se permite la misma facultad del trabajo y solo se evita al asesor (`esAutoEvaluacion`).
 - **Ganadores (NUEVO):** ponencia = top 3 **general** (todo el pool); cartel = top 3 **por facultad/entidad**. `getWinners` devuelve `{ oral, poster }` con `poster` plano (top 3 por facultad, con `facultad_key` y `poster_rank`). `generarPremiacionMasiva` genera 12 reconocimientos (3 orales + 3 por facultad).
 - **Rúbricas Fase 2 (NUEVO):** el modal en vivo usa un **control por sección** (Opción B) escalado a **0–100**. Cartel y ponencia tienen 9 secciones; cada una vale su peso ×10. La rúbrica vive en `evaluator-dashboard.html` (`LIVE_RUBRICAS`) y se envía como `rubrica` (JSON) + `total_score` en `submitLiveEvaluation`.
+- **Auditorio único (NUEVO):** para este evento todas las ponencias van a **Auditorio Principal**; ya no existe `UMIEZ`. `batchFinalize` y `assignSchedules` usan `slotHora(i)` (bloques de 20 min desde las 10:00). Carteles → `Área de Carteles` / `Sesión Carteles`.
+- **Importación FES Zaragoza (NUEVO):** `importFesZaragoza` (admin) lee dos hojas CSV de Google Sheets (trabajos + usuarios, la segunda opcional) desde la plataforma `github.com/congresolabiq/sistema`. Crea alumnos (conserva el hash de contraseña de origen, `facultad = 'FES Zaragoza'`) y trabajos (respeta `status`, genera `short_id` `FZxx`). Idempotente por `title + student_id`.
+- **`assignSchedules` (NUEVO):** botón en el tab Horarios que programa todas las ponencias aceptadas en el auditorio único (conserva horarios ya asignados y evita empalmes) y marca los carteles como `Sesión Carteles`.
 - **Chrome DevTools mobile emulation** no es igual a un dispositivo real — siempre probar en celular físico.
 
 ---
@@ -101,7 +104,7 @@ El index usa clases `ml-*` para el layout mobile-app:
 | Tab | Contenido |
 |-----|-----------|
 | **Dashboard** | Stats · Toggle subida · Asignar Fase 1 · Dictaminar (N) · Tabla de evaluaciones con filtros · Botón "Ver evaluadores" · Listos para Dictaminar |
-| **Horarios** | Asignar Fase 2 · Caso de Emergencia · Enviar Agendas · Tabla horario general |
+| **Horarios** | Importar FES Zaragoza · Asignar Horarios (auditorio único) · Asignar Fase 2 · Caso de Emergencia · Enviar Agendas · Tabla horario general |
 | **Fase 2** | Top 3 Oral general + Top 3 Cartel por facultad · Generar constancias |
 
 Funciones JS clave:
@@ -109,6 +112,8 @@ Funciones JS clave:
 - `assignAllPendingWorks()` — asigna trabajos pendientes a 3 evaluadores
 - `finalizeAllReadyWorks()` — dictamina trabajos con 3 evaluaciones completas
 - `assignLiveJudges()` — asigna evaluadores Fase 2 (carteles por rotación de facultad; ponencias 1 por facultad)
+- `importFesZaragoza()` — importa trabajos + alumnos desde las URLs CSV de la otra plataforma
+- `assignSchedules()` — asigna horarios a todos los aceptados (auditorio único)
 - `generateCertificates()` — genera constancias en Google Slides
 
 ---
@@ -133,6 +138,8 @@ Funciones JS clave:
 | `resolveHelpRequest` | Admin atiende solicitud de ayuda |
 | `reassignLiveEvaluator` | Sustituir evaluador ausente en Fase 2 |
 | `assignLiveWorks` | Asignar Fase 2: carteles por rotación de facultad (1 evaluador/cartel) y ponencias (1 por facultad). No reasigna trabajos ya asignados |
+| `assignSchedules` | Admin: asigna horarios a todos los aceptados (ponencias al Auditorio Principal en bloques de 20 min; carteles a Sesión Carteles). Conserva horarios previos |
+| `importFesZaragoza` | Admin: importa trabajos + alumnos de FES Zaragoza desde URLs CSV de Google Sheets. Respeta `status`, conserva hash de contraseña, idempotente |
 
 **Cambio reciente:** `submitWork` ahora recibe `facultad` directamente del formulario (antes hacía lookup desde la hoja `users`). El campo `grupo` ya no se envía.
 
@@ -179,7 +186,7 @@ Estados: `pending | acknowledged | resolved`
 
 - `assertAdmin(db, userId)` y `assertUser(db, userId)` en `Code.gs` validan contra la hoja `users` (NUNCA confiar en localStorage para roles).
 - Los endpoints sensibles reciben `admin_user_id` y deben llamar `assertAdmin`:
-  - `getLiveAdminDashboard`, `setEvaluatorStatus`, `markEvaluatorAbsent`, `reactivateEvaluator`, `resolveHelpRequest`, `reassignLiveEvaluator`
+  - `getLiveAdminDashboard`, `setEvaluatorStatus`, `markEvaluatorAbsent`, `reactivateEvaluator`, `resolveHelpRequest`, `reassignLiveEvaluator`, `assignSchedules`, `importFesZaragoza`
 - El evaluador envía `user_id` y se valida con `assertUser` en: `registerActivity`, `requestHelp`.
 - `js/api-client.js` expone `_sessionId()` para enviar el id desde la sesión local en cada request.
 
@@ -194,5 +201,5 @@ Estados: `pending | acknowledged | resolved`
 5. Mobile: probar en dispositivo real, no solo Chrome DevTools (diferencias reales en viewport).
 6. **Fase 2 en vivo (admin):** el tab Dashboard hace polling cada 20s (`pollLiveDashboard`) → solicitudes de ayuda, actividad de evaluadores, mapa de salones.
 7. **Actividad de evaluador:** se registra al abrir Fase 2 (`available`), abrir presentación (`busy`), enviar (`available`). "Sin actividad" = >5 min sin `last_activity`, distinto de "Ausente" (manual).
-8. **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga `Code.gs` en un sandbox en memoria (sin red ni Google) y valida Fase 2 y ganadores (380 aserciones). Guía completa en `tests/README.md`; `tests/Code.pruebas.gs` contiene las pruebas dirigidas de notificaciones/constancias para un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
+8. **Suite de pruebas silenciosa:** `npm test` (o `node tests/run.js`) carga `Code.gs` en un sandbox en memoria (sin red ni Google) y valida Fase 2, ganadores, auditorio único e importación FES Zaragoza (418 aserciones). Guía completa en `tests/README.md`; `tests/Code.pruebas.gs` contiene las pruebas dirigidas de notificaciones/constancias para un clon (cuentas `TestE1`, `MiguelF`, `admin-001`).
 9. **Simulacro de Fase 2 por etapas (clon):** en `tests/Code.pruebas.gs`, `PRUEBA_f2_preparar()` crea 19 cuentas demo + 45 trabajos ya aceptados (13 carteles + 2 ponencias por facultad) y los asigna; el equipo evalúa a mano y `PRUEBA_f2_finalizar()` completa lo que falte y muestra ganadores. Menú **🔬 Simulacro Fase 2** en la hoja. Cubierto por `tests/fase2-simulacro.test.js`.

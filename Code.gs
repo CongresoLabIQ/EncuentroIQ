@@ -208,6 +208,116 @@ function facultadKey(facultad) {
   return null;
 }
 
+// --- HORARIOS (evento de un solo auditorio) ---
+const AUDITORIO_UNICO = 'Auditorio Principal';
+const CARTEL_LUGAR = 'Área de Carteles';
+const CARTEL_HORARIO = 'Sesión Carteles';
+const HORA_INICIO = 10;
+const MIN_POR_TURNO = 20;
+
+// Hora "HH:MM" del slot `index` (10:00, 10:20, 10:40, ...).
+function slotHora(index) {
+  const total = index * MIN_POR_TURNO;
+  return (HORA_INICIO + Math.floor(total / 60)) + ':' + String(total % 60).padStart(2, '0');
+}
+
+// Extrae "HH:MM" de un valor de la hoja (Date o texto), o '' si no es válido.
+function normalizarHora(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (v instanceof Date) {
+    return String(v.getHours()).padStart(2, '0') + ':' + String(v.getMinutes()).padStart(2, '0');
+  }
+  const s = String(v).replace(/^'/, '').trim();
+  const iso = s.match(/T(\d{2}):(\d{2})/);
+  if (iso) return iso[1] + ':' + iso[2];
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  return m ? (m[1].padStart(2, '0') + ':' + m[2]) : '';
+}
+
+// Orden de facultades para armar la agenda (FQ, FC, FZ).
+function facRank(facultad) {
+  const orden = { FQ: 0, FC: 1, FZ: 2 };
+  const k = facultadKey(facultad);
+  return k === null ? 3 : orden[k];
+}
+
+// --- IMPORTACIÓN DESDE FES ZARAGOZA (Google Sheets → CSV) ---
+
+// Acepta una URL de hoja de Google y la convierte en exportación CSV.
+function resolverUrlCsv(url) {
+  const s = String(url || '').trim();
+  if (!s) return '';
+  if (s.indexOf('output=csv') > -1 || s.indexOf('format=csv') > -1) return s;
+  const m = s.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (!m) return s;
+  const gid = (s.match(/[#&?]gid=(\d+)/) || [])[1];
+  let out = 'https://docs.google.com/spreadsheets/d/' + m[1] + '/export?format=csv';
+  if (gid) out += '&gid=' + gid;
+  return out;
+}
+
+function fetchCsv_(url) {
+  const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('No se pudo descargar la hoja (HTTP ' + res.getResponseCode() + '). Verifica que esté publicada o con acceso de lectura.');
+  }
+  return res.getContentText();
+}
+
+// Normaliza encabezados: minúsculas, sin acentos, espacios → "_".
+function normalizarHeader(h) {
+  return String(h || '')
+    .replace(/^\uFEFF/, '')
+    .trim().toLowerCase()
+    .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
+    .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
+    .replace(/[úùüû]/g, 'u').replace(/ñ/g, 'n')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+// Parser CSV que respeta comillas, comas y saltos dentro de celdas.
+function parseCsv(text) {
+  const s = String(text || '').replace(/^\uFEFF/, '');
+  const rows = [];
+  let row = [], field = '', inQuotes = false, i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (s[i + 1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += c; i++; continue;
+    }
+    if (c === '"') { inQuotes = true; i++; continue; }
+    if (c === ',') { row.push(field); field = ''; i++; continue; }
+    if (c === '\r') { i++; continue; }
+    if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+    field += c; i++;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  if (!rows.length) return [];
+  const headers = rows[0].map(normalizarHeader);
+  return rows.slice(1)
+    .filter(r => r.some(v => String(v).trim() !== ''))
+    .map(r => {
+      const o = {};
+      headers.forEach((h, idx) => { if (h) o[h] = r[idx]; });
+      return o;
+    });
+}
+
+function slug_(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+}
+
+function parseFechaImport_(v) {
+  if (v === null || v === undefined || String(v).trim() === '') return new Date();
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
 // Grupos de hasta 5 evaluadores por facultad, ordenados por menor carga actual.
 function cargarGruposEvaluadores(db) {
   const evaluators = getSheetData(db, 'users').filter(u => u.user_type === 'evaluator');
@@ -606,7 +716,7 @@ function doPost(e) {
               w.fStat = 'accepted_oral';
               orales.push(w);
             } else {
-              w.fStat = 'accepted_poster'; w.fAud = ''; w.fHor = 'Sesión Carteles';
+              w.fStat = 'accepted_poster'; w.fAud = CARTEL_LUGAR; w.fHor = CARTEL_HORARIO;
             }
           } else {
             w.fStat = 'rejected'; w.fAud = ''; w.fHor = '';
@@ -614,18 +724,11 @@ function doPost(e) {
         });
       });
 
-      // 2) Distribuir las 6 ponencias en dos auditorios (3 y 3)
-      const salas = ["Auditorio Principal", "UMIEZ"];
-      orales.forEach((w, i) => { w.fAud = salas[i % salas.length]; });
+      // 2) Todas las ponencias al único auditorio del evento
+      orales.forEach(w => { w.fAud = AUDITORIO_UNICO; });
 
-      // 3) Horarios de ponencias
-      const hInicio = 10, mTurno = 20;
-      salas.forEach(sala => {
-        shuffleArray(orales.filter(o => o.fAud === sala)).forEach((work, idx) => {
-          let totalMins = idx * mTurno;
-          work.fHor = (hInicio + Math.floor(totalMins/60)) + ":" + (totalMins % 60).toString().padStart(2,'0');
-        });
-      });
+      // 3) Horarios de ponencias: bloques de 20 min consecutivos desde las 10:00
+      orales.forEach((work, idx) => { work.fHor = slotHora(idx); });
 
       workPool.forEach(w => {
         wSheet.getRange(w.rowIndex, h.indexOf('status')+1).setValue(w.fStat);
@@ -746,6 +849,178 @@ function doPost(e) {
 
       filas.forEach(f => lSheet.appendRow(f));
       result = { success: true, count: filas.length, resumen: { carteles, orales, sinEvaluador } };
+    }
+
+    else if (data.action === 'assignSchedules') {
+      assertAdmin(db, data.admin_user_id);
+      const wSheet = db.getSheetByName('works');
+      const headers = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
+      const audIdx = headers.indexOf('auditorio');
+      const horIdx = headers.indexOf('horario');
+      if (audIdx === -1 || horIdx === -1) throw new Error('La hoja works no tiene las columnas auditorio/horario.');
+
+      const works = getSheetData(db, 'works');
+      const rowIndexById = {};
+      works.forEach((w, i) => { rowIndexById[String(w.id)] = i + 2; });
+
+      // Ponencias ordenadas por facultad (FQ, FC, FZ) y por ID corto.
+      const orales = works
+        .filter(w => w.status === 'accepted_oral')
+        .sort((a, b) => (facRank(a.facultad) - facRank(b.facultad)) ||
+          String(a.short_id || '').localeCompare(String(b.short_id || '')));
+
+      // Los horarios ya asignados se conservan; los huecos (y empalmes) se llenan en orden.
+      const ocupados = {};
+      let cursor = 0;
+      const siguienteLibre = () => {
+        while (ocupados[slotHora(cursor)]) cursor++;
+        const t = slotHora(cursor);
+        ocupados[t] = true;
+        cursor++;
+        return t;
+      };
+
+      let oralesAsignados = 0, carteles = 0;
+      orales.forEach(w => {
+        let hora = normalizarHora(w.horario);
+        if (!hora || ocupados[hora]) {
+          hora = siguienteLibre();
+        } else {
+          ocupados[hora] = true;
+        }
+        const r = rowIndexById[String(w.id)];
+        wSheet.getRange(r, audIdx + 1).setValue(AUDITORIO_UNICO);
+        wSheet.getRange(r, horIdx + 1).setValue("'" + hora);
+        oralesAsignados++;
+      });
+
+      works.filter(w => w.status === 'accepted_poster').forEach(w => {
+        const r = rowIndexById[String(w.id)];
+        wSheet.getRange(r, audIdx + 1).setValue(CARTEL_LUGAR);
+        wSheet.getRange(r, horIdx + 1).setValue(CARTEL_HORARIO);
+        carteles++;
+      });
+
+      SpreadsheetApp.flush();
+      result = { success: true, orales: oralesAsignados, carteles, auditorio: AUDITORIO_UNICO };
+    }
+
+    else if (data.action === 'importFesZaragoza') {
+      assertAdmin(db, data.admin_user_id);
+      const worksUrl = resolverUrlCsv(data.works_csv_url);
+      const usersUrl = data.users_csv_url ? resolverUrlCsv(data.users_csv_url) : '';
+      if (!worksUrl) throw new Error('Falta la URL de la hoja de trabajos.');
+
+      const worksRows = parseCsv(fetchCsv_(worksUrl));
+      if (!worksRows.length) throw new Error('La hoja de trabajos está vacía o no se pudo leer.');
+      const usersRows = usersUrl ? parseCsv(fetchCsv_(usersUrl)) : [];
+
+      // Índice de usuarios de origen (por id, email y nombre).
+      const srcUsers = {};
+      usersRows.forEach(u => {
+        const id = String(u.id || '').trim();
+        const email = String(u.email || '').trim().toLowerCase();
+        const name = String(u.name || '').trim().toLowerCase();
+        if (id) srcUsers[id] = u;
+        if (email) srcUsers[email] = u;
+        if (name) srcUsers['name:' + name] = u;
+      });
+
+      const uSheet = db.getSheetByName('users');
+      const uHeaders = uSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
+      const uCol = k => uHeaders.indexOf(k);
+      const usersByEmail = {};
+      getSheetData(db, 'users').forEach(u => { usersByEmail[String(u.email || '').trim().toLowerCase()] = u; });
+
+      const wSheet = db.getSheetByName('works');
+      const wHeaders = wSheet.getDataRange().getValues()[0].map(h => String(h).trim().toLowerCase());
+      const wCol = k => wHeaders.indexOf(k);
+
+      const existingWorks = getSheetData(db, 'works');
+      const refKey = (title, studentId) => String(title || '').trim().toLowerCase() + '|' + String(studentId || '').trim().toLowerCase();
+      const existingRefs = {};
+      existingWorks.forEach(w => { existingRefs[refKey(w.title, w.student_id)] = true; });
+
+      let fzCount = existingWorks.filter(w => String(w.facultad || '').toLowerCase().includes('zaragoza')).length;
+
+      let imported = 0, alumnosCreados = 0, omitidos = 0;
+      const errores = [];
+
+      worksRows.forEach((row, n) => {
+        try {
+          const title = String(row.title || '').trim();
+          if (!title) { omitidos++; return; }
+
+          // Resolver autor desde la hoja de usuarios de FES Zaragoza.
+          const srcStudentId = String(row.student_id || '').trim();
+          const srcEmail = String(row.student_email || row.email || '').trim().toLowerCase();
+          const srcName = String(row.student_name || row.nombre || '').trim();
+          const src = srcUsers[srcStudentId] || (srcEmail ? srcUsers[srcEmail] : null) ||
+            (srcName ? srcUsers['name:' + srcName.toLowerCase()] : null) || {};
+
+          const email = String(src.email || srcEmail || '').trim().toLowerCase();
+          const name = String(src.name || srcName || '').trim() || 'Estudiante FES Zaragoza';
+          const rawPassword = String((src.password != null && src.password !== '') ? src.password : (row.password || '')).trim();
+
+          let student = email ? usersByEmail[email] : null;
+          if (!student && email) {
+            const uid = Utilities.getUuid();
+            const uRow = new Array(uHeaders.length).fill("");
+            if (uCol('id') > -1) uRow[uCol('id')] = uid;
+            if (uCol('email') > -1) uRow[uCol('email')] = email;
+            if (uCol('password') > -1) uRow[uCol('password')] = rawPassword ? ("'" + rawPassword.replace(/^'/, '')) : "";
+            if (uCol('name') > -1) uRow[uCol('name')] = name;
+            if (uCol('user_type') > -1) uRow[uCol('user_type')] = 'student';
+            if (uCol('facultad') > -1) uRow[uCol('facultad')] = 'FES Zaragoza';
+            if (uCol('timestamp') > -1) uRow[uCol('timestamp')] = new Date();
+            uSheet.appendRow(uRow);
+            student = { id: uid, email: email, name: name };
+            usersByEmail[email] = student;
+            alumnosCreados++;
+          }
+
+          const studentId = student ? student.id : (srcStudentId || ('fz-' + slug_(title)));
+          const key = refKey(title, studentId);
+          if (existingRefs[key]) { omitidos++; return; }
+
+          const status = String(row.status || 'pending').trim();
+          const modality = String(row.modality || (
+            status === 'accepted_oral' ? 'Oral' :
+              status === 'accepted_poster' ? 'Cartel' : 'Pendiente'
+          )).trim();
+
+          const wRow = new Array(wHeaders.length).fill("");
+          const setW = (k, v) => { const idx = wCol(k); if (idx > -1) wRow[idx] = v; };
+          setW('id', Utilities.getUuid());
+          setW('short_id', 'FZ' + String(++fzCount).padStart(2, '0'));
+          setW('student_id', studentId);
+          setW('title', title);
+          setW('abstract', String(row.abstract || row.resumen || '').trim());
+          setW('modality', modality);
+          setW('file_url', String(row.file_url || '').trim());
+          setW('file_id', String(row.file_id || '').trim());
+          setW('status', status);
+          setW('submitted_at', parseFechaImport_(row.submitted_at));
+          setW('semester', String(row.semester || '').trim());
+          setW('team_members', String(row.team_members || '').trim());
+          setW('grupo', String(row.grupo || '').trim());
+          setW('profesor_cargo', String(row.profesor_cargo || '').trim());
+          setW('final_score', (row.final_score !== undefined && row.final_score !== '') ? Number(row.final_score) : '');
+          setW('feedback', String(row.feedback || '').trim());
+          setW('auditorio', '');
+          setW('horario', '');
+          setW('facultad', 'FES Zaragoza');
+          wSheet.appendRow(wRow);
+
+          existingRefs[key] = true;
+          imported++;
+        } catch (err) {
+          errores.push('Fila ' + (n + 2) + ': ' + err.message);
+        }
+      });
+
+      SpreadsheetApp.flush();
+      result = { success: true, imported, alumnosCreados, omitidos, errores };
     }
 
     else if (data.action === 'assignManualLive') {

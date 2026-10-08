@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.9.0] — 2026-10-08
+
+### Added
+- **Importación de FES Zaragoza:** nuevo endpoint `importFesZaragoza` (admin) que lee la hoja de datos de la otra plataforma (`github.com/congresolabiq/sistema`) vía URL de Google Sheets publicada como CSV. Crea/actualiza las cuentas de alumno (conservando el hash de contraseña de origen) y sus trabajos, respetando el `status` de la hoja. Idempotente (omite trabajos ya importados) y con parser CSV propio (comas/comillas).
+- **`assignSchedules` (admin):** asigna horarios a todos los trabajos aceptados. Ponencias: bloques de 20 min desde las 10:00 en **Auditorio Principal**, conservando horarios ya asignados y evitando empalmes. Carteles: `Sesión Carteles` en `Área de Carteles`.
+- **UI en el tab Horarios:** tarjeta "Importar trabajos de FES Zaragoza" (URLs de trabajos y usuarios) y tarjeta "Asignar Horarios (auditorio único)".
+- **Pruebas `tests/import-schedule.test.js`:** auditorio único (dictamen + asignación), respeto de horarios previos, permisos de admin e importación idempotente (418 aserciones en total).
+
+### Changed
+- **Un solo auditorio:** `batchFinalize` ya no reparte las ponencias entre "Auditorio Principal" y "UMIEZ"; todas van al **Auditorio Principal** en bloques consecutivos de 20 min desde las 10:00.
+- **Vistas del admin:** la tabla de Horario General y el Mapa de Salones muestran una sola columna/sala (Auditorio Principal).
+- **Sandbox de pruebas:** `SpreadsheetApp.flush()` disponible en el harness.
+- **Service worker:** caché actualizado a `encuentroiq-v12`.
+
 ## [1.8.0] — 2026-09-11
 
 ### Removed

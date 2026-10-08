@@ -25,7 +25,10 @@ fallback, balance, orales (3 por ponencia, una por facultad, anti-asesor),
 idempotencia, conflictos por modalidad (`assignManualLive`/`reassignLiveEvaluator`),
 `esAutoEvaluacion`/`getAsesores`, `formatearAsesores` y `getWinners`
 (oral top 3 general; cartel top 3 por facultad). Incluye una suite **E2E** que
-encadena asignar → evaluar en vivo → ganadores.
+encadena asignar → evaluar en vivo → ganadores, y la suite
+`import-schedule.test.js` que valida el **auditorio único**
+(`batchFinalize`/`assignSchedules`, sin `UMIEZ`) y la **importación de FES
+Zaragoza** (`importFesZaragoza`: CSV, hash de contraseña, idempotencia).
 
 Ejecutar (desde la raíz del repo):
 
@@ -143,7 +146,7 @@ la URL del Web App del clon y rechaza la URL de producción configurada en el pr
 
 ## Criterios de aceptación
 
-- `node tests/run.js` termina con `✅ TODO OK` (380 aserciones).
+- `node tests/run.js` termina con `✅ TODO OK` (418 aserciones).
 - El sensor de notificaciones queda en **0** en la Fase A.
 - En Fase C, los correos/push llegan **únicamente** a `TestE1`, `MiguelF` y `admin-001`.
 - `PRUEBA_limpiar()` elimina las filas demo marcadas y conserva las filas ajenas.
