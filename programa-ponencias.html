@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa de Ponencias · EEIQ 2026</title>
+    <meta name="description"
+        content="Horario de ponencias del 9° Encuentro Estudiantil de Ingeniería Química — 29 de octubre de 2026, Auditorio Principal.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <style>
+        *,
+        *::before,
+        *::after { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px 110px;
+            background: #06101f;
+            font-family: 'Roboto', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---------- Lienzo 12 x 16 in (3:4) ---------- */
+        .poster-shell {
+            width: min(calc(100vw - 40px), calc((100vh - 134px) * 0.75));
+            aspect-ratio: 3 / 4;
+            filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.55));
+        }
+
+        .poster {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            container-type: size;
+            background: url('Programa%20Ponencias%20EEIQ-2027-1.png') center / 100% 100% no-repeat;
+        }
+
+        .poster-content {
+            position: absolute;
+            left: 6%;
+            right: 10%;
+            top: 18.2%;
+            bottom: 15.2%;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        /* ---------- Encabezado ---------- */
+        .poster-eyebrow {
+            margin: 0 0 1cqw;
+            font-size: 1.02cqw;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: #8fb9e8;
+        }
+
+        .poster-title {
+            margin: 0;
+            font-family: 'Roboto Slab', Georgia, serif;
+            font-size: 4.3cqw;
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -0.01em;
+            color: #fff;
+        }
+
+        .poster-rule {
+            width: 7cqw;
+            height: 0.3cqw;
+            margin: 1.6cqw 0 1.3cqw;
+            border-radius: 3px;
+            background: #f0b830;
+        }
+
+        .poster-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7cqw 2.4cqw;
+            font-size: 1.16cqw;
+            color: #c2d6ec;
+        }
+
+        .poster-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6cqw;
+            white-space: nowrap;
+        }
+
+        .poster-meta svg {
+            width: 1.35cqw;
+            height: 1.35cqw;
+            flex-shrink: 0;
+            stroke: #f0b830;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ---------- Agenda ---------- */
+        .talks {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .talk {
+            display: grid;
+            grid-template-columns: 9.5cqw 1fr;
+            gap: 2.6cqw;
+            align-items: start;
+            padding: 1.4cqw 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .talk:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+
+        .talk-start {
+            display: block;
+            font-family: 'Roboto Slab', Georgia, serif;
+            font-size: 2.3cqw;
+            font-weight: 700;
+            line-height: 1;
+            color: #f0b830;
+        }
+
+        .talk-end {
+            display: block;
+            margin-top: 0.6cqw;
+            font-size: 1.02cqw;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .talk-title {
+            margin: 0;
+            font-family: 'Roboto Slab', Georgia, serif;
+            font-size: 1.72cqw;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #fff;
+            text-wrap: balance;
+        }
+
+        .talk-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.35cqw 0.9cqw;
+            margin: 0.85cqw 0 0;
+            font-size: 1.02cqw;
+            color: #9fbbda;
+        }
+
+        .talk-folio {
+            padding: 0.18cqw 0.7cqw;
+            border: 1px solid rgba(240, 184, 48, 0.5);
+            border-radius: 999px;
+            font-size: 0.85cqw;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #f0b830;
+        }
+
+        .poster-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2cqw;
+            font-size: 0.95cqw;
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        /* ---------- Barra de herramientas (solo pantalla) ---------- */
+        .toolbar {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: rgba(5, 14, 26, 0.92);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .toolbar button,
+        .toolbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: #dbe7f5;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .toolbar button:hover,
+        .toolbar a:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .toolbar .is-primary { background: #f0b830; color: #0b2a4a; }
+        .toolbar .is-primary:hover { background: #f7c94d; color: #0b2a4a; }
+
+        .toolbar svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .toolbar .btn-label { white-space: nowrap; }
+
+        /* ---------- Modo captura (para generar el PNG) ---------- */
+        body.captura { padding: 0; background: #0b2a4a; }
+        body.captura .poster-shell { width: min(100vw, calc(100vh * 0.75)); filter: none; }
+        body.captura .toolbar { display: none; }
+
+        /* ---------- Impresión / PDF ---------- */
+        @page { size: 12in 16in; margin: 0; }
+
+        @media print {
+            html, body {
+                padding: 0;
+                background: #0b2a4a;
+                display: block;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .toolbar { display: none !important; }
+
+            .poster-shell,
+            .poster {
+                width: 12in;
+                height: 16in;
+                filter: none;
+            }
+
+            .poster { break-inside: avoid; }
+        }
+
+        @media (max-width: 640px) {
+            .toolbar { bottom: 12px; gap: 2px; padding: 5px; }
+            .toolbar button, .toolbar a { padding: 11px 14px; }
+            .toolbar .btn-label { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="poster-shell">
+        <article class="poster" aria-labelledby="posterTitle">
+            <div class="poster-content">
+                <header>
+                    <p class="poster-eyebrow">9° Encuentro Estudiantil de Ingeniería Química · UNAM</p>
+                    <h1 class="poster-title" id="posterTitle">Programa de Ponencias</h1>
+                    <div class="poster-rule" aria-hidden="true"></div>
+                    <p class="poster-meta">
+                        <span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            29 de octubre de 2026
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            Auditorio Principal · Campus II
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span id="rangoHorario">10:30 – 12:30 h</span>
+                        </span>
+                    </p>
+                </header>
+
+                <ol class="talks" id="talks" aria-label="Ponencias programadas"></ol>
+
+                <footer class="poster-foot">
+                    <span>Los horarios pueden estar sujetos a cambios.</span>
+                    <span>Encuentro IQ · UNAM</span>
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="toolbar">
+        <button type="button" class="is-primary" onclick="window.print()"
+            title="Imprimir o guardar como PDF" aria-label="Imprimir o guardar como PDF">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            <span class="btn-label">Imprimir / PDF</span>
+        </button>
+        <a href="Programa%20Ponencias%20EEIQ-2027-1-horario.png" download
+            title="Descargar el póster en PNG (3600 × 4800)" aria-label="Descargar el póster en PNG">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span class="btn-label">Descargar PNG</span>
+        </a>
+        <a href="Programa%20Ponencias%20EEIQ-2027-1-horario.pdf" download
+            title="Descargar el póster en PDF (12 × 16 in)" aria-label="Descargar el póster en PDF">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            <span class="btn-label">Descargar PDF</span>
+        </a>
+        <button type="button" onclick="cargarPrograma()" title="Actualizar el horario"
+            aria-label="Actualizar el horario">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+            <span class="btn-label">Actualizar</span>
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            if (new URLSearchParams(window.location.search).has('captura')) {
+                document.body.classList.add('captura');
+            }
+
+            // Último programa conocido: si el API no responde, el póster sigue completo.
+            const PROGRAMA_LOCAL = [
+                {
+                    start: '10:30', end: '10:50', folio: 'FC08', faculty: 'FES Cuautitlán',
+                    title: 'Aportación técnico-didáctica-experimental de una línea de proceso a la red de flujo para la práctica de medición de caudal de Ingeniería Química'
+                },
+                {
+                    start: '10:50', end: '11:10', folio: 'FQ09', faculty: 'Facultad de Química',
+                    title: 'Evaluación del uso de la microalga Chlamydomonas sp en el tratamiento de aguas residuales provenientes de la industria cervecera'
+                },
+                {
+                    start: '11:10', end: '11:30', folio: 'FZ01', faculty: 'FES Zaragoza',
+                    title: 'Diseño de una red de intercambio de calor para la producción continua de ibuprofeno y su impacto en el costo energético'
+                },
+                {
+                    start: '11:30', end: '11:50', folio: 'FC11', faculty: 'FES Cuautitlán',
+                    title: 'Modelamiento Matemático de la etapa de desproteinización biológica de cascaras de camarón para la obtención de un biopolímero.'
+                },
+                {
+                    start: '11:50', end: '12:10', folio: 'FQ12', faculty: 'Facultad de Química',
+                    title: 'De aceites a biocombustibles: El papel de los catalizadores Co(x)/SAPO-11 en la producción de diésel verde'
+                },
+                {
+                    start: '12:10', end: '12:30', folio: 'FZ02', faculty: 'FES Zaragoza',
+                    title: 'Desarrollo de un simulador hidráulico matricial automatizado para el diseño y análisis de redes de tuberías de proceso'
+                }
+            ];
+
+            const DURACION_MIN = 20;
+
+            function minutos(hora) {
+                const [h, m] = hora.split(':').map(Number);
+                return h * 60 + m;
+            }
+
+            function aHora(total) {
+                const h = Math.floor(total / 60) % 24;
+                const m = total % 60;
+                return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+            }
+
+            function leerHorario(valor) {
+                const m = String(valor || '').match(/(\d{1,2}):(\d{2})\s*(?:[-–—]\s*(\d{1,2}):(\d{2}))?/);
+                if (!m) return null;
+                const start = String(Number(m[1])).padStart(2, '0') + ':' + m[2];
+                const end = m[3]
+                    ? String(Number(m[3])).padStart(2, '0') + ':' + m[4]
+                    : aHora(minutos(start) + DURACION_MIN);
+                return { start, end };
+            }
+
+            function crearPonencia(talk) {
+                const li = document.createElement('li');
+                li.className = 'talk';
+
+                const time = document.createElement('div');
+                const start = document.createElement('span');
+                start.className = 'talk-start';
+                start.textContent = talk.start;
+                const end = document.createElement('span');
+                end.className = 'talk-end';
+                end.textContent = talk.end + ' h';
+                time.append(start, end);
+
+                const body = document.createElement('div');
+                const title = document.createElement('h2');
+                title.className = 'talk-title';
+                title.textContent = talk.title;
+                const meta = document.createElement('p');
+                meta.className = 'talk-meta';
+                const folio = document.createElement('span');
+                folio.className = 'talk-folio';
+                folio.textContent = talk.folio;
+                const faculty = document.createElement('span');
+                faculty.textContent = talk.faculty;
+                meta.append(folio, faculty);
+                body.append(title, meta);
+
+                li.append(time, body);
+                return li;
+            }
+
+            function render(talks) {
+                const list = document.getElementById('talks');
+                list.textContent = '';
+                talks.forEach(function (talk) {
+                    list.appendChild(crearPonencia(talk));
+                });
+
+                const range = document.getElementById('rangoHorario');
+                if (talks.length && range) {
+                    range.textContent = talks[0].start + ' – ' + talks[talks.length - 1].end + ' h';
+                }
+            }
+
+            function desdeApi(works) {
+                return works
+                    .filter(function (w) { return w.status === 'accepted_oral' && leerHorario(w.horario); })
+                    .map(function (w) {
+                        const horario = leerHorario(w.horario);
+                        return {
+                            start: horario.start,
+                            end: horario.end,
+                            title: String(w.title || '').trim(),
+                            folio: String(w.short_id || '').trim(),
+                            faculty: String(w.facultad || '').trim()
+                        };
+                    })
+                    .sort(function (a, b) { return minutos(a.start) - minutos(b.start); });
+            }
+
+            async function cargarPrograma() {
+                let talks = PROGRAMA_LOCAL;
+                try {
+                    const controller = new AbortController();
+                    const timer = setTimeout(function () { controller.abort(); }, 8000);
+                    const res = await fetch(GOOGLE_SCRIPT_URL + '?action=getWorks', {
+                        cache: 'no-store',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timer);
+                    const json = await res.json();
+                    const remotas = desdeApi((json && json.data) || []);
+                    if (remotas.length) talks = remotas;
+                } catch (err) {
+                    console.warn('Programa: se usa la copia local del horario.', err);
+                }
+                render(talks);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                render(PROGRAMA_LOCAL);   // pinta de inmediato
+                cargarPrograma();         // y refresca con los datos del sistema
+            });
+
+            window.cargarPrograma = cargarPrograma;
+        })();
+    </script>
+</body>
+
+</html>

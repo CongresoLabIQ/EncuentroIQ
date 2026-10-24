@@ -25,6 +25,19 @@
 <body>
     <a href="#mainContent" class="skip-link">Saltar al contenido principal</a>
     <button id="themeToggle" class="theme-toggle" aria-label="Cambiar a modo oscuro"></button>
+
+    <!-- Burbuja del programa (aparece al cerrar el pop-up) -->
+    <button id="programaBubble" class="programa-bubble is-hidden" type="button" aria-hidden="true"
+        aria-label="Abrir el Programa General EEIQ 2026" title="Programa General EEIQ 2026">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+    </button>
+
     <div id="toastContainer" role="status" aria-live="polite"></div>
 
     <!-- ==================== TOP BAR (desktop only) ==================== -->
@@ -61,6 +74,19 @@
         <div class="container">
             <div class="ml-section-title">Recursos y Plantillas</div>
             <div class="ml-resources">
+                <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener"
+                    class="ml-pill ml-pill-programa" data-programa-open>
+                    <span class="ml-pill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg></span>
+                    <span class="ml-pill-label">Programa General</span>
+                    <span class="ml-pill-desc">Horarios y actividades del evento</span>
+                    <span class="ml-pill-type">PDF</span>
+                </a>
                 <a href="https://drive.google.com/file/d/1rUaqq0z3XIX-qOIiwzZlofEoqJV600q2/view?usp=sharing"
                     target="_blank" rel="noopener" class="ml-pill">
                     <span class="ml-pill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -224,6 +250,56 @@
         </div>
     </footer>
 
+    <!-- ==================== PROGRAMA GENERAL (pop-up) ==================== -->
+    <div class="programa-modal" id="programaModal" role="dialog" aria-modal="true"
+        aria-labelledby="programaTitle" aria-describedby="programaDesc" aria-hidden="true">
+        <div class="programa-modal-backdrop" data-programa-close></div>
+        <div class="programa-modal-dialog" role="document" tabindex="-1">
+            <header class="programa-modal-header">
+                <div>
+                    <span class="programa-modal-kicker">9° Edición · 29 de octubre de 2026</span>
+                    <h2 class="programa-modal-title" id="programaTitle">Programa General EEIQ 2026</h2>
+                </div>
+                <button class="programa-modal-close" type="button" data-programa-close
+                    aria-label="Cerrar el programa">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </header>
+
+            <div class="programa-modal-body">
+                <iframe id="programaFrame" class="programa-pdf"
+                    title="Programa General EEIQ 2026 (documento PDF)"></iframe>
+                <div class="programa-mobile-card" id="programaDesc">
+                    <span class="programa-mobile-icon" aria-hidden="true">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                    </span>
+                    <p>Consulta el programa completo: horarios, sedes y actividades del 9° Encuentro Estudiantil de
+                        Ingeniería Química.</p>
+                    <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener"
+                        class="btn btn-unam px-4">Abrir programa</a>
+                </div>
+            </div>
+
+            <footer class="programa-modal-footer">
+                <span class="programa-modal-hint">29 de octubre de 2026 · Ciudad de México</span>
+                <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener"
+                    class="btn btn-outline-unam">Abrir en pestaña nueva</a>
+                <a href="Programa%20gral%20EEIQ-2026.pdf" download="Programa gral EEIQ-2026.pdf"
+                    class="btn btn-unam">Descargar PDF</a>
+            </footer>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Service Worker -->
@@ -250,6 +326,182 @@
     <script src="js/config.js"></script>
     <script src="js/api-client.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Programa General: pop-up al entrar + burbuja flotante -->
+    <script>
+        (function () {
+            const PDF_URL = 'Programa%20gral%20EEIQ-2026.pdf';
+            const SEEN_KEY = 'encuentroIQ_programa_visto';
+            const modal = document.getElementById('programaModal');
+            const bubble = document.getElementById('programaBubble');
+            if (!modal || !bubble) return;
+
+            const dialog = modal.querySelector('.programa-modal-dialog');
+            const frame = document.getElementById('programaFrame');
+            const reduceMotion = function () {
+                return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            };
+            const inlinePdf = window.matchMedia('(min-width: 768px)').matches;
+
+            let isOpen = false;
+            let lastFocus = null;
+            let closeTimer = null;
+
+            function loadFrame() {
+                if (inlinePdf && !frame.getAttribute('src')) {
+                    frame.setAttribute('src', PDF_URL + '#view=FitH');
+                }
+            }
+
+            // Centro de la burbuja respecto al centro del diálogo (para el "morph")
+            function morphOrigin() {
+                const d = dialog.getBoundingClientRect();
+                const b = bubble.getBoundingClientRect();
+                if (!d.width || !d.height || !b.width) return { dx: 0, dy: 0, scale: 0.85 };
+                return {
+                    dx: (b.left + b.width / 2) - (d.left + d.width / 2),
+                    dy: (b.top + b.height / 2) - (d.top + d.height / 2),
+                    scale: Math.max(b.width / d.width, 0.05)
+                };
+            }
+
+            function openPrograma() {
+                if (isOpen) return;
+                isOpen = true;
+                clearTimeout(closeTimer);
+                lastFocus = document.activeElement;
+
+                loadFrame();
+                modal.removeAttribute('aria-hidden');
+                modal.classList.remove('is-closing');
+                modal.classList.add('is-open');
+                document.body.classList.add('programa-open');
+
+                if (!reduceMotion()) {
+                    // nace desde la posición de la burbuja
+                    const o = morphOrigin();
+                    dialog.style.transition = 'none';
+                    dialog.style.transform = 'translate(' + o.dx + 'px,' + o.dy + 'px) scale(' + o.scale + ')';
+                    dialog.style.opacity = '0';
+                    void dialog.offsetWidth;
+                    dialog.style.transition = '';
+                    dialog.style.transform = 'translate(0,0) scale(1)';
+                    dialog.style.opacity = '1';
+                }
+
+                bubble.classList.add('is-hidden');
+                bubble.classList.remove('is-revealed');
+                bubble.setAttribute('aria-hidden', 'true');
+
+                setTimeout(function () {
+                    dialog.focus({ preventScroll: true });
+                }, 80);
+            }
+
+            function showBubble() {
+                bubble.classList.remove('is-hidden');
+                bubble.setAttribute('aria-hidden', 'false');
+                bubble.classList.remove('is-revealed');
+                void bubble.offsetWidth;
+                bubble.classList.add('is-revealed');
+            }
+
+            function closePrograma() {
+                if (!isOpen) return;
+                isOpen = false;
+
+                const finishClose = function () {
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('programa-open');
+                    dialog.style.transition = '';
+                    dialog.style.transform = '';
+                    dialog.style.opacity = '';
+
+                    showBubble();
+
+                    if (lastFocus && typeof lastFocus.focus === 'function') {
+                        lastFocus.focus({ preventScroll: true });
+                    }
+                };
+
+                if (reduceMotion()) { finishClose(); return; }
+
+                // el pop-up se encoge hasta la burbuja
+                const o = morphOrigin();
+                modal.classList.add('is-closing');
+                dialog.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1), opacity .45s ease';
+                dialog.style.transform = 'translate(' + o.dx + 'px,' + o.dy + 'px) scale(' + o.scale + ')';
+                dialog.style.opacity = '0';
+                closeTimer = setTimeout(finishClose, 460);
+            }
+
+            bubble.addEventListener('click', openPrograma);
+
+            document.querySelectorAll('[data-programa-open]').forEach(function (trigger) {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openPrograma();
+                });
+            });
+
+            modal.addEventListener('click', function (e) {
+                if (e.target.closest('[data-programa-close]')) {
+                    e.preventDefault();
+                    closePrograma();
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (!isOpen) return;
+
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closePrograma();
+                    return;
+                }
+
+                if (e.key === 'Tab') {
+                    const focusables = Array.prototype.slice
+                        .call(modal.querySelectorAll('a[href], button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'))
+                        .filter(function (el) { return el.offsetParent !== null; });
+                    if (!focusables.length) return;
+                    const first = focusables[0];
+                    const last = focusables[focusables.length - 1];
+                    if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            });
+
+            function autoOpen() {
+                if (window.location.hash === '#programa') { openPrograma(); return; }
+
+                let alreadySeen = false;
+                try {
+                    alreadySeen = !!sessionStorage.getItem(SEEN_KEY);
+                    sessionStorage.setItem(SEEN_KEY, '1');
+                } catch (err) { /* modo privado */ }
+
+                if (alreadySeen) {
+                    // ya se mostró en esta sesión: el programa queda en la burbuja
+                    setTimeout(showBubble, 500);
+                } else {
+                    setTimeout(openPrograma, 650);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', autoOpen);
+            } else {
+                autoOpen();
+            }
+        })();
+    </script>
 </body>
 
 </html>
