@@ -28,7 +28,7 @@
 
     <!-- Burbuja del programa (aparece al cerrar el pop-up) -->
     <button id="programaBubble" class="programa-bubble is-hidden" type="button" aria-hidden="true"
-        aria-label="Abrir el Programa General EEIQ 2026" title="Programa General EEIQ 2026">
+        aria-label="Abrir el Programa sintético EEIQ 2026" title="Programa sintético EEIQ 2026">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -74,7 +74,7 @@
         <div class="container">
             <div class="ml-section-title">Recursos y Plantillas</div>
             <div class="ml-resources">
-                <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener" class="ml-pill">
+                <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener" class="ml-pill ml-pill-programa" data-programa-open>
                     <span class="ml-pill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="8" y1="6" x2="21" y2="6" />
@@ -89,7 +89,7 @@
                     <span class="ml-pill-type">PDF</span>
                 </a>
                 <a href="Programa%20general%20EEIQ-2026.pdf" target="_blank" rel="noopener"
-                    class="ml-pill ml-pill-programa" data-programa-open>
+                    class="ml-pill">
                     <span class="ml-pill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -284,7 +284,7 @@
             <header class="programa-modal-header">
                 <div>
                     <span class="programa-modal-kicker">9° Edición · 29 de octubre de 2026</span>
-                    <h2 class="programa-modal-title" id="programaTitle">Programa General EEIQ 2026</h2>
+                    <h2 class="programa-modal-title" id="programaTitle">Programa sintético EEIQ 2026</h2>
                 </div>
                 <button class="programa-modal-close" type="button" data-programa-close
                     aria-label="Cerrar el programa">
@@ -298,7 +298,7 @@
 
             <div class="programa-modal-body">
                 <iframe id="programaFrame" class="programa-pdf"
-                    title="Programa General EEIQ 2026 (documento PDF)"></iframe>
+                    title="Programa sintético EEIQ 2026 (documento PDF)"></iframe>
                 <div class="programa-mobile-card" id="programaDesc">
                     <span class="programa-mobile-icon" aria-hidden="true">
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -311,16 +311,16 @@
                     </span>
                     <p>Consulta el programa completo: horarios, sedes y actividades del 9° Encuentro Estudiantil de
                         Ingeniería Química.</p>
-                    <a href="Programa%20general%20EEIQ-2026.pdf" target="_blank" rel="noopener"
+                    <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener"
                         class="btn btn-unam px-4">Abrir programa</a>
                 </div>
             </div>
 
             <footer class="programa-modal-footer">
                 <span class="programa-modal-hint">29 de octubre de 2026 · Ciudad de México</span>
-                <a href="Programa%20general%20EEIQ-2026.pdf" target="_blank" rel="noopener"
+                <a href="Programa%20gral%20EEIQ-2026.pdf" target="_blank" rel="noopener"
                     class="btn btn-outline-unam">Abrir en pestaña nueva</a>
-                <a href="Programa%20general%20EEIQ-2026.pdf" download="Programa general EEIQ-2026.pdf"
+                <a href="Programa%20gral%20EEIQ-2026.pdf" download="Programa gral EEIQ-2026.pdf"
                     class="btn btn-unam">Descargar PDF</a>
             </footer>
         </div>
@@ -353,10 +353,10 @@
     <script src="js/api-client.js"></script>
     <script src="js/app.js"></script>
 
-    <!-- Programa General: pop-up al entrar + burbuja flotante -->
+    <!-- Programa sintético: pop-up al entrar + burbuja flotante -->
     <script>
         (function () {
-            const PDF_URL = 'Programa%20general%20EEIQ-2026.pdf';
+            const PDF_URL = 'Programa%20gral%20EEIQ-2026.pdf';
             const SEEN_KEY = 'encuentroIQ_programa_visto';
             const modal = document.getElementById('programaModal');
             const bubble = document.getElementById('programaBubble');
