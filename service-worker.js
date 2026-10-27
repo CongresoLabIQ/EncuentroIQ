@@ -1,4 +1,4 @@
-const CACHE_NAME = 'encuentroiq-v14';
+const CACHE_NAME = 'encuentroiq-v15';
 const PUSH_ICON = 'assets/icon-192.png';
 
 importScripts('js/config.js');
@@ -74,7 +74,9 @@ const ASSETS = [
     'js/app.js',
     'js/evaluation-assignment.js',
     'manifest.json',
+    'Programa%20general%20EEIQ-2026.pdf',
     'Programa%20gral%20EEIQ-2026.pdf',
+    'Presentación%20Diego%20Angon%20EEIQ-2026.pdf',
     'Programa%20Ponencias%20EEIQ-2027-1-horario.png',
     'Programa%20Ponencias%20EEIQ-2027-1-horario.pdf',
     'favicon.ico',

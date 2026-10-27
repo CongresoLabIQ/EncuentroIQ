@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.11.0] — 2026-10-27
+
+### Added
+- **Recursos en el index:** dos PDFs nuevos consultables en "Recursos y Plantillas":
+  - **Programa General** (`Programa general EEIQ-2026.pdf`) — ahora es el programa que abre el pop-up.
+  - **Conferencia Diego Angón** (`Presentación Diego Angon EEIQ-2026.pdf`).
+- El programa anterior (`Programa gral EEIQ-2026.pdf`) se renombró en la UI a **Programa sintético**.
+
+### Changed
+- **Service worker:** caché actualizado a `encuentroiq-v15` e incluye los PDFs nuevos.
+
 ## [1.10.0] — 2026-10-27
 
 ### Added
