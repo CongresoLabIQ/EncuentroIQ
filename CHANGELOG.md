@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.10.0] — 2026-10-27
+
+### Added
+- **PDF de cada reconocimiento:** `generarPremiacionMasiva` ahora genera, además de los editables (Slides), un **PDF individual** por ganador (`PDF: …`) en la carpeta de constancias.
+- **PDF global:** se construye una presentación con las 12 diapositivas y se exporta a un único PDF (`GLOBAL: Reconocimientos Encuentro IQ - <fecha>.pdf`).
+- **Envío automático:** el PDF global se envía por correo a `iq.cterminal@zaragoza.unam.mx` (`GLOBAL_PDF_RECIPIENT`) con `MailApp.sendEmail` (adjunto). El envío falla de forma tolerante (solo registra el error, no interrumpe la generación).
+- **Botón en el panel:** nuevo botón **"Generar premiación masiva"** en la pestaña **Fase 2** del `admin-dashboard` que llama al nuevo endpoint `generatePremiacionMasiva` (admin-only) y muestra el resultado en un toast.
+- **Pruebas:** `premiacion.test.js` y `simulacion.js` validan 12 editables + 12 PDF individuales + 1 PDF global, la duplicación de diapositivas (Slides `batchUpdate`), el correo al terminal y el endpoint admin (491 aserciones).
+
+### Changed
+- `crearSlideEditable` ahora delega en `crearSlideFile` (que devuelve el `File`) para poder exportar el PDF sin re-abrir el archivo.
+- Sandbox de pruebas: `Drive`/`Slides` falsos ahora soportan `getAs('application/pdf')`, `folder.createFile`, `getSlides()` y el servicio avanzado `Slides.Presentations.batchUpdate`.
+
+### Requerido
+- Habilitar el **servicio avanzado "Google Slides API"** en el editor de Apps Script (Servicios → Google Slides API) para que `generarPremiacionMasiva` pueda construir el PDF global.
+
 ## [1.9.0] — 2026-10-08
 
 ### Added

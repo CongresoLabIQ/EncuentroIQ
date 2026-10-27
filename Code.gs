@@ -1,6 +1,7 @@
 const DRIVE_FOLDER_ID = '1L9IHjQpTBVgb5TC0cD-OB2pkrRRNKm_o';
 const TEMPLATE_ID = '1DNdoBL30o2hG77INqP4shV9Dtv-77yWyaIhnnKPT6j0';
 const CERTIFICATES_FOLDER_ID = '1A6ZuVHobxHtu3S3incdUk_HAbTMrrHGc';
+const GLOBAL_PDF_RECIPIENT = 'iq.cterminal@zaragoza.unam.mx';
 const FRONTEND_URL = 'https://congresolabiq.github.io/EncuentroIQ';
 const RESET_TOKEN_EXPIRY_HOURS = 1;
 
@@ -1252,6 +1253,12 @@ function doPost(e) {
       result = { success: true, fileUrl: url };
     }
 
+    else if (data.action === 'generatePremiacionMasiva') {
+      assertAdmin(db, data.admin_user_id);
+      const count = generarPremiacionMasiva(db);
+      result = { success: true, count: count };
+    }
+
     else if (data.action === 'forgotPassword') {
       const users = getSheetData(db, 'users');
       const user = users.find(u => u.email === data.email);
@@ -1369,22 +1376,50 @@ function obtenerGanadores(db) {
   return { oral, poster };
 }
 
-function generarPremiacionMasiva() {
-  const db = SpreadsheetApp.getActiveSpreadsheet();
+function generarPremiacionMasiva(db) {
+  db = db || SpreadsheetApp.getActiveSpreadsheet();
   const { oral, poster } = obtenerGanadores(db);
+  const ordinal = ['1er', '2do', '3er'];
 
-  let listaGanadores = [];
-
+  const listaGanadores = [];
   oral.forEach((w, i) => {
-    listaGanadores.push({ w, l: `${i + 1}er Lugar Ponencia Oral` });
+    listaGanadores.push({ w, l: `${ordinal[i] || (i + 1) + 'º'} Lugar Ponencia Oral` });
   });
-
   poster.forEach(w => {
-    listaGanadores.push({ w, l: `${w.poster_rank + 1}er Lugar Cartel — ${w.facultad}` });
+    listaGanadores.push({ w, l: `${ordinal[w.poster_rank] || (w.poster_rank + 1) + 'º'} Lugar Cartel — ${w.facultad}` });
   });
 
-  listaGanadores.forEach(g => crearSlideEditable(g.w, getAsesores(g.w) || "No asignado", g.l));
-  Logger.log(`✅ ${listaGanadores.length} reconocimientos editables generados.`);
+  if (listaGanadores.length === 0) {
+    Logger.log('⚠️ No hay ganadores con puntaje para generar reconocimientos.');
+    return 0;
+  }
+
+  const folderId = CERTIFICATES_FOLDER_ID;
+
+  // 1) Editable (Slides) + PDF individual por cada ganador.
+  listaGanadores.forEach(g => {
+    const profesor = getAsesores(g.w) || "No asignado";
+    const editable = crearSlideFile(g.w, profesor, g.l, folderId);
+    exportarSlidePdf(editable, `PDF: ${g.l} - ${g.w.short_id}`, folderId);
+  });
+
+  // 2) PDF global (una sola presentación con todas las diapositivas).
+  const globalPdf = generarPdfGlobal(listaGanadores, folderId);
+
+  // 3) Envío automático del PDF global al correo de la terminal.
+  try {
+    MailApp.sendEmail({
+      to: GLOBAL_PDF_RECIPIENT,
+      subject: 'Reconocimientos Encuentro IQ (PDF global)',
+      body: 'Se adjunta el PDF con todos los reconocimientos de los ganadores del Encuentro IQ.',
+      attachments: [globalPdf]
+    });
+  } catch (e) {
+    Logger.log('⚠️ No se pudo enviar el PDF global por correo: ' + e.toString());
+  }
+
+  Logger.log(`✅ ${listaGanadores.length} reconocimientos editables, ${listaGanadores.length} PDF individuales y 1 PDF global generados.`);
+  return listaGanadores.length;
 }
 
 function formatearAsesores(profesor) {
@@ -1393,20 +1428,92 @@ function formatearAsesores(profesor) {
 }
 
 function crearSlideEditable(work, profesor, lugarTexto, folderId) {
+  return crearSlideFile(work, profesor, lugarTexto, folderId).getUrl();
+}
+
+// Crea una copia editable de la plantilla y devuelve el archivo (File) de Drive.
+function crearSlideFile(work, profesor, lugarTexto, folderId) {
   const folder = DriveApp.getFolderById(folderId || CERTIFICATES_FOLDER_ID);
   const copy = DriveApp.getFileById(TEMPLATE_ID).makeCopy(`EDITABLE: ${lugarTexto} - ${work.short_id}`, folder);
   const pres = SlidesApp.openById(copy.getId());
-  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-  const hoy = new Date();
 
   pres.replaceAllText('{{INTEGRANTES}}', work.team_members);
   pres.replaceAllText('{{TITULO}}', work.title);
   pres.replaceAllText('{{PROFESOR}}', formatearAsesores(profesor));
   pres.replaceAllText('{{MODALIDAD}}', work.status === 'accepted_oral' ? 'Ponencia Oral' : 'Cartel');
   pres.replaceAllText('{{LUGAR}}', lugarTexto);
-  pres.replaceAllText('{{FECHA}}', `${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`);
+  pres.replaceAllText('{{FECHA}}', fechaActualTexto());
   pres.saveAndClose();
-  return copy.getUrl();
+  return copy;
+}
+
+function fechaActualTexto() {
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const hoy = new Date();
+  return `${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`;
+}
+
+// Exporta un slide a PDF y lo guarda en la carpeta de constancias.
+function exportarSlidePdf(file, nombre, folderId) {
+  const folder = DriveApp.getFolderById(folderId || CERTIFICATES_FOLDER_ID);
+  const blob = file.getAs(MimeType.PDF);
+  blob.setName(nombre + '.pdf');
+  folder.createFile(blob);
+  return blob;
+}
+
+// Construye una presentación con una diapositiva por ganador y la exporta a un único PDF.
+function generarPdfGlobal(lista, folderId) {
+  const folder = DriveApp.getFolderById(folderId || CERTIFICATES_FOLDER_ID);
+  const nombreBase = `GLOBAL: Reconocimientos Encuentro IQ - ${fechaActualTexto()}`;
+
+  const master = DriveApp.getFileById(TEMPLATE_ID).makeCopy(nombreBase, folder);
+  const masterId = master.getId();
+  const originalId = SlidesApp.openById(masterId).getSlides()[0].getObjectId();
+
+  const pageIds = [originalId];
+  for (let i = 1; i < lista.length; i++) pageIds.push('slide_' + (i + 1));
+
+  const requests = [];
+
+  // Duplica la diapositiva de la plantilla una vez por cada ganador adicional.
+  for (let i = 1; i < lista.length; i++) {
+    requests.push({
+      duplicateObject: {
+        objectId: pageIds[i - 1],
+        objectIds: { [pageIds[i - 1]]: pageIds[i] }
+      }
+    });
+  }
+
+  // Rellena los marcadores de cada diapositiva con los datos de su ganador.
+  lista.forEach((g, i) => {
+    const profesor = getAsesores(g.w) || "No asignado";
+    const campos = {
+      '{{INTEGRANTES}}': g.w.team_members,
+      '{{TITULO}}': g.w.title,
+      '{{PROFESOR}}': formatearAsesores(profesor),
+      '{{MODALIDAD}}': g.w.status === 'accepted_oral' ? 'Ponencia Oral' : 'Cartel',
+      '{{LUGAR}}': g.l,
+      '{{FECHA}}': fechaActualTexto()
+    };
+    Object.keys(campos).forEach(find => {
+      requests.push({
+        replaceAllText: {
+          containsText: { text: find, matchCase: true },
+          replaceText: campos[find],
+          pageObjectIds: [pageIds[i]]
+        }
+      });
+    });
+  });
+
+  Slides.Presentations.batchUpdate({ requests: requests }, masterId);
+
+  const blob = master.getAs(MimeType.PDF);
+  blob.setName(nombreBase + '.pdf');
+  folder.createFile(blob);
+  return blob;
 }
 
 // --- HELPERS GENERALES ---

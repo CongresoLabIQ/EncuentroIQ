@@ -491,6 +491,20 @@
                         </svg>
                         Ganadores
                     </h3>
+
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <button id="btnPremiacionMasiva" class="btn btn-primary fw-semibold"
+                            onclick="generatePremiacionMasiva()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                                <circle cx="12" cy="8" r="6" />
+                                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                            </svg>
+                            Generar premiación masiva
+                        </button>
+                        <span class="small text-muted">Crea los 12 reconocimientos (editables + PDF), el PDF global y lo envía a iq.cterminal@zaragoza.unam.mx.</span>
+                    </div>
+
                     <div class="row mb-4" id="winnersByCycle">
                         <div class="col-12 text-center text-muted py-3">Cargando ganadores...</div>
                     </div>
@@ -1748,6 +1762,37 @@
                 btn.disabled = false;
                 btn.innerHTML = originalText;
                 btn.className = 'btn btn-sm btn-outline-primary fw-bold';
+            }
+        }
+
+        async function generatePremiacionMasiva() {
+            if (!confirm('¿Generar la premiación masiva?\n\nSe crearán los 12 reconocimientos editables, sus PDFs individuales y el PDF global, y se enviará este último por correo a iq.cterminal@zaragoza.unam.mx.\n\nEste proceso puede tardar entre 1 y 2 minutos.')) return;
+            const btn = document.getElementById('btnPremiacionMasiva');
+            if (!btn) return;
+            const originalHtml = btn.innerHTML;
+            const originalClass = btn.className;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generando...';
+            try {
+                const res = await window.apiClient.generatePremiacionMasiva();
+                if (res.success) {
+                    if (!res.count) {
+                        btn.innerHTML = 'Sin ganadores';
+                        showToast('No hay ganadores con puntaje para generar reconocimientos.', 'warning');
+                        return;
+                    }
+                    btn.innerHTML = '✅ Premiación generada';
+                    btn.className = 'btn btn-success fw-semibold';
+                    showToast('Se generaron ' + res.count + ' reconocimientos con sus PDFs y se envió el PDF global a iq.cterminal@zaragoza.unam.mx.', 'success');
+                } else {
+                    throw new Error(res.error || 'Error desconocido');
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+                btn.innerHTML = originalHtml;
+                btn.className = originalClass;
+            } finally {
+                btn.disabled = false;
             }
         }
 

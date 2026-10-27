@@ -51,6 +51,19 @@ Los certificados se almacenan en la carpeta configurada en `CERTIFICATES_FOLDER_
 
 ---
 
+## Generación masiva de reconocimientos (ganadores)
+
+Al ejecutar `generarPremiacionMasiva()` desde el editor de Apps Script se genera, por cada ganador:
+
+1. El **editable** de Slides (`EDITABLE: …`).
+2. Un **PDF individual** (`PDF: …`).
+
+Además se crea un **PDF global** (`GLOBAL: Reconocimientos Encuentro IQ - <fecha>.pdf`) con todas las diapositivas y se envía automáticamente por correo a `iq.cterminal@zaragoza.unam.mx`.
+
+> **Requisito previo:** habilita el servicio avanzado **Google Slides API** (en el editor: **Servicios → Google Slides API → Añadir**) antes de ejecutar `generarPremiacionMasiva`.
+
+---
+
 ## Tipos de certificados disponibles
 
 | Tipo | Descripción | Incluye |

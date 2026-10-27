@@ -17,16 +17,22 @@ prueban contra las cuentas de prueba.
 Carga el `Code.gs` **real** en un entorno falso de Apps Script:
 - Hojas en memoria (no toca Google Sheets).
 - `MailApp`/`GmailApp`/`UrlFetchApp` solo *registran* la llamada.
-- `DriveApp`/`SlidesApp` lanzan error si se invocan.
-- Al final se verifica que **no hubo ninguna notificación**.
+- `DriveApp`/`SlidesApp` lanzan error si se invocan; la suite de premiación los
+  activa como *falsos* (en memoria) para generar los 12 reconocimientos (editables
+  + PDF individuales + PDF global) sin crear archivos reales.
+- Al final se verifica que **no hubo ninguna notificación** salvo el correo del
+  PDF global a la terminal (que se valida explícitamente).
 
 Cubre: rotación de carteles (FQ→FC→FZ→FQ), 1 evaluador por cartel, límite de 5,
 fallback, balance, orales (3 por ponencia, una por facultad, anti-asesor),
 idempotencia, conflictos por modalidad (`assignManualLive`/`reassignLiveEvaluator`),
 `esAutoEvaluacion`/`getAsesores`, `formatearAsesores` y `getWinners`
 (oral top 3 general; cartel top 3 por facultad). Incluye una suite **E2E** que
-encadena asignar → evaluar en vivo → ganadores, y la suite
-`import-schedule.test.js` que valida el **auditorio único**
+encadena asignar → evaluar en vivo → ganadores, la suite de **premiación**
+(`premiacion.test.js`: 12 editables con ordinales 1er/2do/3er, 12 PDF individuales,
+1 PDF global, placeholders reemplazados, duplicación de diapositivas vía
+`Slides.Presentations.batchUpdate`, carpeta de constancias y el correo del PDF
+global a la terminal) y la suite `import-schedule.test.js` que valida el **auditorio único**
 (`batchFinalize`/`assignSchedules`, sin `UMIEZ`) y la **importación de FES
 Zaragoza** (`importFesZaragoza`: CSV, hash de contraseña, idempotencia).
 
@@ -47,8 +53,9 @@ node tests/simulacion.js   # o: npm run simular
 ```
 
 Encadena 60 trabajos (20 por facultad) → asignación Fase 1 → 180 evaluaciones →
-dictamen → Fase 2 (45 carteles + 6 ponencias) → evaluaciones en vivo → ganadores,
-y verifica cada etapa sin enviar notificaciones.
+dictamen → Fase 2 (45 carteles + 6 ponencias) → evaluaciones en vivo → ganadores
+→ premiación (12 editables + 12 PDF + 1 PDF global), y verifica cada etapa; el único
+correo es el del PDF global a la terminal.
 
 ### Simulación de Fase 2 por etapas
 
@@ -133,7 +140,7 @@ Nunca ejecutar estas funciones contra la hoja de producción.
 ### Qué NO debe ejecutarse nunca sobre producción
 - `notifyFinalResults` / `notifyJudgesAgenda` sin el modo dirigido (notifican a todos).
 - `assignLiveWorks`, `assignAllPending`, `batchFinalize`, `setConfig` (escriben datos).
-- `generarPremiacionMasiva()` sin filtrar (genera constancias de ganadores reales).
+- `generarPremiacionMasiva()` sin filtrar (genera constancias de ganadores reales y envía el PDF global por correo a la terminal).
 - `submitWork` / `submitPresentation` con datos reales.
 
 ### Simulacro de la interfaz desde celulares
@@ -146,7 +153,7 @@ la URL del Web App del clon y rechaza la URL de producción configurada en el pr
 
 ## Criterios de aceptación
 
-- `node tests/run.js` termina con `✅ TODO OK` (418 aserciones).
-- El sensor de notificaciones queda en **0** en la Fase A.
+- `node tests/run.js` termina con `✅ TODO OK` (491 aserciones).
+- El sensor de notificaciones queda en **0** en la Fase A, salvo el correo del PDF global a `iq.cterminal@zaragoza.unam.mx` (exactamente 1).
 - En Fase C, los correos/push llegan **únicamente** a `TestE1`, `MiguelF` y `admin-001`.
 - `PRUEBA_limpiar()` elimina las filas demo marcadas y conserva las filas ajenas.

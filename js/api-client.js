@@ -210,6 +210,14 @@ const apiClient = {
         return await postData({ action: 'generateCertificates', work_id: workId });
     },
 
+    // Genera la premiación masiva: 12 editables + 12 PDF individuales + 1 PDF global + envío por correo.
+    async generatePremiacionMasiva() {
+        return await postData({
+            action: 'generatePremiacionMasiva',
+            admin_user_id: this._sessionId()
+        }, 300000);
+    },
+
     async getProfessorsBySemester(semester) {
         return await fetchJson(`${GOOGLE_SCRIPT_URL}?action=getProfessorsBySemester&semester=${encodeURIComponent(semester)}`);
     },

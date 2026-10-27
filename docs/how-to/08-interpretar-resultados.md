@@ -58,7 +58,13 @@ El administrador los revisa en la pestaña **Fase 2** del panel, donde puede gen
 
 1. Ver las tarjetas de **Top 3 Ponencia Oral (General)** y **Top 3 Cartel** por facultad.
 2. Generar la constancia individual de cada ganador con el botón **Constancia**.
-3. Para generar los 12 reconocimientos de una sola vez, ejecutar `generarPremiacionMasiva()` en el editor de Apps Script.
+3. Para generar todos los reconocimientos de una sola vez, usar el botón **Generar premiación masiva** de la pestaña **Fase 2** (o ejecutar `generarPremiacionMasiva()` en el editor de Apps Script). Por cada ganador se crea:
+   - El **editable** de Slides (`EDITABLE: …`).
+   - Un **PDF individual** (`PDF: …`).
+   
+   Además se genera un **PDF global** (`GLOBAL: Reconocimientos Encuentro IQ - <fecha>.pdf`) con las 12 diapositivas, que se envía automáticamente por correo a `iq.cterminal@zaragoza.unam.mx`.
+
+> **Requisito previo:** habilita el servicio avanzado **Google Slides API** (en el editor: **Servicios → Google Slides API → Añadir**) antes de ejecutar `generarPremiacionMasiva`; se usa para construir el PDF global.
 
 ---
 

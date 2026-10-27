@@ -2,7 +2,7 @@
 // Simulación del ciclo COMPLETO del evento con datos ficticios, en el sandbox:
 //   Fase 1 (asignar 60 trabajos) -> evaluaciones -> dictamen (top 17 por facultad)
 //   -> Fase 2 (carteles por rotación + orales por facultad) -> evaluaciones en vivo
-//   -> ganadores.
+//   -> ganadores -> premiación (12 editables + 12 PDF individuales + 1 PDF global).
 // No toca Google ni envía notificaciones. Uso: node tests/simulacion.js
 
 const { createSandbox, post, get } = require('./harness/sandbox');
@@ -11,6 +11,7 @@ const { seedPendingSheets, toObjects } = require('./fixtures/seed');
 const FAC_TOTAL = 20;              // trabajos por facultad
 const MAX_POR_FACULTAD = 17;       // 2 oral + 15 cartel
 const ORALES_POR_FACULTAD = 2;
+const CERT_FOLDER_ID = '1A6ZuVHobxHtu3S3incdUk_HAbTMrrHGc';
 
 function readSheet(spreadsheet, name) {
   return toObjects(spreadsheet.getSheetByName(name).getDataRange().getValues());
@@ -37,8 +38,10 @@ function banner(title) {
 }
 
 banner('SIMULACIÓN DEL WORKFLOW — 60 trabajos (20 por facultad), 15 evaluadores');
-const { sandbox, spreadsheet, notifications } = createSandbox(
-  seedPendingSheets({ worksPerFaculty: FAC_TOTAL, counts: { FQ: 5, FC: 5, FZ: 5 }, includeTestAccounts: false })
+const { sandbox, spreadsheet, notifications, drive } = createSandbox(
+  seedPendingSheets({ worksPerFaculty: FAC_TOTAL, counts: { FQ: 5, FC: 5, FZ: 5 }, includeTestAccounts: false }),
+  null,
+  { allowDrive: true }
 );
 
 // ---------------------------------------------------------------- Fase 1
@@ -160,9 +163,37 @@ check(win.data.oral.length === 3, '3 ganadores de ponencia (general)');
 check(win.data.poster.length === 9, '9 ganadores de cartel (3 por facultad)');
 check(['FQ', 'FC', 'FZ'].every(k => (byFac[k] || []).length === 3), 'una terna de carteles por facultad');
 
-// ---------------------------------------------------------------- Silencio
+// ---------------------------------------------------------------- Premiación
+banner('PREMIACIÓN — 12 editables + 12 PDF individuales + 1 PDF global');
+check(drive.calls.length === 0, 'las fases 1 y 2 no tocaron Drive');
+sandbox.generarPremiacionMasiva();
+
+const editables = drive.copies.filter(c => c.name.startsWith('EDITABLE:'));
+const globalEditable = drive.copies.filter(c => c.name.startsWith('GLOBAL:'));
+console.log('  Reconocimientos editables:', editables.length);
+editables.forEach((c, i) => console.log('    ' + String(i + 1).padStart(2, '0') + '. ' + c.name.replace('EDITABLE: ', '')));
+check(editables.length === 12, 'se generan 12 reconocimientos editables');
+check(editables.filter(c => /Lugar Ponencia Oral/.test(c.name)).length === 3, '3 reconocimientos de ponencia oral');
+check(editables.filter(c => /Lugar Cartel/.test(c.name)).length === 9, '9 reconocimientos de cartel');
+check(editables.every(c => c.saved === true), 'todas las presentaciones se guardan');
+check(editables.every(c => Object.keys(c.replacements).length === 6), 'los 6 campos se reemplazan en cada reconocimiento');
+check(editables.every(c => !Object.values(c.replacements).join(' ').includes('{{')), 'sin placeholders pendientes');
+check(editables.every(c => c.folderId === CERT_FOLDER_ID), 'se guardan en la carpeta de constancias');
+check(editables.some(c => c.replacements['{{MODALIDAD}}'] === 'Ponencia Oral') &&
+  editables.some(c => c.replacements['{{MODALIDAD}}'] === 'Cartel'), 'modalidad correcta por tipo');
+
+console.log('  PDFs generados:', drive.pdfs.length);
+drive.pdfs.forEach((p, i) => console.log('    ' + String(i + 1).padStart(2, '0') + '. ' + p.name));
+check(drive.pdfs.length === 13, '12 PDF individuales + 1 PDF global');
+check(drive.pdfs.filter(p => p.name.startsWith('PDF:')).length === 12, '12 PDF individuales');
+check(drive.pdfs.filter(p => p.name.startsWith('GLOBAL:')).length === 1, '1 PDF global');
+check(globalEditable.length === 1, '1 presentación global editable');
+
+// ---------------------------------------------------------------- Correo y silencio
 banner('VERIFICACIÓN FINAL');
-check(notifications.length === 0, 'cero notificaciones (correo/push/fetch) en toda la simulación');
+check(notifications.length === 1, 'un único correo (el del PDF global)');
+check(notifications[0].type === 'MailApp.sendEmail' && notifications[0].args[0].to === 'iq.cterminal@zaragoza.unam.mx',
+  'el PDF global se envía a la terminal');
 check(readSheet(spreadsheet, 'live_assignments').every(a => a.status === 'completed'), 'todas las asignaciones en vivo quedan completadas');
 
 console.log('\n' + (failures === 0 ? '✅ SIMULACIÓN CORRECTA' : '❌ ' + failures + ' VERIFICACIONES FALLIDAS'));
