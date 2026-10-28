@@ -36,7 +36,7 @@ El panel tiene 3 pestañas accesibles desde la barra de navegación inferior:
 | Pestaña | Contenido |
 |---------|-----------|
 | **Dashboard** | Toggle subida activa · Asignar evaluadores Fase 1 · Dictaminar trabajos listos · Tabla de seguimiento de evaluaciones con filtros · Ver evaluadores asignados por trabajo |
-| **Horarios** | Asignar evaluadores Fase 2 · Caso de emergencia (juez sustituto) · Enviar agendas por correo · Tabla de horario general de ponencias |
+| **Horarios** | Asignar evaluadores Fase 2 · Caso de emergencia (juez sustituto) · Enviar agendas por facultad · Tabla de horario general de ponencias |
 | **Fase 2** | Reconocimientos por ciclo académico · Top 3 Oral y Top 3 Cartel · Generación de constancias (PDF) |
 
 ---
@@ -67,7 +67,7 @@ El panel tiene 3 pestañas accesibles desde la barra de navegación inferior:
 2. En **Fase 2: Evaluación Presencial**, haz clic en **Asignar evaluadores Fase 2** para asignar 3 evaluadores presenciales a todos los trabajos aceptados.
 3. Configura los horarios de presentación en la tabla de horario general.
 4. Si un juez no asistió, usa el botón **Asignar Juez de Emergencia** para sustituirlo.
-5. Cuando todo esté listo, haz clic en **Enviar Agendas por Correo a todos los Jueces**.
+5. Cuando todo esté listo, elige la facultad correspondiente en **Enviar Agendas por Correo** (FES Zaragoza, FES Cuautitlán o FQ) o usa **Enviar a todos los jueces**.
 
 ---
 

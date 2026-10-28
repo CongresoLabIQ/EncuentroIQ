@@ -870,22 +870,38 @@ function doPost(e) {
     }
 
     else if (data.action === 'notifyJudgesAgenda') {
+      assertAdmin(db, data.admin_user_id);
+      const soloFac = data.facultad ? String(data.facultad).trim().toUpperCase() : '';
+      if (soloFac && FACULTADES_ROTACION.indexOf(soloFac) === -1) {
+        throw new Error('Facultad no válida: ' + data.facultad + '. Usa FQ, FC o FZ.');
+      }
+
       const liveAssigns = getSheetData(db, 'live_assignments');
       const works = getSheetData(db, 'works');
       const users = getSheetData(db, 'users');
+      const fechaEvento = obtenerFechaEvento();
+      let sent = 0, skipped = 0;
+      const errores = [];
+
       users.filter(u => u.user_type === 'evaluator').forEach(ev => {
+        if (soloFac && facultadKey(ev.facultad) !== soloFac) return;
         const tasks = liveAssigns.filter(a => a.evaluator_id === ev.id);
-        if (tasks.length === 0) return;
-        const fechaEvento = obtenerFechaEvento();
-        let html = `<h2>Agenda para Prof. ${ev.name}</h2><p><strong>Fecha del evento:</strong> ${fechaEvento}</p><table border="1" style="border-collapse:collapse; width:100%;"><tr style="background:#0d6efd; color:white;"><th>Hora</th><th>Lugar</th><th>Trabajo</th></tr>`;
+        if (tasks.length === 0) { skipped++; return; }
+        let html = `<h2>Agenda para Prof. ${escapeHtml_(ev.name)}</h2><p><strong>Fecha del evento:</strong> ${escapeHtml_(fechaEvento)}</p><table border="1" style="border-collapse:collapse; width:100%;"><tr style="background:#0d6efd; color:white;"><th>Hora</th><th>Lugar</th><th>Trabajo</th></tr>`;
         tasks.forEach(t => {
           const w = works.find(work => work.id === t.work_id);
-          if (w) html += `<tr><td>${w.horario || 'N/A'}</td><td>${w.auditorio || 'Carteles'}</td><td><b>${w.short_id}</b> - ${w.title}</td></tr>`;
+          if (w) html += `<tr><td>${escapeHtml_(String(w.horario || 'N/A').replace(/^'/, ''))}</td><td>${escapeHtml_(w.auditorio || 'Carteles')}</td><td><b>${escapeHtml_(w.short_id)}</b> - ${escapeHtml_(w.title)}</td></tr>`;
         });
         html += `</table>`;
-        try { MailApp.sendEmail({ to: ev.email, subject: "Agenda de Evaluación - Encuentro IQ", htmlBody: html }); } catch(e) {}
+        try {
+          MailApp.sendEmail({ to: ev.email, subject: "Agenda de Evaluación - Encuentro IQ", htmlBody: html });
+          sent++;
+        } catch(e) {
+          errores.push({ evaluator_id: ev.id, email: ev.email, error: e.message });
+        }
       });
-      result = { success: true };
+
+      result = { success: true, count: sent, skipped: skipped, errores: errores, facultad: soloFac || 'TODAS' };
     }
 
     else if (data.action === 'assignLiveWorks') {

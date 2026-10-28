@@ -347,6 +347,20 @@ Respuesta: `{ "success": true, "count": 51, "skipped": 0, "errores": [] }`, dond
 
 ---
 
+### `notifyJudgesAgenda`
+
+Envía a cada evaluador su **agenda personalizada** (hora, lugar y trabajo asignado en Fase 2). Si se indica `facultad`, solo envía a los evaluadores de esa facultad; sin el parámetro envía a todos.
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"notifyJudgesAgenda"` |
+| `admin_user_id` | string | Sí | ID del administrador que envía |
+| `facultad` | string | No | `"FQ"`, `"FC"` o `"FZ"`. Si se omite, envía a todos los evaluadores. |
+
+Respuesta: `{ "success": true, "count": 15, "skipped": 0, "errores": [], "facultad": "FZ" }`. `count` son las agendas enviadas y `skipped` los evaluadores sin asignaciones.
+
+---
+
 ### `getLiveAssignments`
 
 Obtener asignaciones en vivo para un evaluador.

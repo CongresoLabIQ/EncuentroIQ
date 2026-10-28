@@ -177,6 +177,16 @@ const apiClient = {
         }, 300000);
     },
 
+    // Envía las agendas personalizadas a los evaluadores (opcionalmente solo de una facultad)
+    async notifyJudgesAgenda(facultad) {
+        const payload = {
+            action: 'notifyJudgesAgenda',
+            admin_user_id: this._sessionId()
+        };
+        if (facultad) payload.facultad = facultad;
+        return await postData(payload, 300000);
+    },
+
     async assignLiveWorks(facultad) {
         const payload = { action: 'assignLiveWorks' };
         if (facultad) payload.facultad = facultad;

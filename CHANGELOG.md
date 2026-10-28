@@ -4,15 +4,16 @@
 
 ### Added
 - **Asignación de Fase 2 por facultad:** el panel de admin ahora tiene tres botones independientes —**FES Zaragoza (FZ)**, **FES Cuautitlán (FC)** y **FQ**— que asignan únicamente a los evaluadores de esa facultad. Se conserva el enlace **"Asignar todas las facultades"**.
+- **Envío de agendas por facultad:** el botón único "Enviar Agendas a todos los Jueces" se reemplazó por tres botones —**FES Zaragoza**, **FES Cuautitlán** y **FQ**— más el enlace **"Enviar a todos los jueces"**. `notifyJudgesAgenda` acepta `facultad` (`FQ`/`FC`/`FZ`) y ahora es admin-only; responde cuántas agendas envió, cuántos evaluadores no tenían asignaciones y los errores.
 - **`assignLiveWorks` acepta `facultad`:** parámetro opcional (`FQ`/`FC`/`FZ`) para asignar solo los carteles que le tocan por rotación y su evaluador en cada ponencia. Es idempotente por facultad: repetir un botón no duplica ni genera asignaciones extra.
 - **Recordatorio del evento a participantes:** nuevo endpoint `notifyEventReminder` (admin) y botón **"Enviar recordatorio"** en la pestaña Fase 2. Envía un correo por cada trabajo aceptado (ponencia oral o cartel) con el título, la modalidad, la fecha, la sede, el horario de registro y el enlace a la página del evento. Para ponencias orales añade el aviso de subir la presentación antes del plazo. Omite trabajos no seleccionados y alumnos sin correo.
 - **Presentaciones orales de Fase 2:** nueva sección **"Presentación oral (Fase 2)"** en el panel del alumno, visible solo para trabajos `accepted_oral`, con estado de subida, botones para subir/reemplazar/ver y el plazo límite. El plazo por defecto es el **28 de octubre de 2026 a las 23:00 hrs (CDMX)** y se puede editar desde una nueva tarjeta del admin (se guarda en `config.presentation_deadline`).
 - **Hoja dedicada `oral_presentations`:** las presentaciones ya no se guardan en `works`; se almacenan en su propia hoja (`id`, `work_id`, `student_id`, `file_name`, `mime_type`, `file_size`, `file_id`, `file_url`, `uploaded_at`, `updated_at`), con una fila por ponencia y actualización al reemplazar. `getStudentWorks` combina los datos para el dashboard.
-- **Pruebas:** `fase2.test.js` valida la asignación por facultad (21 asignaciones por botón, 63 en total, cobertura y rotación correctas, idempotencia y facultad inválida); `recordatorio.test.js` valida permisos, envío por trabajo, modalidades, aviso de presentación oral, omisiones y escapado de HTML; `presentaciones.test.js` valida subida, plazo, reemplazo, validaciones y la hoja dedicada.
+- **Pruebas:** `fase2.test.js` valida la asignación por facultad (21 asignaciones por botón, 63 en total, cobertura y rotación correctas, idempotencia y facultad inválida); `recordatorio.test.js` valida permisos, envío por trabajo, modalidades, aviso de presentación oral, omisiones y escapado de HTML; `presentaciones.test.js` valida subida, plazo, reemplazo, validaciones y la hoja dedicada; `agendas.test.js` valida el envío de agendas por facultad, permisos y validaciones.
 
 ### Changed
 - El backend ya no bloquea la asignación de una ponencia completa cuando otra facultad ya tiene un evaluador: valida por par trabajo/facultad, no por trabajo.
-- **Service worker:** caché actualizado a `encuentroiq-v18` para servir el nuevo panel.
+- **Service worker:** caché actualizado a `encuentroiq-v19` para servir el nuevo panel.
 
 ## [1.11.0] — 2026-10-27
 

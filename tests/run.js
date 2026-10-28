@@ -14,7 +14,8 @@ const suites = [
   require('./import-schedule.test'),
   require('./premiacion.test'),
   require('./recordatorio.test'),
-  require('./presentaciones.test')
+  require('./presentaciones.test'),
+  require('./agendas.test')
 ];
 
 let passed = 0;

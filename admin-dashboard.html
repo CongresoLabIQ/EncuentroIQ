@@ -521,14 +521,63 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-dark w-100 mb-3 py-3" onclick="enviarAgendas()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                            <polyline points="22,6 12,13 2,6" />
-                        </svg>
-                        Enviar Agendas por Correo a todos los Jueces
-                    </button>
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 mb-3 mb-md-0">
+                                    <h5 class="fw-bold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                            <polyline points="22,6 12,13 2,6" />
+                                        </svg>
+                                        Enviar Agendas por Correo
+                                    </h5>
+                                    <p class="mb-0 text-muted">Envía a cada evaluador su agenda personalizada. Cada botón
+                                        manda únicamente a los jueces de esa facultad.</p>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="d-flex flex-column flex-md-row flex-md-wrap gap-2 justify-content-md-end">
+                                        <button class="btn btn-dark" onclick="enviarAgendas('FZ', this)"
+                                            title="Enviar agendas solo a evaluadores de FES Zaragoza">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                                <polyline points="22,6 12,13 2,6" />
+                                            </svg>
+                                            FES Zaragoza
+                                        </button>
+                                        <button class="btn btn-dark" onclick="enviarAgendas('FC', this)"
+                                            title="Enviar agendas solo a evaluadores de FES Cuautitlán">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                                <polyline points="22,6 12,13 2,6" />
+                                            </svg>
+                                            FES Cuautitlán
+                                        </button>
+                                        <button class="btn btn-dark" onclick="enviarAgendas('FQ', this)"
+                                            title="Enviar agendas solo a evaluadores de la Facultad de Química">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                                <polyline points="22,6 12,13 2,6" />
+                                            </svg>
+                                            FQ
+                                        </button>
+                                    </div>
+                                    <div class="text-md-end mt-2">
+                                        <button class="btn btn-link btn-sm text-muted p-0"
+                                            onclick="enviarAgendas(undefined, this)">Enviar a todos los jueces</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <h3 class="mb-3 mt-2 d-flex align-items-center gap-2 text-primary-theme">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2131,17 +2180,35 @@
             }
         }
 
-        async function enviarAgendas() {
-            if (!confirm("¿Enviar las agendas personalizadas a los 45 profesores?")) return;
-            const btn = event.target;
+        async function enviarAgendas(facultad, btn) {
+            const nombres = { FZ: 'FES Zaragoza', FC: 'FES Cuautitlán', FQ: 'Facultad de Química' };
+            const nombre = facultad ? nombres[facultad] : '';
+            const mensaje = facultad
+                ? `¿Enviar las agendas personalizadas a los evaluadores de ${nombre}?`
+                : '¿Enviar las agendas personalizadas a todos los evaluadores?';
+            if (!confirm(mensaje)) return;
+
+            const original = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
             try {
-                const res = await window.apiClient.post({ action: 'notifyJudgesAgenda' });
-                if (res.success) showToast("Agendas enviadas correctamente.", 'success');
-            } catch (e) { showToast("Error: " + e.message, 'error'); }
-            btn.disabled = false;
-            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Enviar Agendas por Correo a todos los Jueces';
+                const res = await window.apiClient.notifyJudgesAgenda(facultad);
+                if (res.success) {
+                    let msg = facultad
+                        ? `${nombre}: ${res.count} agenda(s) enviada(s).`
+                        : `${res.count} agenda(s) enviada(s).`;
+                    if (res.skipped) msg += ` Sin asignaciones: ${res.skipped}.`;
+                    if (res.errores && res.errores.length) msg += ` Errores: ${res.errores.length}.`;
+                    showToast(msg, res.errores && res.errores.length ? 'warning' : 'success');
+                } else {
+                    showToast('Error: ' + (res.error || 'desconocido'), 'error');
+                }
+            } catch (e) {
+                showToast('Error de red: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
         }
     </script>
 </body>
