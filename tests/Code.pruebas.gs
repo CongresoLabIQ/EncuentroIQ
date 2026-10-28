@@ -478,7 +478,7 @@ function PRUEBA_notifAgenda() {
   } else {
     tasks.forEach(t => {
       const w = works.find(work => work.id === t.work_id);
-      if (w) html += '<tr><td>' + (w.horario || 'N/A') + '</td><td>' + (w.auditorio || 'Carteles') +
+      if (w) html += '<tr><td>' + (w.horario || 'N/A') + '</td><td>' + lugarDeTrabajo_(w) +
         '</td><td><b>' + w.short_id + '</b> - ' + w.title + '</td></tr>';
     });
   }

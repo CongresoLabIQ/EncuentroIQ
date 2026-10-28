@@ -361,6 +361,20 @@ Respuesta: `{ "success": true, "count": 15, "skipped": 0, "errores": [], "facult
 
 ---
 
+### `notifyAgendaCorrection`
+
+Envía a los evaluadores la **fe de erratas** sobre el lugar de las ponencias: aclara que las ponencias con horario se evalúan en el **Auditorio Principal** y los carteles en el **Área de Carteles**. Solo se envía a evaluadores con asignaciones en `live_assignments`.
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"notifyAgendaCorrection"` |
+| `admin_user_id` | string | Sí | ID del administrador que envía |
+| `facultad` | string | No | `"FQ"`, `"FC"` o `"FZ"`. Si se omite, envía a todos los evaluadores. |
+
+Respuesta: `{ "success": true, "count": 15, "skipped": 0, "errores": [], "facultad": "FZ" }`.
+
+---
+
 ### `getLiveAssignments`
 
 Obtener asignaciones en vivo para un evaluador.

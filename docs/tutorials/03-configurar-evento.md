@@ -36,7 +36,7 @@ El panel tiene 3 pestañas accesibles desde la barra de navegación inferior:
 | Pestaña | Contenido |
 |---------|-----------|
 | **Dashboard** | Toggle subida activa · Asignar evaluadores Fase 1 · Dictaminar trabajos listos · Tabla de seguimiento de evaluaciones con filtros · Ver evaluadores asignados por trabajo |
-| **Horarios** | Asignar evaluadores Fase 2 · Caso de emergencia (juez sustituto) · Enviar agendas por facultad · Tabla de horario general de ponencias |
+| **Horarios** | Asignar evaluadores Fase 2 · Caso de emergencia (juez sustituto) · Enviar agendas por facultad · Fe de erratas del lugar de ponencias · Tabla de horario general de ponencias |
 | **Fase 2** | Reconocimientos por ciclo académico · Top 3 Oral y Top 3 Cartel · Generación de constancias (PDF) |
 
 ---

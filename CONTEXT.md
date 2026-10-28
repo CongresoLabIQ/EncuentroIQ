@@ -141,6 +141,7 @@ Funciones JS clave:
 | `assignLiveWorks` | Asignar Fase 2: carteles por rotación de facultad (1 evaluador/cartel) y ponencias (1 por facultad). Acepta `facultad` (`FQ`/`FC`/`FZ`) para asignar solo esa facultad. No reasigna trabajos ya asignados |
 | `notifyEventReminder` | Admin: envía un correo recordatorio del evento a cada participante con trabajo aceptado (oral o cartel), con título, modalidad, fecha, sede, horario y enlace |
 | `notifyJudgesAgenda` | Admin: envía la agenda personalizada a cada evaluador. Acepta `facultad` (`FQ`/`FC`/`FZ`) para enviar solo a esa facultad |
+| `notifyAgendaCorrection` | Admin: envía la fe de erratas del lugar de las ponencias (Auditorio Principal) a los evaluadores. Acepta `facultad` |
 | `assignSchedules` | Admin: asigna horarios a todos los aceptados (ponencias al Auditorio Principal en bloques de 20 min; carteles a Sesión Carteles). Conserva horarios previos |
 | `importFesZaragoza` | Admin: importa trabajos + alumnos de FES Zaragoza desde URLs CSV de Google Sheets. Respeta `status`, conserva hash de contraseña, idempotente |
 

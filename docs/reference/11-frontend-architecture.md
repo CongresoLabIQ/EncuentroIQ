@@ -85,7 +85,7 @@ Navegación por **bottom nav fija** con 3 pestañas:
 | Pestaña | Contenido |
 |---------|-----------|
 | **Dashboard** | Toggle subida activa · Botón Asignar Fase 1 · Botón Dictaminar (N) · Tabla de seguimiento de evaluaciones con filtros · Botón "Ver evaluadores" por trabajo · Sección "Listos para Dictaminar" |
-| **Horarios** | Asignar horarios · Importar FES Zaragoza · Enviar Agendas por facultad · Tabla de horario general de ponencias |
+| **Horarios** | Asignar horarios · Importar FES Zaragoza · Enviar Agendas por facultad · Fe de erratas del lugar de ponencias · Tabla de horario general de ponencias |
 | **Fase 2** | Asignar evaluadores por facultad · Plazo de presentaciones orales · Recordatorio a participantes · Caso de Emergencia · Reconocimientos por ciclo académico (Top 3 Oral + Top 3 Cartel) · Generación de constancias |
 
 ---

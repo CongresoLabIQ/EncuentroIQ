@@ -187,6 +187,16 @@ const apiClient = {
         return await postData(payload, 300000);
     },
 
+    // Envía la fe de erratas del lugar de las ponencias a los evaluadores
+    async notifyAgendaCorrection(facultad) {
+        const payload = {
+            action: 'notifyAgendaCorrection',
+            admin_user_id: this._sessionId()
+        };
+        if (facultad) payload.facultad = facultad;
+        return await postData(payload, 300000);
+    },
+
     async assignLiveWorks(facultad) {
         const payload = { action: 'assignLiveWorks' };
         if (facultad) payload.facultad = facultad;

@@ -3,6 +3,7 @@ const TEMPLATE_ID = '1DNdoBL30o2hG77INqP4shV9Dtv-77yWyaIhnnKPT6j0';
 const CERTIFICATES_FOLDER_ID = '1A6ZuVHobxHtu3S3incdUk_HAbTMrrHGc';
 const GLOBAL_PDF_RECIPIENT = 'iq.cterminal@zaragoza.unam.mx';
 const FRONTEND_URL = 'https://congresolabiq.github.io/EncuentroIQ';
+const CONTACTO_EVENTO = 'contacto.encuentroestiq@gmail.com';
 const RESET_TOKEN_EXPIRY_HOURS = 1;
 
 // Fase 2 · Presentaciones orales
@@ -192,6 +193,17 @@ function tieneConflictoDeFacultad(work, evaluator) {
 function getAsesores(work) {
   if (!work) return '';
   return String(work.asesores || work.profesor_cargo || '');
+}
+
+// Lugar que se muestra en correos y agendas según el tipo de trabajo.
+// Las ponencias siempre van al auditorio único del evento, aunque la hoja
+// tenga el campo vacío o un valor anterior (p. ej. "UMIEZ").
+function lugarDeTrabajo_(work) {
+  if (!work) return 'N/A';
+  if (work.status === 'accepted_oral') return AUDITORIO_UNICO;
+  if (work.status === 'accepted_poster') return CARTEL_LUGAR;
+  const lugar = String(work.auditorio || '').trim();
+  return lugar || 'N/A';
 }
 
 function esAutoEvaluacion(work, evaluator) {
@@ -803,7 +815,7 @@ function doPost(e) {
         const student = users.find(u => u.id === w.student_id);
         if (!student) return;
         const hora = String(w.horario || '').replace(/^'/, '');
-        const msg = `Dictamen: ${statusLabel[w.status]}\nLugar: ${w.auditorio || 'N/A'}\nHora: ${hora || 'N/A'}\n\nRetroalimentación:\n${w.feedback || 'N/A'}`;
+        const msg = `Dictamen: ${statusLabel[w.status]}\nLugar: ${lugarDeTrabajo_(w)}\nHora: ${hora || 'N/A'}\n\nRetroalimentación:\n${w.feedback || 'N/A'}`;
         try {
           MailApp.sendEmail(student.email, "Resultado Encuentro IQ", msg);
           sent++;
@@ -890,7 +902,7 @@ function doPost(e) {
         let html = `<h2>Agenda para Prof. ${escapeHtml_(ev.name)}</h2><p><strong>Fecha del evento:</strong> ${escapeHtml_(fechaEvento)}</p><table border="1" style="border-collapse:collapse; width:100%;"><tr style="background:#0d6efd; color:white;"><th>Hora</th><th>Lugar</th><th>Trabajo</th></tr>`;
         tasks.forEach(t => {
           const w = works.find(work => work.id === t.work_id);
-          if (w) html += `<tr><td>${escapeHtml_(String(w.horario || 'N/A').replace(/^'/, ''))}</td><td>${escapeHtml_(w.auditorio || 'Carteles')}</td><td><b>${escapeHtml_(w.short_id)}</b> - ${escapeHtml_(w.title)}</td></tr>`;
+          if (w) html += `<tr><td>${escapeHtml_(String(w.horario || 'N/A').replace(/^'/, ''))}</td><td>${escapeHtml_(lugarDeTrabajo_(w))}</td><td><b>${escapeHtml_(w.short_id)}</b> - ${escapeHtml_(w.title)}</td></tr>`;
         });
         html += `</table>`;
         try {
@@ -898,6 +910,63 @@ function doPost(e) {
           sent++;
         } catch(e) {
           errores.push({ evaluator_id: ev.id, email: ev.email, error: e.message });
+        }
+      });
+
+      result = { success: true, count: sent, skipped: skipped, errores: errores, facultad: soloFac || 'TODAS' };
+    }
+
+    else if (data.action === 'notifyAgendaCorrection') {
+      assertAdmin(db, data.admin_user_id);
+      const soloFac = data.facultad ? String(data.facultad).trim().toUpperCase() : '';
+      if (soloFac && FACULTADES_ROTACION.indexOf(soloFac) === -1) {
+        throw new Error('Facultad no válida: ' + data.facultad + '. Usa FQ, FC o FZ.');
+      }
+
+      const liveAssigns = getSheetData(db, 'live_assignments');
+      const users = getSheetData(db, 'users');
+      const conAsignaciones = {};
+      liveAssigns.forEach(a => { conAsignaciones[String(a.evaluator_id)] = true; });
+
+      const asunto = 'Fe de erratas: lugar de las ponencias — 9.º Encuentro Estudiantil de Ingeniería Química';
+      let sent = 0, skipped = 0;
+      const errores = [];
+
+      users.filter(u => u.user_type === 'evaluator').forEach(ev => {
+        if (soloFac && facultadKey(ev.facultad) !== soloFac) return;
+        if (!conAsignaciones[String(ev.id)]) { skipped++; return; }
+        const email = String(ev.email || '').trim();
+        if (!email) { skipped++; return; }
+
+        const htmlBody = `
+<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2933;line-height:1.65;max-width:640px;margin:0 auto;">
+  <div style="background:#003D79;color:#ffffff;padding:24px;border-radius:12px 12px 0 0;">
+    <h1 style="margin:0;font-size:20px;line-height:1.3;">Fe de erratas: lugar de las ponencias</h1>
+    <p style="margin:8px 0 0;color:#E8B830;font-weight:600;font-size:14px;letter-spacing:.3px;">9.º ENCUENTRO ESTUDIANTIL DE INGENIERÍA QUÍMICA</p>
+  </div>
+  <div style="border:1px solid #e5e7eb;border-top:0;padding:24px;border-radius:0 0 12px 12px;">
+    <p style="margin-top:0;">Estimadas profesoras y profesores evaluadores:</p>
+    <p>Reciban un cordial saludo.</p>
+    <p>Les escribimos para corregir un error en la agenda de evaluación que recibieron previamente: el lugar indicado para algunas ponencias no era el correcto.</p>
+    <p style="margin-bottom:6px;"><strong>La información correcta es la siguiente:</strong></p>
+    <ul style="margin-top:0;">
+      <li><strong>Ponencias</strong> —los trabajos que tienen un horario asignado— se presentarán en el <strong>Auditorio Principal</strong> de la Facultad de Estudios Superiores Zaragoza, Campus II.</li>
+      <li><strong>Carteles</strong> se mantienen en el <strong>Área de Carteles</strong>, durante la <strong>Sesión de Carteles</strong>.</li>
+    </ul>
+    <p>Es decir, si en su agenda aparece un trabajo con horario, se trata de una ponencia y deberá evaluarse en el <strong>Auditorio Principal</strong>.</p>
+    <p>El evento se llevará a cabo el <strong>jueves 29 de octubre de 2026</strong> en la Facultad de Estudios Superiores Zaragoza, Campus II, de la UNAM.</p>
+    <p>Lamentamos la confusión que este error haya podido ocasionar y agradecemos su comprensión. En breve reenviaremos su agenda con la información corregida.</p>
+    <p>Para cualquier duda, pueden escribirnos a <a href="mailto:${CONTACTO_EVENTO}" style="color:#003D79;font-weight:600;">${CONTACTO_EVENTO}</a>.</p>
+    <p style="margin:24px 0 0;">Atentamente,</p>
+    <p style="margin:0;"><strong>Comité Organizador</strong><br>9.º Encuentro Estudiantil de Ingeniería Química<br>Facultad de Estudios Superiores Zaragoza, UNAM</p>
+  </div>
+</div>`;
+
+        try {
+          MailApp.sendEmail({ to: email, subject: asunto, htmlBody: htmlBody });
+          sent++;
+        } catch(e) {
+          errores.push({ evaluator_id: ev.id, email: email, error: e.message });
         }
       });
 
