@@ -367,19 +367,51 @@
                                         </svg>
                                         Asignar Evaluadores Fase 2
                                     </h5>
-                                    <p class="mb-0 text-muted">Carteles: 5 evaluadores por facultad evalúan los carteles de otra facultad (1 por cartel, rotación FQ → FC → FZ → FQ). Ponencias: 3 evaluadores, uno por facultad.</p>
+                                    <p class="mb-0 text-muted">Cada botón asigna únicamente a los evaluadores de
+                                        esa facultad. Carteles: 5 evaluadores por facultad evalúan los carteles de
+                                        otra facultad (1 por cartel, rotación FQ → FC → FZ → FQ). Ponencias: cada
+                                        facultad aporta un evaluador por ponencia.</p>
                                 </div>
-                                <div class="col-md-5 text-md-end">
-                                    <button class="btn btn-primary btn-lg w-100 w-md-auto" onclick="assignLiveJudges()">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" class="me-2">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <line x1="12" y1="8" x2="12" y2="16" />
-                                            <line x1="8" y1="12" x2="16" y2="12" />
-                                        </svg>
-                                        Asignar evaluadores Fase 2
-                                    </button>
+                                <div class="col-md-5">
+                                    <div class="d-flex flex-column flex-md-row flex-md-wrap gap-2 justify-content-md-end">
+                                        <button class="btn btn-primary" onclick="assignLiveJudges('FZ')"
+                                            title="Asignar solo evaluadores de FES Zaragoza">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="12" y1="8" x2="12" y2="16" />
+                                                <line x1="8" y1="12" x2="16" y2="12" />
+                                            </svg>
+                                            FES Zaragoza
+                                        </button>
+                                        <button class="btn btn-primary" onclick="assignLiveJudges('FC')"
+                                            title="Asignar solo evaluadores de FES Cuautitlán">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="12" y1="8" x2="12" y2="16" />
+                                                <line x1="8" y1="12" x2="16" y2="12" />
+                                            </svg>
+                                            FES Cuautitlán
+                                        </button>
+                                        <button class="btn btn-primary" onclick="assignLiveJudges('FQ')"
+                                            title="Asignar solo evaluadores de la Facultad de Química">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="me-1">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="12" y1="8" x2="12" y2="16" />
+                                                <line x1="8" y1="12" x2="16" y2="12" />
+                                            </svg>
+                                            FQ
+                                        </button>
+                                    </div>
+                                    <div class="text-md-end mt-2">
+                                        <button class="btn btn-link btn-sm text-muted p-0"
+                                            onclick="assignLiveJudges()">Asignar todas las facultades</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -412,6 +444,77 @@
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                                         </svg>
                                         Asignar Juez de Emergencia
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-2">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="me-1">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                                Plazo para subir presentaciones orales
+                            </h5>
+                            <p class="text-muted small mb-3">Fecha y hora límite para que los alumnos con ponencia
+                                oral suban su presentación (PDF o PPTX). Se muestra en el panel del alumno y se valida
+                                en el servidor.</p>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold" for="presentationDeadlineInput">Fecha y
+                                        hora límite</label>
+                                    <input type="datetime-local" class="form-control" id="presentationDeadlineInput">
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary" onclick="savePresentationDeadline(this)">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                            <polyline points="17 21 17 13 7 13 7 21" />
+                                            <polyline points="7 3 7 8 15 8" />
+                                        </svg>
+                                        Guardar plazo
+                                    </button>
+                                    <div class="small text-muted mt-2" id="presentationDeadlineStatus"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 mb-3 mb-md-0">
+                                    <h5 class="fw-bold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-1">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                            <polyline points="22,6 12,13 2,6" />
+                                        </svg>
+                                        Recordatorio a Participantes
+                                    </h5>
+                                    <p class="mb-0 text-muted">Envía un correo a cada participante con trabajo aceptado
+                                        (ponencia oral o cartel) con la fecha, sede, horario de registro y la modalidad
+                                        seleccionada.</p>
+                                </div>
+                                <div class="col-md-5 text-md-end">
+                                    <button class="btn btn-primary" onclick="enviarRecordatorioParticipantes(this)">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="me-2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                            <polyline points="22,6 12,13 2,6" />
+                                        </svg>
+                                        Enviar recordatorio
                                     </button>
                                 </div>
                             </div>
@@ -1075,6 +1178,7 @@
                 renderDashboard();
                 loadUploadToggle();
                 loadPhase1Toggle();
+                loadPresentationDeadline();
             } catch (e) { showToast('Error al cargar: ' + e.message, 'error'); }
         }
 
@@ -1549,16 +1653,25 @@
         }
 
         // --- FASE 2 ---
-        async function assignLiveJudges() {
-            if (!confirm('¿Asignar evaluadores a todos los trabajos aceptados para la evaluación presencial?\n\nCarteles: 5 evaluadores por facultad evalúan los carteles de otra facultad (1 por cartel).\nPonencias: 3 evaluadores, uno por facultad.')) return;
+        async function assignLiveJudges(facultad) {
+            const nombres = { FZ: 'FES Zaragoza', FC: 'FES Cuautitlán', FQ: 'Facultad de Química' };
+            const nombre = facultad ? nombres[facultad] : '';
+            const detalle = facultad
+                ? `¿Asignar únicamente a los evaluadores de ${nombre} para la evaluación presencial?\n\nCarteles: 5 evaluadores de ${nombre} evalúan los carteles que les tocan por rotación (1 por cartel).\nPonencias: 1 evaluador de ${nombre} por ponencia.`
+                : '¿Asignar evaluadores de TODAS las facultades a los trabajos aceptados para la evaluación presencial?\n\nCarteles: 5 evaluadores por facultad evalúan los carteles de otra facultad (1 por cartel).\nPonencias: 3 evaluadores, uno por facultad.';
+            if (!confirm(detalle)) return;
             progressModal.show();
-            document.getElementById('progressMessage').innerText = 'Asignando evaluadores presenciales...';
+            document.getElementById('progressMessage').innerText = facultad
+                ? `Asignando evaluadores de ${nombre}...`
+                : 'Asignando evaluadores presenciales...';
             try {
-                const res = await window.apiClient.assignLiveWorks();
+                const res = await window.apiClient.assignLiveWorks(facultad);
                 progressModal.hide();
                 if (res.success) {
                     const r = res.resumen || {};
-                    let msg = `Se generaron ${res.count} asignaciones (${r.carteles || 0} carteles, ${r.orales || 0} ponencias).`;
+                    let msg = facultad
+                        ? `${nombre}: se generaron ${res.count} asignaciones (${r.carteles || 0} carteles, ${r.orales || 0} ponencias).`
+                        : `Se generaron ${res.count} asignaciones (${r.carteles || 0} carteles, ${r.orales || 0} ponencias).`;
                     if (r.sinEvaluador) msg += ` Sin evaluador: ${r.sinEvaluador}.`;
                     showToast(msg, 'success');
                 } else showToast('Error: ' + res.error, 'error');
@@ -1946,6 +2059,78 @@
         }
     </script>
     <script>
+        function toLocalDatetimeValue(value) {
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return '';
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        async function loadPresentationDeadline() {
+            const input = document.getElementById('presentationDeadlineInput');
+            const status = document.getElementById('presentationDeadlineStatus');
+            if (!input) return;
+            try {
+                const cfg = await window.apiClient.getConfig();
+                input.value = cfg.presentation_deadline ? toLocalDatetimeValue(cfg.presentation_deadline) : '';
+                if (status) {
+                    status.textContent = cfg.presentation_deadline
+                        ? 'Plazo actual: ' + new Date(cfg.presentation_deadline).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' })
+                        : 'Sin plazo configurado.';
+                }
+            } catch (e) { /* silencioso: el panel sigue funcionando */ }
+        }
+
+        async function savePresentationDeadline(btn) {
+            const input = document.getElementById('presentationDeadlineInput');
+            if (!input || !input.value) {
+                showToast('Selecciona la fecha y hora límite.', 'warning');
+                return;
+            }
+            const iso = new Date(input.value).toISOString();
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+            try {
+                const res = await window.apiClient.setConfig('presentation_deadline', iso);
+                if (res.success) {
+                    const shown = new Date(iso).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' });
+                    document.getElementById('presentationDeadlineStatus').textContent = 'Plazo actual: ' + shown;
+                    showToast('Plazo actualizado: ' + shown, 'success');
+                } else {
+                    showToast('Error: ' + (res.error || 'desconocido'), 'error');
+                }
+            } catch (e) {
+                showToast('Error de red: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        async function enviarRecordatorioParticipantes(btn) {
+            if (!confirm('¿Enviar el correo recordatorio a todos los participantes con trabajo aceptado (ponencia oral o cartel)?\n\nSe enviará un correo por cada trabajo aceptado.')) return;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+            try {
+                const res = await window.apiClient.notifyEventReminder();
+                if (res.success) {
+                    let msg = `Recordatorios enviados: ${res.count}.`;
+                    if (res.skipped) msg += ` Sin correo registrado: ${res.skipped}.`;
+                    if (res.errores && res.errores.length) msg += ` Errores: ${res.errores.length}.`;
+                    showToast(msg, res.errores && res.errores.length ? 'warning' : 'success');
+                } else {
+                    showToast('Error: ' + (res.error || 'desconocido'), 'error');
+                }
+            } catch (e) {
+                showToast('Error de red: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
         async function enviarAgendas() {
             if (!confirm("¿Enviar las agendas personalizadas a los 45 profesores?")) return;
             const btn = event.target;

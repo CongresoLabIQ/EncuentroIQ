@@ -1064,7 +1064,12 @@ function PRUEBA_limpiarDatos() {
   const isSeedId = id => String(id || '').indexOf(PRUEBA_DATA_PREFIX) === 0;
   let removed = 0;
 
+  getSheetData(db, 'oral_presentations').forEach(p => {
+    if (isTestWork(p.work_id) || isSeedId(p.id)) testFileIds[String(p.file_id)] = true;
+  });
+
   removed += PRUEBA_quitarFilas_('works', PRUEBA_f2_esTrabajoDemo_);
+  removed += PRUEBA_quitarFilas_('oral_presentations', row => isTestWork(row.work_id) || isSeedId(row.id));
 
   ['assignments', 'evaluations', 'live_assignments', 'live_evaluations', 'reassign_log'].forEach(name => {
     removed += PRUEBA_quitarFilas_(name, row => isTestWork(row.work_id) || isSeedId(row.id));

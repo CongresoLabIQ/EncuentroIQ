@@ -47,6 +47,25 @@ Trabajos académicos enviados por los estudiantes.
 
 ---
 
+## Hoja: `oral_presentations`
+
+Presentaciones de Fase 2 subidas por los alumnos con ponencia oral. Se mantiene separada de `works` para no mezclar el resumen de Fase 1 con el archivo de la presentación.
+
+| Columna | Tipo | Descripción |
+|---------|------|-------------|
+| `id` | string | Identificador único |
+| `work_id` | string | ID del trabajo (`accepted_oral`) |
+| `student_id` | string | ID del alumno autor |
+| `file_name` | string | Nombre original del archivo |
+| `mime_type` | string | MIME del archivo (`application/pdf` o PowerPoint) |
+| `file_size` | number | Tamaño en bytes |
+| `file_id` | string | ID del archivo en Google Drive |
+| `file_url` | string | URL de visualización del archivo |
+| `uploaded_at` | date | Fecha de la primera subida |
+| `updated_at` | date | Fecha de la última actualización |
+
+---
+
 ## Hoja: `Evaluaciones`
 
 Evaluaciones de fase 1 realizadas por evaluadores.
@@ -167,7 +186,7 @@ Parámetros predefinidos:
 | `fecha_fin` | — | Fecha de fin del congreso |
 | `limite_envios` | — | Fecha límite para enviar trabajos |
 | `limite_evaluaciones` | — | Fecha límite para evaluar |
-| `presentation_deadline` | — | Fecha límite para subir presentaciones de Fase 2 |
+| `presentation_deadline` | `2026-10-28T23:00:00-06:00` | Fecha límite para subir presentaciones de Fase 2 (editable desde el admin) |
 | `fase1_enabled` | 1 | 1 = Fase 1 visible para evaluadores; 0 = oculta (la controla el admin) |
 | `puntaje_minimo` | 60 | Puntaje mínimo para aprobar fase 1 |
 | `peso_fase1` | 0.4 | Peso de fase 1 en puntaje final |

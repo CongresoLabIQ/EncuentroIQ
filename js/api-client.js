@@ -169,8 +169,18 @@ const apiClient = {
         return await postData({ action: 'notifyFinalResults' });
     },
 
-    async assignLiveWorks() {
-        return await postData({ action: 'assignLiveWorks' });
+    // Envía el correo recordatorio del evento a cada participante con trabajo aceptado
+    async notifyEventReminder() {
+        return await postData({
+            action: 'notifyEventReminder',
+            admin_user_id: this._sessionId()
+        }, 300000);
+    },
+
+    async assignLiveWorks(facultad) {
+        const payload = { action: 'assignLiveWorks' };
+        if (facultad) payload.facultad = facultad;
+        return await postData(payload);
     },
 
     // Asigna horarios (un solo auditorio) a todos los trabajos aceptados

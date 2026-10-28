@@ -5,6 +5,14 @@ const GLOBAL_PDF_RECIPIENT = 'iq.cterminal@zaragoza.unam.mx';
 const FRONTEND_URL = 'https://congresolabiq.github.io/EncuentroIQ';
 const RESET_TOKEN_EXPIRY_HOURS = 1;
 
+// Fase 2 · Presentaciones orales
+const ORAL_PRESENTATIONS_SHEET = 'oral_presentations';
+const ORAL_PRESENTATIONS_HEADERS = [
+  'id', 'work_id', 'student_id', 'file_name', 'mime_type', 'file_size',
+  'file_id', 'file_url', 'uploaded_at', 'updated_at'
+];
+const PRESENTATION_DEADLINE_DEFAULT = '2026-10-28T23:00:00-06:00';
+
 // --- FUNCIONES DE ENTRADA (GET) ---
 
 function doGet(e) {
@@ -25,11 +33,25 @@ function doGet(e) {
     else if (action === 'getStudentWorks') {
       const studentId = e.parameter.studentId;
       const works = getSheetData(db, 'works');
-      const data = works.filter(w => w.student_id === studentId);
+      const presentations = getSheetData(db, ORAL_PRESENTATIONS_SHEET);
+      const presentationByWork = {};
+      presentations.forEach(p => { presentationByWork[String(p.work_id)] = p; });
+      const data = works.filter(w => w.student_id === studentId).map(w => {
+        const p = presentationByWork[String(w.id)];
+        if (p && p.file_url) {
+          return {
+            ...w,
+            presentation_url: p.file_url,
+            presentation_file_id: p.file_id,
+            presentation_updated_at: p.updated_at
+          };
+        }
+        return w;
+      });
       result = { success: true, data: data };
     }
     else if (action === 'getConfig') {
-      const presDeadline = parseConfigDateStr(getConfigValue('presentation_deadline', ''));
+      const presDeadline = parseConfigDateStr(getConfigValue('presentation_deadline', PRESENTATION_DEADLINE_DEFAULT));
       result = { success: true, data: {
         event_date: getConfigValue('event_date', ''),
         presentation_deadline: presDeadline ? presDeadline.toISOString() : '',
@@ -313,6 +335,16 @@ function slug_(s) {
   return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
 }
 
+// Escapa texto para insertarlo con seguridad en cuerpos HTML de correo.
+function escapeHtml_(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function parseFechaImport_(v) {
   if (v === null || v === undefined || String(v).trim() === '') return new Date();
   const d = new Date(v);
@@ -444,7 +476,7 @@ function parseConfigDateStr(value) {
 }
 
 function presentationDeadlinePassed() {
-  const deadline = getConfigValue('presentation_deadline', '');
+  const deadline = getConfigValue('presentation_deadline', PRESENTATION_DEADLINE_DEFAULT);
   const d = parseConfigDateStr(deadline);
   return d && new Date() > d;
 }
@@ -575,13 +607,20 @@ function doPost(e) {
         result = { success: false, error: 'Solo los trabajos aceptados para ponencia oral pueden subir presentación.' };
       } else if (presentationDeadlinePassed()) {
         result = { success: false, error: 'La fecha límite para subir la presentación ya pasó.' };
+      } else if (!data.fileBase64 || !data.fileName) {
+        result = { success: false, error: 'Falta el archivo de la presentación.' };
+      } else if (['pdf', 'pptx', 'ppt'].indexOf(String(data.fileName).split('.').pop().toLowerCase()) === -1) {
+        result = { success: false, error: 'Solo se permiten archivos PDF o PPTX.' };
       } else {
         const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-        const ext = (data.fileName || '').split('.').pop().toLowerCase();
+        const ext = String(data.fileName).split('.').pop().toLowerCase();
         const mime = ext === 'pptx' || ext === 'ppt'
           ? MimeType.MICROSOFT_POWERPOINT
           : MimeType.PDF;
-        const blob = Utilities.newBlob(Utilities.base64Decode(data.fileBase64), mime, data.fileName);
+        const bytes = Utilities.base64Decode(data.fileBase64);
+        const nombreBase = String(work.short_id || work.id || 'trabajo').replace(/[^A-Za-z0-9._-]+/g, '_');
+        const nombreArchivo = String(data.fileName).replace(/[\\/:*?"<>|]+/g, '_');
+        const blob = Utilities.newBlob(bytes, mime, nombreBase + ' - Presentacion - ' + nombreArchivo);
         const file = folder.createFile(blob);
         let fileUrl = "";
         try {
@@ -589,21 +628,30 @@ function doPost(e) {
           fileUrl = file.getUrl();
         } catch(e) { fileUrl = "https://drive.google.com/open?id=" + file.getId(); }
 
-        // Asegurar que las columnas de presentación existan en la hoja
-        const wSheet = db.getSheetByName('works');
-        const headers = wSheet.getDataRange().getValues()[0].map(h => String(h).trim());
-        ['presentation_url', 'presentation_file_id', 'presentation_updated_at'].forEach(col => {
-          if (headers.indexOf(col) === -1) {
-            wSheet.getRange(1, headers.length + 1).setValue(col);
-            headers.push(col);
-          }
-        });
-
-        updateRow(db, 'works', 'id', data.work_id, {
-          presentation_url: fileUrl,
-          presentation_file_id: file.getId(),
-          presentation_updated_at: new Date()
-        });
+        // Las presentaciones de Fase 2 se guardan en su propia hoja, separadas
+        // de los resúmenes enviados en Fase 1 (hoja works).
+        const pSheet = getOralPresentationsSheet_(db);
+        const existing = getOralPresentationByWork_(db, data.work_id);
+        const ahora = new Date();
+        const registro = {
+          work_id: data.work_id,
+          student_id: data.student_id,
+          file_name: data.fileName,
+          mime_type: mime,
+          file_size: bytes.length,
+          file_id: file.getId(),
+          file_url: fileUrl,
+          updated_at: ahora
+        };
+        if (existing) {
+          updateRow(db, ORAL_PRESENTATIONS_SHEET, 'work_id', data.work_id, registro);
+        } else {
+          pSheet.appendRow([
+            Utilities.getUuid(), registro.work_id, registro.student_id, registro.file_name,
+            registro.mime_type, registro.file_size, registro.file_id, registro.file_url,
+            ahora, ahora
+          ]);
+        }
         result = { success: true, fileUrl: fileUrl };
       }
     }
@@ -764,6 +812,63 @@ function doPost(e) {
       result = { success: true, count: sent };
     }
 
+    else if (data.action === 'notifyEventReminder') {
+      assertAdmin(db, data.admin_user_id);
+      const works = getSheetData(db, 'works');
+      const users = getSheetData(db, 'users');
+      const emailById = {};
+      users.forEach(u => { emailById[String(u.id)] = String(u.email || '').trim(); });
+
+      const modalidad = {
+        'accepted_oral': 'PONENCIA ORAL',
+        'accepted_poster': 'PRESENTACIÓN EN CARTEL'
+      };
+      const paginaEvento = FRONTEND_URL;
+      const asunto = 'Recordatorio: 9.º Encuentro Estudiantil de Ingeniería Química';
+      let sent = 0, skipped = 0;
+      const errores = [];
+
+      works.forEach(w => {
+        if (!modalidad[w.status]) return;
+        const email = emailById[String(w.student_id)];
+        if (!email) { skipped++; return; }
+
+        const titulo = escapeHtml_(w.title || '(sin título)');
+        const avisoPresentacion = w.status === 'accepted_oral'
+          ? `<p>Se les recuerda que ya está habilitada en la página la sección <strong>&laquo;Presentación oral (Fase 2)&raquo;</strong>, en la que podrán subir su presentación en formato <strong>PDF o PPTX</strong> a más tardar el <strong>28 de octubre de 2026 a las 23:00 hrs</strong>.</p>`
+          : '';
+        const htmlBody = `
+<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2933;line-height:1.65;max-width:640px;margin:0 auto;">
+  <div style="background:#003D79;color:#ffffff;padding:24px;border-radius:12px 12px 0 0;">
+    <h1 style="margin:0;font-size:20px;line-height:1.3;">9.º Encuentro Estudiantil de Ingeniería Química</h1>
+    <p style="margin:8px 0 0;color:#E8B830;font-weight:600;font-size:14px;letter-spacing:.3px;">SU TRABAJO FUE SELECCIONADO</p>
+  </div>
+  <div style="border:1px solid #e5e7eb;border-top:0;padding:24px;border-radius:0 0 12px 12px;">
+    <p style="margin-top:0;">Estimadas y estimados participantes:</p>
+    <p>Reciban un cordial saludo.</p>
+    <p>Nos complace recordarles que su trabajo titulado <strong>&laquo;${titulo}&raquo;</strong> fue seleccionado para participar en el <strong>9.º Encuentro Estudiantil de Ingeniería Química</strong>, en la modalidad de <strong>${modalidad[w.status]}</strong>.</p>
+    <p>Les recordamos que el evento se llevará a cabo el próximo <strong>jueves 29 de octubre de 2026</strong>, en la Facultad de Estudios Superiores Zaragoza, Campus II, de la UNAM.</p>
+    <p>El registro de trabajos y la ceremonia de inauguración darán inicio a las <strong>8:30 h</strong>, por lo que les solicitamos atentamente llegar con anticipación para realizar su registro y participar en las actividades programadas.</p>
+    ${avisoPresentacion}
+    <p>Pueden verificar los detalles y consultar el programa en <a href="${paginaEvento}" style="color:#003D79;font-weight:600;">la página del evento</a>.</p>
+    <p>Agradecemos su interés y entusiasmo por formar parte de este encuentro, cuyo objetivo es promover el intercambio de conocimientos y experiencias, así como difundir el trabajo académico y de investigación desarrollado por las y los estudiantes de Ingeniería Química.</p>
+    <p>Esperamos contar con su puntual asistencia y les deseamos mucho éxito en la presentación de sus trabajos.</p>
+    <p style="margin:24px 0 0;">Atentamente,</p>
+    <p style="margin:0;"><strong>Comité Organizador</strong><br>9.º Encuentro Estudiantil de Ingeniería Química<br>Facultad de Estudios Superiores Zaragoza, UNAM</p>
+  </div>
+</div>`;
+
+        try {
+          MailApp.sendEmail({ to: email, subject: asunto, htmlBody: htmlBody });
+          sent++;
+        } catch (e) {
+          errores.push({ work_id: w.id, email: email, error: e.message });
+        }
+      });
+
+      result = { success: true, count: sent, skipped: skipped, errores: errores };
+    }
+
     else if (data.action === 'notifyJudgesAgenda') {
       const liveAssigns = getSheetData(db, 'live_assignments');
       const works = getSheetData(db, 'works');
@@ -789,11 +894,41 @@ function doPost(e) {
       const lSheet = db.getSheetByName('live_assignments');
       const { evaluators, carga, grupos } = cargarGruposEvaluadores(db);
 
+      // Facultad opcional: si se indica, solo se asignan los evaluadores de esa
+      // facultad (los demás se asignan con su propio botón).
+      const soloFac = data.facultad ? String(data.facultad).trim().toUpperCase() : '';
+      if (soloFac && FACULTADES_ROTACION.indexOf(soloFac) === -1) {
+        throw new Error('Facultad no válida: ' + data.facultad + '. Usa FQ, FC o FZ.');
+      }
+      const facultades = soloFac ? [soloFac] : FACULTADES_ROTACION.slice();
+
       const conteo = {};
       evaluators.forEach(ev => conteo[ev.id] = 0);
 
-      const yaAsignados = {};
-      existing.forEach(a => { yaAsignados[String(a.work_id)] = true; });
+      const workById = {};
+      works.forEach(w => { workById[String(w.id)] = w; });
+      const evaluatorById = {};
+      evaluators.forEach(ev => { evaluatorById[String(ev.id)] = ev; });
+
+      // Carteles ya cubiertos (solo llevan 1 evaluador) y ponencias ya cubiertas
+      // por facultad (cada facultad aporta como máximo 1 evaluador por ponencia).
+      const cartelesCubiertos = {};
+      const oralesCubiertos = {};
+      existing.forEach(a => {
+        const w = workById[String(a.work_id)];
+        if (!w) return;
+        if (w.status === 'accepted_poster') {
+          cartelesCubiertos[String(a.work_id)] = true;
+        } else if (w.status === 'accepted_oral') {
+          const ev = evaluatorById[String(a.evaluator_id)];
+          const k = ev ? facultadKey(ev.facultad) : null;
+          if (k) {
+            const key = String(a.work_id);
+            oralesCubiertos[key] = oralesCubiertos[key] || {};
+            oralesCubiertos[key][k] = true;
+          }
+        }
+      });
 
       const filas = [];
       let carteles = 0, orales = 0, sinEvaluador = 0;
@@ -807,8 +942,15 @@ function doPost(e) {
         return gruposCartel[key];
       }
 
-      works.filter(w => w.status === 'accepted_poster' && !yaAsignados[String(w.id)]).forEach(w => {
-        const grupo = grupoCartel(facultadKey(w.facultad));
+      works.filter(w => w.status === 'accepted_poster' && !cartelesCubiertos[String(w.id)]).forEach(w => {
+        const targetFac = facultadKey(w.facultad);
+        // En modo por facultad, solo se atienden los carteles que le tocan a esa
+        // facultad según la rotación; el resto lo hace su propio botón.
+        if (soloFac) {
+          const evaluadoraDe = FACULTADES_ROTACION.find(f => ROTACION_CARTELES[f] === targetFac);
+          if (evaluadoraDe !== soloFac) return;
+        }
+        const grupo = soloFac ? grupos[soloFac] : grupoCartel(targetFac);
         if (!grupo.length) { sinEvaluador++; return; }
         const ev = elegirEvaluador(grupo, w, conteo);
         if (!ev) { sinEvaluador++; return; }
@@ -819,11 +961,13 @@ function doPost(e) {
 
       // --- ORALES: 1 evaluador de cada facultad por ponencia (misma facultad permitida,
       // solo se evita al asesor del trabajo).
-      works.filter(w => w.status === 'accepted_oral' && !yaAsignados[String(w.id)]).forEach(w => {
+      works.filter(w => w.status === 'accepted_oral').forEach(w => {
         const usados = {};
-        FACULTADES_ROTACION.forEach(fac => {
+        facultades.forEach(fac => {
+          const cubiertas = oralesCubiertos[String(w.id)] || {};
+          if (cubiertas[fac]) return;
           let grupo = grupos[fac];
-          if (!grupo.length) grupo = evaluators.filter(ev => !usados[ev.id]);
+          if (!grupo.length && !soloFac) grupo = evaluators.filter(ev => !usados[ev.id]);
           let ev = null, mejor = Infinity;
           grupo.forEach(cand => {
             if (usados[cand.id] || esAutoEvaluacion(w, cand)) return;
@@ -849,7 +993,12 @@ function doPost(e) {
       });
 
       filas.forEach(f => lSheet.appendRow(f));
-      result = { success: true, count: filas.length, resumen: { carteles, orales, sinEvaluador } };
+      result = {
+        success: true,
+        count: filas.length,
+        facultad: soloFac || 'TODAS',
+        resumen: { carteles, orales, sinEvaluador }
+      };
     }
 
     else if (data.action === 'assignSchedules') {
@@ -1242,6 +1391,9 @@ function doPost(e) {
       const key = String(data.key || '').trim().toLowerCase();
       const value = String(data.value === undefined ? '' : data.value).trim();
       if (!key) throw new Error('Falta el nombre de la clave de configuración.');
+      if (key === 'presentation_deadline' && value && !parseConfigDateStr(value)) {
+        throw new Error('Fecha límite inválida. Usa una fecha ISO, por ejemplo 2026-10-28T23:00:00-06:00.');
+      }
       setConfigValue(key, value);
       result = { success: true };
     }
@@ -1545,6 +1697,23 @@ function updateRow(db, sheetName, idCol, idVal, updates) {
       break;
     }
   }
+}
+
+// Hoja dedicada para las presentaciones de Fase 2 (ponencias orales).
+function getOralPresentationsSheet_(db) {
+  let sheet = db.getSheetByName(ORAL_PRESENTATIONS_SHEET);
+  if (!sheet) {
+    sheet = db.insertSheet(ORAL_PRESENTATIONS_SHEET);
+    sheet.appendRow(ORAL_PRESENTATIONS_HEADERS.slice());
+  } else if (sheet.getLastRow() === 0) {
+    sheet.appendRow(ORAL_PRESENTATIONS_HEADERS.slice());
+  }
+  return sheet;
+}
+
+function getOralPresentationByWork_(db, workId) {
+  return getSheetData(db, ORAL_PRESENTATIONS_SHEET)
+    .find(p => String(p.work_id) === String(workId)) || null;
 }
 
 // ============================================================

@@ -68,6 +68,7 @@
 - Barra superior con datos del usuario
 - Botón "Subir trabajo" dinámico (controlado por toggle del admin en `localStorage.encuentroIQ_uploadsEnabled`)
 - Lista de trabajos enviados y su estado
+- Sección **"Presentación oral (Fase 2)"** para trabajos `accepted_oral`: plazo límite, estado de subida y botones para subir, reemplazar o ver el PDF/PPTX
 - Acceso a encuesta de satisfacción
 
 ### Panel del evaluador (`evaluator-dashboard.html`)
@@ -84,8 +85,8 @@ Navegación por **bottom nav fija** con 3 pestañas:
 | Pestaña | Contenido |
 |---------|-----------|
 | **Dashboard** | Toggle subida activa · Botón Asignar Fase 1 · Botón Dictaminar (N) · Tabla de seguimiento de evaluaciones con filtros · Botón "Ver evaluadores" por trabajo · Sección "Listos para Dictaminar" |
-| **Horarios** | Asignar evaluadores Fase 2 · Caso de Emergencia · Enviar Agendas por correo · Tabla de horario general de ponencias |
-| **Fase 2** | Reconocimientos por ciclo académico (Top 3 Oral + Top 3 Cartel) · Generación de constancias |
+| **Horarios** | Asignar horarios · Importar FES Zaragoza · Enviar Agendas por correo · Tabla de horario general de ponencias |
+| **Fase 2** | Asignar evaluadores por facultad · Plazo de presentaciones orales · Recordatorio a participantes · Caso de Emergencia · Reconocimientos por ciclo académico (Top 3 Oral + Top 3 Cartel) · Generación de constancias |
 
 ---
 

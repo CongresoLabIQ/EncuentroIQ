@@ -167,7 +167,7 @@ Subir la presentación (PPTX/PDF) de un trabajo aceptado a ponencia oral.
 | `fileName` | string | Sí | Nombre del archivo (`.pptx`, `.ppt` o `.pdf`) |
 | `fileBase64` | string | Sí | Archivo codificado en base64 |
 
-Rechaza si el plazo `presentation_deadline` ya pasó. Guarda `presentation_url`, `presentation_file_id` y `presentation_updated_at` en la hoja `works`.
+Rechaza si el plazo `presentation_deadline` ya pasó. La presentación se guarda en la hoja dedicada `oral_presentations` (columnas `id`, `work_id`, `student_id`, `file_name`, `mime_type`, `file_size`, `file_id`, `file_url`, `uploaded_at`, `updated_at`); la hoja `works` conserva únicamente el resumen de Fase 1. Reemplazar una presentación actualiza la misma fila.
 
 ```json
 { "action": "submitPresentation", "work_id": "work_1", "student_id": "user_abc123", "fileName": "presentacion.pptx", "fileBase64": "..." }
@@ -182,10 +182,12 @@ Obtener los trabajos enviados por un estudiante específico.
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"getStudentWorks"` |
-| `token` | string | Sí | Token del estudiante |
+| `studentId` | string | Sí | ID del estudiante |
+
+Cada trabajo que tenga presentación oral incluye `presentation_url`, `presentation_file_id` y `presentation_updated_at`, tomados de la hoja `oral_presentations`.
 
 ```json
-{ "action": "getStudentWorks", "token": "tok_xyz789" }
+{ "action": "getStudentWorks", "studentId": "user_abc123" }
 ```
 
 ---
@@ -318,14 +320,30 @@ Asignar evaluadores a los trabajos aceptados para la evaluación presencial (Fas
 
 Reglas:
 - **Carteles:** cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los carteles de otra facultad según rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel**, repartido de forma balanceada. Si una facultad no tiene 5 evaluadores, se completa con evaluadores de otras facultades, evitando siempre la facultad del cartel.
-- **Ponencias:** cada ponencia recibe **3 evaluadores, uno por cada facultad**. Se permite la misma facultad del trabajo; solo se evita que el evaluador sea asesor del trabajo.
-- No reasigna trabajos que ya tengan una fila en `live_assignments`.
+- **Ponencias:** cada ponencia recibe **un evaluador por cada facultad** (3 en total, o solo el de la facultad indicada). Se permite la misma facultad del trabajo; solo se evita que el evaluador sea asesor del trabajo.
+- **Por facultad:** si se envía `facultad`, solo se asignan los evaluadores de esa facultad (carteles que le tocan por rotación y su lugar en cada ponencia). Es idempotente: repetir el botón no duplica ni genera asignaciones extra.
+- No reasigna trabajos que ya tengan una fila en `live_assignments` (para carteles) ni facultades ya cubiertas (para ponencias).
 
 | Parámetro | Tipo | Obligatorio | Descripción |
 |-----------|------|-------------|-------------|
 | `action` | string | Sí | `"assignLiveWorks"` |
+| `facultad` | string | No | `"FQ"`, `"FC"` o `"FZ"`. Si se omite, asigna todas las facultades. |
 
-Respuesta: `{ "success": true, "count": 63, "resumen": { "carteles": 45, "orales": 18, "sinEvaluador": 0 } }`.
+Respuesta: `{ "success": true, "count": 63, "facultad": "TODAS", "resumen": { "carteles": 45, "orales": 18, "sinEvaluador": 0 } }`.
+Con `facultad: "FQ"` la respuesta es `{ "success": true, "count": 21, "facultad": "FQ", "resumen": { "carteles": 15, "orales": 6, "sinEvaluador": 0 } }`.
+
+---
+
+### `notifyEventReminder`
+
+Envía un correo recordatorio del evento a **cada participante con trabajo aceptado** (`accepted_oral` o `accepted_poster`). Se manda **un correo por trabajo** con el título, la modalidad, la fecha, la sede, el horario de registro y el enlace a la página del evento. Los trabajos no seleccionados y los alumnos sin correo registrado se omiten.
+
+| Parámetro | Tipo | Obligatorio | Descripción |
+|-----------|------|-------------|-------------|
+| `action` | string | Sí | `"notifyEventReminder"` |
+| `admin_user_id` | string | Sí | ID del administrador que envía |
+
+Respuesta: `{ "success": true, "count": 51, "skipped": 0, "errores": [] }`, donde `count` son los correos enviados y `skipped` los trabajos aceptados sin correo.
 
 ---
 
@@ -399,7 +417,7 @@ Respuesta (`data`):
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `event_date` | string | Fecha del evento (texto) |
-| `presentation_deadline` | string | Fecha límite para subir presentaciones (ISO) o vacío |
+| `presentation_deadline` | string | Fecha límite para subir presentaciones (ISO). Por defecto `2026-10-28T23:00:00-06:00` (28 de octubre de 2026, 23:00 CDMX) |
 | `fase1_enabled` | string | `"1"` = Fase 1 visible; `"0"` = oculta |
 
 ---

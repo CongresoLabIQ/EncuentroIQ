@@ -66,7 +66,8 @@ service-worker.js           # Cache-first SW
 ### ⚠️ Conocimiento importante
 - **localStorage `encuentroIQ_uploadsEnabled`:** `'1'` = activo, `'0'` = inactivo. Default: activo si es null.
 - **localStorage `congreso_user`:** Sesión del usuario logueado (JSON con id, name, email, type, facultad).
-- **Google Sheets `config` sheet:** `event_date`, `evaluator_code`, `presentation_deadline`, `fase1_enabled` se leen desde ahí.
+- **Google Sheets `config` sheet:** `event_date`, `evaluator_code`, `presentation_deadline` (por defecto `2026-10-28T23:00:00-06:00`, editable desde el admin), `fase1_enabled` se leen desde ahí.
+- **Presentaciones orales (NUEVO):** los alumnos con trabajo `accepted_oral` ven una sección **“Presentación oral (Fase 2)”** en `student-dashboard.html` para subir PDF/PPTX antes del plazo. El archivo y sus metadatos se guardan en la hoja dedicada **`oral_presentations`**, separada de `works`; `getStudentWorks` combina los datos para exponer `presentation_url`.
 - **Toggle de Fase 1 es server-side:** el admin usa `setConfig('fase1_enabled', '1'|'0')` (endpoint admin-only). El backend lo guarda en la hoja `config` y los dashboards de evaluador y alumno lo leen vía `getConfig()`. `localStorage.encuentroIQ_phase1Enabled` es solo caché.
 - **submit-work.html** redirige a student-dashboard si uploads desactivados o fase 1 oculta (seguridad, verifica en backend).
 - **Fase 2 carteles (NUEVO):** cada facultad aporta hasta 5 evaluadores (los de menor carga) que evalúan los **carteles de otra facultad** con rotación fija `FQ → FC → FZ → FQ`. Se asigna **1 evaluador por cartel** (15 carteles / 5 evaluadores = 3 c/u). Si faltan evaluadores, se completa con otras facultades sin conflicto.
@@ -137,7 +138,8 @@ Funciones JS clave:
 | `requestHelp` | Evaluador pide ayuda |
 | `resolveHelpRequest` | Admin atiende solicitud de ayuda |
 | `reassignLiveEvaluator` | Sustituir evaluador ausente en Fase 2 |
-| `assignLiveWorks` | Asignar Fase 2: carteles por rotación de facultad (1 evaluador/cartel) y ponencias (1 por facultad). No reasigna trabajos ya asignados |
+| `assignLiveWorks` | Asignar Fase 2: carteles por rotación de facultad (1 evaluador/cartel) y ponencias (1 por facultad). Acepta `facultad` (`FQ`/`FC`/`FZ`) para asignar solo esa facultad. No reasigna trabajos ya asignados |
+| `notifyEventReminder` | Admin: envía un correo recordatorio del evento a cada participante con trabajo aceptado (oral o cartel), con título, modalidad, fecha, sede, horario y enlace |
 | `assignSchedules` | Admin: asigna horarios a todos los aceptados (ponencias al Auditorio Principal en bloques de 20 min; carteles a Sesión Carteles). Conserva horarios previos |
 | `importFesZaragoza` | Admin: importa trabajos + alumnos de FES Zaragoza desde URLs CSV de Google Sheets. Respeta `status`, conserva hash de contraseña, idempotente |
 
@@ -159,7 +161,11 @@ Funciones JS clave:
 `id`, `work_id`, `evaluator_id`, `score`, `rubrica`, `status`, `completed_at`
 
 ### Hoja `config`
-`event_date`, `evaluator_code`, `presentation_deadline` (fecha límite para subir presentaciones de Fase 2; se valida en el backend con `presentationDeadlinePassed()` y se muestra como banner en el panel del alumno), `fase1_enabled` (1/0 — oculta Fase 1 para evaluadores y alumnos)
+`event_date`, `evaluator_code`, `presentation_deadline` (fecha límite para subir presentaciones de Fase 2; por defecto `2026-10-28T23:00:00-06:00`, editable desde la tarjeta del admin; se valida con `presentationDeadlinePassed()` y se muestra en el panel del alumno), `fase1_enabled` (1/0 — oculta Fase 1 para evaluadores y alumnos)
+
+### Hoja `oral_presentations` (fase 2 — presentaciones orales)
+`id`, `work_id`, `student_id`, `file_name`, `mime_type`, `file_size`, `file_id`, `file_url`, `uploaded_at`, `updated_at`
+Una fila por ponencia oral; al reemplazar la presentación se actualiza la misma fila. Los resúmenes de Fase 1 siguen en `works`.
 
 ### Hoja `live_evaluator_status` (fase 2 — actividad en vivo)
 `evaluator_id`, `status`, `last_activity`, `updated_at`

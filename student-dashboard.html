@@ -56,6 +56,7 @@
         </div>
 
         <div id="presDeadlineBanner" class="d-none mb-3"></div>
+        <div id="oralPresentationSection" class="d-none mb-4"></div>
 
         <div id="worksList">
             <div class="skeleton-card">
@@ -94,13 +95,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-unam text-white">
-                    <h5 class="modal-title">Subir Presentación</h5>
+                    <h5 class="modal-title">Subir presentación oral</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <small class="text-muted">Presentación para: <strong id="presWorkTitle" class="text-primary-theme"></strong></small>
                     </div>
+                    <div class="alert alert-info small py-2 mb-3" id="presDeadlineNote"></div>
                     <div class="mb-4 d-none" id="presAlreadyDiv">
                         <span class="text-success small">Ya subiste una presentación. Puedes descargarla o reemplazarla.</span>
                         <div class="mt-2" id="presAlreadyLinkBox"></div>
@@ -209,7 +211,6 @@
             }
             window._presDeadline = presDeadline;
             window._phase1Enabled = phase1Enabled;
-            updateDeadlineBanner();
 
             if (uploadsEnabled !== '0' && phase1Enabled) {
                 actionEl.innerHTML = '<a href="submit-work.html" class="btn btn-outline-accent fw-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Subir trabajo</a>';
@@ -220,6 +221,8 @@
             const works = await window.apiClient.getStudentWorks(session.user.id);
             window._currentWorks = works;
             window._sessionUserId = session.user.id;
+            updateDeadlineBanner(works.some(w => w.status === 'accepted_oral'));
+            renderOralPresentationSection(works);
 
             const container = document.getElementById('worksList');
 
@@ -306,16 +309,22 @@
             return isNaN(d.getTime()) ? null : d;
         }
 
-        function updateDeadlineBanner() {
+        function formatPresDeadline() {
+            const dt = parseDeadline(window._presDeadline || '');
+            if (!dt) return window._presDeadline || '28 de octubre de 2026 a las 23:00 hrs';
+            const fecha = dt.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+            const hora = dt.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false });
+            return `${fecha} a las ${hora} hrs`;
+        }
+
+        function updateDeadlineBanner(hasOral) {
             const deadline = window._presDeadline || '';
             const banner = document.getElementById('presDeadlineBanner');
-            if (!deadline) { banner.classList.add('d-none'); return; }
+            if (!deadline || hasOral === false) { banner.classList.add('d-none'); return; }
             const dt = parseDeadline(deadline);
             const passed = dt && new Date() > dt;
             window._presDeadlinePassed = passed;
-            const dateStr = dt
-                ? dt.toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' })
-                : deadline;
+            const dateStr = formatPresDeadline();
             if (passed) {
                 banner.className = 'alert alert-warning border-start border-4 border-warning mb-3';
                 banner.innerHTML = `⏰ <strong>Plazo cerrado.</strong> La fecha límite para subir tu presentación fue el <strong>${dateStr}</strong>.`;
@@ -323,6 +332,64 @@
                 banner.className = 'alert alert-info border-start border-4 border-info mb-3';
                 banner.innerHTML = `📅 La fecha límite para subir tu presentación es el <strong>${dateStr}</strong>.`;
             }
+        }
+
+        function escapeText(text) {
+            return String(text === null || text === undefined ? '' : text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderOralPresentationSection(works) {
+            const container = document.getElementById('oralPresentationSection');
+            if (!container) return;
+            const orales = (works || []).filter(w => w.status === 'accepted_oral');
+            if (!orales.length) {
+                container.classList.add('d-none');
+                container.innerHTML = '';
+                return;
+            }
+
+            const deadline = formatPresDeadline();
+            const passed = !!window._presDeadlinePassed;
+
+            const items = orales.map(w => {
+                const subida = !!(w.presentation_url && w.presentation_url.length);
+                const badge = subida
+                    ? '<span class="badge bg-success">✅ Presentación subida</span>'
+                    : passed
+                        ? '<span class="badge bg-secondary">⏰ Plazo cerrado</span>'
+                        : '<span class="badge bg-warning text-dark">⏳ Pendiente de subir</span>';
+                let acciones = '';
+                if (subida) {
+                    acciones = `<a href="${w.presentation_url}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success me-2">Ver presentación</a>`;
+                    if (!passed) {
+                        acciones += `<button class="btn btn-sm btn-outline-accent" onclick="openPresentationModal('${w.id}','${escapeHtml(w.title)}')">Reemplazar</button>`;
+                    }
+                } else if (!passed) {
+                    acciones = `<button class="btn btn-sm btn-unam" onclick="openPresentationModal('${w.id}','${escapeHtml(w.title)}')">Subir presentación</button>`;
+                }
+                return `<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-3 border-top">
+                    <div>
+                        <div class="fw-bold text-primary-theme">${w.short_id || ''} · ${escapeText(w.title)}</div>
+                        <div class="mt-1">${badge}</div>
+                    </div>
+                    <div>${acciones}</div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `<div class="content-card border-start border-4 border-primary-theme">
+                <div class="content-card-body">
+                    <h5 class="fw-bold text-primary-theme mb-2">🎤 Presentación oral (Fase 2)</h5>
+                    <p class="mb-2">Tu trabajo fue seleccionado para <strong>ponencia oral</strong>. Sube tu presentación en formato <strong>PDF o PPTX</strong> a más tardar el <strong>${deadline}</strong>.</p>
+                    <p class="text-muted small mb-0">Puedes reemplazarla mientras el plazo siga abierto.</p>
+                    ${items}
+                </div>
+            </div>`;
+            container.classList.remove('d-none');
         }
 
         function openPresentationModal(workId, title) {
@@ -333,6 +400,9 @@
             presWorkId = workId;
             presSelectedFile = null;
             document.getElementById('presWorkTitle').textContent = title || '';
+            const note = document.getElementById('presDeadlineNote');
+            note.className = 'alert alert-info small py-2 mb-3';
+            note.innerHTML = `Fecha límite: <strong>${formatPresDeadline()}</strong>.`;
             document.getElementById('presFileName').innerHTML = 'Haz clic para seleccionar archivo (PPTX o PDF)';
             document.getElementById('presFileInput').value = '';
             const pb = document.getElementById('presProgressBar');

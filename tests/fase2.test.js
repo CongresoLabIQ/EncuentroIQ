@@ -110,6 +110,70 @@ function run(t) {
   const rowsAfter = readSheet(base.spreadsheet, 'live_assignments').length;
   t.equal(rowsAfter, rowsBefore, 'no se duplican filas');
 
+  // ===================== Asignación independiente por facultad =====================
+  t.group('Asignación independiente por facultad');
+  const ind = createSandbox(seedSheets());
+  notifications.push(...ind.notifications);
+
+  function indAssigns() {
+    return readSheet(ind.spreadsheet, 'live_assignments');
+  }
+  function resumenDe(res) {
+    return res.resumen || {};
+  }
+
+  const pasos = [
+    { fac: 'FQ', cartelDe: 'FC' },
+    { fac: 'FC', cartelDe: 'FZ' },
+    { fac: 'FZ', cartelDe: 'FQ' }
+  ];
+  pasos.forEach(({ fac, cartelDe }) => {
+    const antes = indAssigns().length;
+    const res = post(ind.sandbox, { action: 'assignLiveWorks', facultad: fac });
+    t.equal(res.success, true, fac + ': success');
+    t.equal(res.facultad, fac, fac + ': responde la facultad asignada');
+    t.equal(resumenDe(res).carteles, 15, fac + ': asigna 15 carteles');
+    t.equal(resumenDe(res).orales, 6, fac + ': asigna 1 evaluador por ponencia');
+    t.equal(resumenDe(res).sinEvaluador, 0, fac + ': sin evaluador = 0');
+
+    const nuevas = indAssigns().slice(antes);
+    t.equal(nuevas.length, 21, fac + ': genera 21 asignaciones nuevas');
+    const usersById = {};
+    readSheet(ind.spreadsheet, 'users').forEach(u => { usersById[u.id] = u; });
+    const worksById = {};
+    readSheet(ind.spreadsheet, 'works').forEach(w => { worksById[w.id] = w; });
+
+    t.ok(nuevas.every(a => facultadKey(usersById[a.evaluator_id].facultad) === fac),
+      fac + ': solo usa evaluadores de ' + fac);
+    nuevas
+      .filter(a => worksById[a.work_id].status === 'accepted_poster')
+      .forEach(a => t.equal(facultadKey(worksById[a.work_id].facultad), cartelDe,
+        fac + ': evalúa los carteles de ' + cartelDe));
+  });
+
+  t.group('Asignación independiente — cobertura final');
+  const indFinal = indAssigns();
+  t.equal(indFinal.length, 63, 'los tres botones cubren las 63 asignaciones');
+  const worksByIdInd = {};
+  readSheet(ind.spreadsheet, 'works').forEach(w => { worksByIdInd[w.id] = w; });
+  const postersInd = indFinal.filter(a => worksByIdInd[a.work_id].status === 'accepted_poster');
+  const oralsInd = indFinal.filter(a => worksByIdInd[a.work_id].status === 'accepted_oral');
+  const porCartel = {};
+  postersInd.forEach(a => { porCartel[a.work_id] = (porCartel[a.work_id] || 0) + 1; });
+  t.equal(Object.keys(porCartel).length, 45, 'los 45 carteles quedan cubiertos');
+  t.ok(Object.values(porCartel).every(c => c === 1), 'sigue habiendo 1 evaluador por cartel');
+  const porOral = {};
+  oralsInd.forEach(a => { porOral[a.work_id] = (porOral[a.work_id] || 0) + 1; });
+  t.equal(Object.keys(porOral).length, 6, 'las 6 ponencias quedan cubiertas');
+  t.ok(Object.values(porOral).every(c => c === 3), 'cada ponencia vuelve a tener 3 evaluadores');
+
+  t.group('Asignación independiente — idempotencia y validación');
+  t.equal(post(ind.sandbox, { action: 'assignLiveWorks', facultad: 'FQ' }).count, 0,
+    'repetir el botón de una facultad no duplica asignaciones');
+  const invalida = post(ind.sandbox, { action: 'assignLiveWorks', facultad: 'XX' });
+  t.equal(invalida.success, false, 'facultad inválida devuelve error');
+  t.equal(indAssigns().length, 63, 'la facultad inválida no escribe filas');
+
   // ===================== Fallback (facultad con <5) =====================
   t.group('Fallback: FZ con solo 3 evaluadores');
   const fb = createSandbox(seedSheets({ counts: { FQ: 6, FC: 5, FZ: 3 }, includeTestAccounts: false }));

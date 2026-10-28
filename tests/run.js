@@ -12,7 +12,9 @@ const suites = [
   require('./poblado.test'),
   require('./fase2-simulacro.test'),
   require('./import-schedule.test'),
-  require('./premiacion.test')
+  require('./premiacion.test'),
+  require('./recordatorio.test'),
+  require('./presentaciones.test')
 ];
 
 let passed = 0;
