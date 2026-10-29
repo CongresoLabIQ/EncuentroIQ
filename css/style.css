@@ -439,6 +439,57 @@ h1, h2, h3, h4, h5, h6 {
 
 .eval-progress-label { font-size: 0.65rem; font-weight: 600; color: #6c757d; }
 
+/* ID del trabajo (columna izquierda del dashboard admin) */
+.work-id-cell { white-space: nowrap; }
+.work-id {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  color: var(--primary);
+  background: var(--accent-bg);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* Evaluadores asignados a cada trabajo */
+.eval-names-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.eval-name-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+.eval-name-dot {
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #fff;
+  background: #e9ecef;
+  border: 2px solid #dee2e6;
+}
+.eval-name-item.done .eval-name-dot { background: #20c997; border-color: #198754; }
+.eval-name-text { color: var(--text); }
+.eval-name-item.done .eval-name-text { color: var(--text-light); }
+.eval-name-score { margin-left: auto; font-size: 0.66rem; font-weight: 700; color: #198754; }
+
 .avg-score-ring {
   display: inline-flex;
   align-items: center;
@@ -2029,6 +2080,7 @@ body.modal-open .floating-help {
 [data-theme="dark"] .skeleton-stat { background: var(--bg-card); }
 [data-theme="dark"] .skeleton-row { border-color: var(--border); }
 [data-theme="dark"] .eval-dot.pending { background: #3a3f4a; border-color: #4a4f5a; }
+[data-theme="dark"] .eval-name-dot { background: #3a3f4a; border-color: #4a4f5a; }
 [data-theme="dark"] .eval-pdf-panel { background: #080b10; }
 [data-theme="dark"] .footer-institutional { background: #080b10; }
 [data-theme="dark"] .footer-motto { color: rgba(255,255,255,0.5); }

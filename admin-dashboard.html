@@ -188,17 +188,18 @@
                                 <table class="table data-table table-hover align-middle mb-0" id="evalProgressTable">
                                     <thead>
                                         <tr>
+                                            <th style="width:110px;">ID</th>
                                             <th style="min-width:200px;">Trabajo</th>
                                             <th>Semestre</th>
                                             <th>Tipo</th>
-                                            <th style="width:160px;">Evaluadores</th>
+                                            <th style="width:240px;">Evaluadores</th>
                                             <th style="width:80px;">Promedio</th>
                                             <th style="width:130px;">Estatus</th>
                                         </tr>
                                     </thead>
                                     <tbody id="evalProgressBody">
                                         <tr>
-                                            <td colspan="6">
+                                            <td colspan="7">
                                                 <div class="p-2">
                                                     <div class="skeleton-row"><div class="skeleton skeleton-text w-50"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-text w-33"></div></div>
                                                     <div class="skeleton-row"><div class="skeleton skeleton-text w-75"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-text w-33"></div></div>
@@ -1335,7 +1336,7 @@
             }
 
             if (!filtered.length) {
-                container.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay trabajos que coincidan con el filtro.</td></tr>';
+                container.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No hay trabajos que coincidan con el filtro.</td></tr>';
                 return;
             }
 
@@ -1376,11 +1377,25 @@
                     scoreDisplay = `<span class="avg-score-ring ${cls}">${scoreInfo.avg}</span>`;
                 }
 
+                const evaluatorItems = wAssignments.map(a => {
+                    const name = a.user_profiles?.name || a.evaluators?.name || 'Evaluador';
+                    const isCompleted = a.status === 'completed';
+                    const score = isCompleted ? getScoreFromAssignment(a) : null;
+                    return `<li class="eval-name-item ${isCompleted ? 'done' : 'pending'}">
+                        <span class="eval-name-dot">${isCompleted ? '✓' : ''}</span>
+                        <span class="eval-name-text">${name}</span>
+                        ${score != null ? `<span class="eval-name-score">${score}</span>` : ''}
+                    </li>`;
+                }).join('');
+
                 const evalLabel = !wAssignments.length
                     ? '<span class="text-muted small">Sin asignar</span>'
-                    : `<div class="eval-progress-track">${dots}<span class="eval-progress-label ms-1">${completed}/${wAssignments.length}</span></div><button class="btn btn-link btn-sm p-0 mt-1 small" onclick="showEvaluatorsModal('${w.id}')">Ver evaluadores</button>`;
+                    : `<ul class="eval-names-list">${evaluatorItems}</ul>
+                        <div class="eval-progress-track mt-1">${dots}<span class="eval-progress-label ms-1">${completed}/${wAssignments.length}</span>
+                        <button class="btn btn-link btn-sm p-0 ms-auto small" onclick="showEvaluatorsModal('${w.id}')">Detalle</button></div>`;
 
                 return `<tr>
+                    <td class="work-id-cell"><span class="work-id" title="ID del trabajo">${w.id}</span></td>
                     <td>
                         <div class="fw-semibold small">${w.title}</div>
                         <div class="text-muted" style="font-size:0.75rem;">${w.student_name || ''}</div>
