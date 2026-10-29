@@ -1395,7 +1395,7 @@
                         <button class="btn btn-link btn-sm p-0 ms-auto small" onclick="showEvaluatorsModal('${w.id}')">Detalle</button></div>`;
 
                 return `<tr>
-                    <td class="work-id-cell"><span class="work-id" title="ID del trabajo">${w.id}</span></td>
+                    <td class="work-id-cell"><span class="work-id" title="ID corto del trabajo">${w.short_id || w.id}</span></td>
                     <td>
                         <div class="fw-semibold small">${w.title}</div>
                         <div class="text-muted" style="font-size:0.75rem;">${w.student_name || ''}</div>
