@@ -508,6 +508,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ---- FILTER BAR (admin dashboard) ---- */
 #evalFilterBar { background: var(--bg); border-radius: var(--radius) var(--radius) 0 0; }
 #evalFilterBar .btn-sm { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 6px; }
+#evalFilterBar select.form-select-sm { font-size: 0.75rem; padding: 0.2rem 1.75rem 0.2rem 0.6rem; border-radius: 6px; }
 #evalFilterBar .active-filter { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff !important; }
 
 /* ---- SIDEBAR SECTIONS ---- */
@@ -1365,6 +1366,7 @@ body.has-bottom-nav { padding-bottom: 64px; }
     padding-bottom: 4px;
   }
   #evalFilterBar .btn { white-space: nowrap; flex-shrink: 0; font-size: 0.68rem; padding: 3px 8px; }
+  #evalFilterBar select.form-select-sm { flex-shrink: 0; font-size: 0.68rem; padding-top: 3px; padding-bottom: 3px; }
 
   /* Footer hidden in app mode */
   .footer-institutional { display: none; }
