@@ -1485,9 +1485,14 @@ function doPost(e) {
 
     else if (data.action === 'generateCertificates') {
       const work = getSheetData(db, 'works').find(w => w.id === data.work_id);
+      if (!work) throw new Error('Trabajo no encontrado.');
+      const student = getSheetData(db, 'users').find(u => u.id === work.student_id);
       const prof = getAsesores(work) || "No asignado";
-      const url = crearSlideEditable(work, prof, "Participación");
-      result = { success: true, fileUrl: url };
+      // Si el trabajo es ganador, la constancia debe indicar su lugar (1er/2do/3er);
+      // "Participación" queda solo para los trabajos que no están en el Top 3.
+      const lugar = lugarDeGanador_(db, work.id);
+      const url = crearSlideEditable({ ...work, student_name: student ? student.name : '' }, prof, lugar);
+      result = { success: true, fileUrl: url, lugar: lugar };
     }
 
     else if (data.action === 'generatePremiacionMasiva') {
@@ -1613,18 +1618,29 @@ function obtenerGanadores(db) {
   return { oral, poster };
 }
 
-function generarPremiacionMasiva(db) {
-  db = db || SpreadsheetApp.getActiveSpreadsheet();
+// Lista de ganadores con la etiqueta de su lugar (1er/2do/3er) y modalidad.
+function obtenerGanadoresConLugar(db) {
   const { oral, poster } = obtenerGanadores(db);
   const ordinal = ['1er', '2do', '3er'];
-
-  const listaGanadores = [];
+  const lista = [];
   oral.forEach((w, i) => {
-    listaGanadores.push({ w, l: `${ordinal[i] || (i + 1) + 'º'} Lugar Ponencia Oral` });
+    lista.push({ w, l: `${ordinal[i] || (i + 1) + 'º'} Lugar Ponencia Oral` });
   });
   poster.forEach(w => {
-    listaGanadores.push({ w, l: `${ordinal[w.poster_rank] || (w.poster_rank + 1) + 'º'} Lugar Cartel — ${w.facultad}` });
+    lista.push({ w, l: `${ordinal[w.poster_rank] || (w.poster_rank + 1) + 'º'} Lugar Cartel — ${w.facultad}` });
   });
+  return lista;
+}
+
+// Lugar de un trabajo dentro de la premiación vigente. Si no es ganador, "Participación".
+function lugarDeGanador_(db, workId) {
+  const ganador = obtenerGanadoresConLugar(db).find(g => String(g.w.id) === String(workId));
+  return ganador ? ganador.l : 'Participación';
+}
+
+function generarPremiacionMasiva(db) {
+  db = db || SpreadsheetApp.getActiveSpreadsheet();
+  const listaGanadores = obtenerGanadoresConLugar(db);
 
   if (listaGanadores.length === 0) {
     Logger.log('⚠️ No hay ganadores con puntaje para generar reconocimientos.');
@@ -1664,6 +1680,27 @@ function formatearAsesores(profesor) {
   return lista.length ? lista.join('\n') : 'No asignado';
 }
 
+// Nombre normalizado para comparar integrantes sin distinguir mayúsculas ni acentos.
+function normalizarNombre_(nombre) {
+  return String(nombre || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ').trim().toUpperCase();
+}
+
+// Integrantes que aparecen en la constancia: todos los registrados en el trabajo.
+// Si el autor que subió el trabajo no viene en team_members, se agrega para no omitirlo.
+function formatearIntegrantes(work) {
+  const lista = String((work && work.team_members) || '')
+    .split(',').map(s => s.trim()).filter(Boolean);
+
+  const autor = String((work && work.student_name) || '').trim();
+  const autorValido = autor && !/^(N\/A|DESCONOCIDO|DESCONOCIDA|NO ASIGNADO)$/i.test(autor);
+  if (autorValido && !lista.some(n => normalizarNombre_(n) === normalizarNombre_(autor))) {
+    lista.unshift(autor);
+  }
+  return lista.length ? lista.join(', ') : 'No asignado';
+}
+
 function crearSlideEditable(work, profesor, lugarTexto, folderId) {
   return crearSlideFile(work, profesor, lugarTexto, folderId).getUrl();
 }
@@ -1674,11 +1711,11 @@ function crearSlideFile(work, profesor, lugarTexto, folderId) {
   const copy = DriveApp.getFileById(TEMPLATE_ID).makeCopy(`EDITABLE: ${lugarTexto} - ${work.short_id}`, folder);
   const pres = SlidesApp.openById(copy.getId());
 
-  pres.replaceAllText('{{INTEGRANTES}}', work.team_members);
-  pres.replaceAllText('{{TITULO}}', work.title);
+  pres.replaceAllText('{{INTEGRANTES}}', formatearIntegrantes(work));
+  pres.replaceAllText('{{TITULO}}', String(work.title || 'Sin título'));
   pres.replaceAllText('{{PROFESOR}}', formatearAsesores(profesor));
   pres.replaceAllText('{{MODALIDAD}}', work.status === 'accepted_oral' ? 'Ponencia Oral' : 'Cartel');
-  pres.replaceAllText('{{LUGAR}}', lugarTexto);
+  pres.replaceAllText('{{LUGAR}}', String(lugarTexto || 'Participación'));
   pres.replaceAllText('{{FECHA}}', fechaActualTexto());
   pres.saveAndClose();
   return copy;
@@ -1727,8 +1764,8 @@ function generarPdfGlobal(lista, folderId) {
   lista.forEach((g, i) => {
     const profesor = getAsesores(g.w) || "No asignado";
     const campos = {
-      '{{INTEGRANTES}}': g.w.team_members,
-      '{{TITULO}}': g.w.title,
+      '{{INTEGRANTES}}': formatearIntegrantes(g.w),
+      '{{TITULO}}': String(g.w.title || 'Sin título'),
       '{{PROFESOR}}': formatearAsesores(profesor),
       '{{MODALIDAD}}': g.w.status === 'accepted_oral' ? 'Ponencia Oral' : 'Cartel',
       '{{LUGAR}}': g.l,

@@ -57,7 +57,7 @@ El sistema determina los ganadores automáticamente a partir del puntaje de Fase
 El administrador los revisa en la pestaña **Fase 2** del panel, donde puede generar las constancias:
 
 1. Ver las tarjetas de **Top 3 Ponencia Oral (General)** y **Top 3 Cartel** por facultad.
-2. Generar la constancia individual de cada ganador con el botón **Constancia**.
+2. Generar la constancia individual de cada ganador con el botón **Constancia**. La constancia indica el lugar obtenido (`1er/2do/3er Lugar Ponencia Oral` o `1er/2do/3er Lugar Cartel — <facultad>`) y la lista de integrantes registrados en el trabajo.
 3. Para generar todos los reconocimientos de una sola vez, usar el botón **Generar premiación masiva** de la pestaña **Fase 2** (o ejecutar `generarPremiacionMasiva()` en el editor de Apps Script). Por cada ganador se crea:
    - El **editable** de Slides (`EDITABLE: …`).
    - Un **PDF individual** (`PDF: …`).

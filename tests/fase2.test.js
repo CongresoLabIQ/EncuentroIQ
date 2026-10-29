@@ -236,6 +236,19 @@ function run(t) {
   t.equal(util.formatearAsesores(null), 'No asignado', 'null seguro');
   t.equal(util.formatearAsesores('Asesor de Prueba'), 'Asesor de Prueba', 'un solo asesor sin cambios');
 
+  t.group('formatearIntegrantes (constancias)');
+  t.equal(util.formatearIntegrantes({ team_members: 'Ana, Luis' }), 'Ana, Luis', 'conserva a todos los integrantes');
+  t.equal(util.formatearIntegrantes({ team_members: 'Ana, Luis', student_name: 'Pedro' }), 'Pedro, Ana, Luis',
+    'agrega al autor si no venía en la lista');
+  t.equal(util.formatearIntegrantes({ team_members: 'ANA PÉREZ, Luis', student_name: 'Ana Perez' }), 'ANA PÉREZ, Luis',
+    'no duplica al autor (sin distinguir mayúsculas ni acentos)');
+  t.equal(util.formatearIntegrantes({ team_members: '', student_name: 'Ana Pérez' }), 'Ana Pérez',
+    'si no hay integrantes usa al autor');
+  t.equal(util.formatearIntegrantes({ team_members: '', student_name: 'N/A' }), 'No asignado',
+    'ignora nombres placeholder');
+  t.equal(util.formatearIntegrantes({}), 'No asignado', 'vacío: No asignado');
+  t.equal(util.formatearIntegrantes(null), 'No asignado', 'null seguro');
+
   // ===================== Silencio =====================
   t.group('Silencio');
   t.equal(notifications.length, 0, 'ningún correo/push/fetch durante las pruebas');

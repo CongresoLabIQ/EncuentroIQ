@@ -93,7 +93,26 @@ function run(t) {
   const single = post(sandbox, { action: 'generateCertificates', work_id: 'FQ-POSTER-0' });
   t.equal(single.success, true, 'generateCertificates responde success');
   t.ok(/^https:\/\/docs\.google\.com\/presentation\//.test(single.fileUrl || ''), 'devuelve la URL del archivo');
+  t.equal(single.lugar, 'Participación', 'un trabajo fuera del Top 3 dice Participación');
   t.equal(drive.copies.filter(c => c.replacements['{{LUGAR}}'] === 'Participación').length, 1, 'se crea una constancia adicional (Participación)');
+
+  t.group('Constancia de un ganador');
+  const primerLugar = res.data.poster[0];
+  const lugarEsperado = '1er Lugar Cartel — ' + primerLugar.facultad;
+  const ganadora = post(sandbox, { action: 'generateCertificates', work_id: primerLugar.id });
+  t.equal(ganadora.success, true, 'generateCertificates responde para un ganador');
+  t.equal(ganadora.lugar, lugarEsperado, 'devuelve el lugar real del ganador');
+  const copiaGanadora = drive.copies
+    .filter(c => c.name === `EDITABLE: ${lugarEsperado} - ${primerLugar.short_id}`)
+    .pop();
+  t.ok(copiaGanadora, 'nombra el archivo con el lugar del ganador');
+  t.equal(copiaGanadora.replacements['{{LUGAR}}'], lugarEsperado, 'el placeholder LUGAR lleva el 1er lugar');
+  t.ok(String(copiaGanadora.replacements['{{INTEGRANTES}}']).includes('Equipo ' + primerLugar.id),
+    'incluye a los integrantes registrados del trabajo');
+
+  const oral = res.data.oral[0];
+  const oralGanadora = post(sandbox, { action: 'generateCertificates', work_id: oral.id });
+  t.equal(oralGanadora.lugar, '1er Lugar Ponencia Oral', 'la ponencia ganadora indica 1er lugar');
 
   // ---------------------------------------------------------- Endpoint de premiación (botón del admin)
   t.group('Endpoint generatePremiacionMasiva (admin)');

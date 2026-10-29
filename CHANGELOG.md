@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.1] — 2026-10-29
+
+### Fixed
+- **Constancia individual de ganadores:** el botón **Constancia** de las tarjetas de Fase 2 generaba un reconocimiento con el texto **"Participación"** en el lugar, aunque el trabajo fuera 1.º, 2.º o 3.er lugar. Ahora usa el lugar real (`1er/2do/3er Lugar Ponencia Oral` o `1er/2do/3er Lugar Cartel — <facultad>`) y nombra el archivo con ese lugar. Solo los trabajos fuera del Top 3 conservan "Participación".
+- **Integrantes en las constancias:** se muestran todos los integrantes registrados en el trabajo y, si el autor que subió el trabajo no viene en `team_members`, se agrega para no omitirlo (sin duplicarlo por mayúsculas/acentos). Las tarjetas de ganadores del admin muestran la misma lista de integrantes que aparecerá en la constancia.
+- **Valores vacíos:** la generación tolera títulos, integrantes o asesores vacíos sin escribir "undefined" en la plantilla.
+- **Pruebas:** `premiacion.test.js` valida que la constancia de un ganador lleve el lugar correcto y `fase2.test.js` cubre `formatearIntegrantes` (830 aserciones en total).
+
 ## [1.12.0] — 2026-10-27
 
 ### Added
