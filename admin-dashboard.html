@@ -191,7 +191,7 @@
                                             <th style="width:110px;">ID</th>
                                             <th style="min-width:200px;">Trabajo</th>
                                             <th>Semestre</th>
-                                            <th>Tipo</th>
+                                            <th>Facultad</th>
                                             <th style="width:240px;">Evaluadores</th>
                                             <th style="width:80px;">Promedio</th>
                                             <th style="width:130px;">Estatus</th>
@@ -926,6 +926,7 @@
     <script src="js/evaluation-assignment.js"></script>
     <script>
         let allWorks = [], pendingWorks = [], readyWorksCache = [], allAssignmentsCache = [];
+        let liveAssignmentsCache = [], liveEvaluatorsCache = [], liveAssignmentsSig = '';
         let evalFilter = { status: 'all', modality: 'all', sortBy: 'default' };
         let assignmentSystem = new EvaluationAssignment();
         let progressModal = null;
@@ -1096,6 +1097,13 @@
                 const data = await window.apiClient.getLiveAdminDashboard();
                 if (!data) return;
                 liveData = data;
+                liveAssignmentsCache = data.liveAssignments || [];
+                liveEvaluatorsCache = data.evaluators || [];
+                const sig = liveSignature(liveAssignmentsCache, liveEvaluatorsCache);
+                if (sig !== liveAssignmentsSig) {
+                    liveAssignmentsSig = sig;
+                    if (allWorks.length) renderEvaluationProgress();
+                }
                 renderHelpRequests(data.helpRequests || []);
                 renderEvaluatorActivity(data.evaluators || []);
                 const map = document.getElementById('mapSection');
@@ -1259,13 +1267,20 @@
 
         async function loadAdminDashboard() {
             try {
-                const [works, assignments] = await Promise.all([
+                const [works, assignments, live] = await Promise.all([
                     window.apiClient.getAllWorks(),
-                    window.apiClient.getAssignments()
+                    window.apiClient.getAssignments(),
+                    window.apiClient.getLiveAdminDashboard().catch(() => null)
                 ]);
                 allWorks = works;
                 pendingWorks = works.filter(w => w.status === 'pending');
                 allAssignmentsCache = assignments;
+                if (live) {
+                    liveData = live;
+                    liveAssignmentsCache = live.liveAssignments || [];
+                    liveEvaluatorsCache = live.evaluators || [];
+                    liveAssignmentsSig = liveSignature(liveAssignmentsCache, liveEvaluatorsCache);
+                }
                 updateStats();
                 calculateReadyWorks();
                 renderDashboard();
@@ -1285,12 +1300,39 @@
             document.getElementById('dashboardUpdated').textContent = 'actualizado ' + new Date().toLocaleTimeString();
         }
 
-        function getAvgScoreForWork(workId) {
-            const workAssignments = allAssignmentsCache.filter(a => a.work_id === workId && a.status === 'completed');
-            const scores = workAssignments
+        function liveSignature(assignments, evaluators) {
+            const a = (assignments || []).map(x => `${x.id}:${x.work_id}:${x.evaluator_id}:${x.status}`).join('|');
+            const e = (evaluators || []).map(x => `${x.id}:${x.name}`).join(',');
+            return a + '#' + e;
+        }
+
+        // Asignaciones vigentes de un trabajo: si ya tiene evaluadores de la fase
+        // presencial (live_assignments) se usan esos; si no, los de la fase 1.
+        function getWorkAssignments(workId) {
+            const live = liveAssignmentsCache.filter(a => String(a.work_id) === String(workId));
+            if (live.length) {
+                const evById = {};
+                liveEvaluatorsCache.forEach(e => { evById[String(e.id)] = e; });
+                return live.map(a => ({
+                    ...a,
+                    is_live: true,
+                    status: a.status === 'completed' ? 'completed' : 'pending',
+                    user_profiles: evById[String(a.evaluator_id)] || null
+                }));
+            }
+            return allAssignmentsCache.filter(a => String(a.work_id) === String(workId));
+        }
+
+        function calcAvgScore(assignments) {
+            const completed = assignments.filter(a => a.status === 'completed');
+            const scores = completed
                 .map(a => parseFloat(getScoreFromAssignment(a)))
                 .filter(s => !isNaN(s));
-            return scores.length ? { avg: (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1), count: scores.length, total: workAssignments.length } : null;
+            return scores.length ? { avg: (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1), count: scores.length, total: completed.length } : null;
+        }
+
+        function getAvgScoreForWork(workId) {
+            return calcAvgScore(allAssignmentsCache.filter(a => String(a.work_id) === String(workId)));
         }
 
         function setEvalFilter(key, value) {
@@ -1341,21 +1383,17 @@
             }
 
             container.innerHTML = filtered.map(w => {
-                const wAssignments = allAssignmentsCache.filter(a => a.work_id === w.id);
+                const wAssignments = getWorkAssignments(w.id);
                 const completed = wAssignments.filter(a => a.status === 'completed').length;
                 const scoreInfo = getAvgScoreForWork(w.id);
 
-                const dots = [0, 1, 2].map(i => {
+                const totalSlots = Math.max(wAssignments.length, 3);
+                const dots = Array.from({ length: totalSlots }, (_, i) => {
                     if (!wAssignments.length) return `<span class="eval-dot pending">-</span>`;
                     if (i < completed) return `<span class="eval-dot done">✓</span>`;
                     if (wAssignments.length > i) return `<span class="eval-dot active">${i + 1}</span>`;
                     return `<span class="eval-dot pending">${i + 1}</span>`;
                 }).join('');
-
-                const isOral = w.modality === 'Oral' || w.modality === 'Ponencia' || w.status === 'accepted_oral';
-                const typeBadge = isOral
-                    ? '<span class="badge badge-oral">Oral</span>'
-                    : '<span class="badge badge-poster">Cartel</span>';
 
                 let statusBadge = '';
                 if (w.status === 'pending') {
@@ -1401,7 +1439,7 @@
                         <div class="text-muted" style="font-size:0.75rem;">${w.student_name || ''}</div>
                     </td>
                     <td class="small">${w.semester || '—'}</td>
-                    <td>${typeBadge}</td>
+                    <td class="small">${w.facultad || '—'}</td>
                     <td>${evalLabel}</td>
                     <td>${scoreDisplay}</td>
                     <td>${statusBadge}</td>
@@ -1440,9 +1478,9 @@
 
         function showEvaluatorsModal(workId) {
             const work = allWorks.find(w => w.id === workId);
-            const workAssignments = allAssignmentsCache.filter(a => a.work_id === workId);
+            const workAssignments = getWorkAssignments(workId);
             const completed = workAssignments.filter(a => a.status === 'completed').length;
-            const scoreInfo = getAvgScoreForWork(workId);
+            const scoreInfo = calcAvgScore(workAssignments);
 
             const evalNames = workAssignments.length
                 ? workAssignments.map(a => {
